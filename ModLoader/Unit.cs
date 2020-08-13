@@ -1,20 +1,26 @@
-﻿namespace ModLoader
+﻿using System.Threading.Tasks;
+
+namespace ModLoader
 {
     public abstract class Unit<T>
         where T : Unit<T>
     {
         public string Name { get; }
 
-        public abstract T Fallback { get; set; }
-        public abstract bool Enabled { get; set; }
+        public virtual Unit<T> Fallback { get; set; }
+        public virtual bool Enabled { get; set; }
 
         public Unit(string name)
         {
             Name = name;
         }
 
-        public virtual bool ConflictsWith(T other) => Name == other.Name;
+        public T Resolve() => Enabled ? ResolveSelf() : Fallback.Resolve();
+        public Task LoadAsync() => Resolve()?.LoadSelfAsync();
 
-        public virtual T Resolve() => Enabled ? this as T : Fallback.Resolve();
+        public abstract bool ConflictsWith(T other);
+
+        protected abstract T ResolveSelf();
+        protected abstract Task LoadSelfAsync();
     }
 }

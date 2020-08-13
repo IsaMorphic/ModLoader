@@ -1,32 +1,42 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ModLoader
 {
     public class Conflict<T> : Merger<T>
         where T : Unit<T>
     {
-        public override T Fallback { get => null; set => throw new NotImplementedException(); }
-        public override bool Enabled { get => true; set => throw new NotImplementedException(); }
+        public T Instigator { get; }
 
-        public Conflict(string name, HashSet<T> mergers) : base(name, mergers)
+        public override Unit<T> Fallback
+        {
+            get => Instigator;
+            set => throw new NotSupportedException();
+        }
+
+        public override bool Enabled { get; set; }
+
+        public Conflict(string name, T instigator, HashSet<T> mergers) : base(name, mergers)
+        {
+            Instigator = instigator;
+        }
+
+        public Conflict(string name, T instigator) : this(name, instigator, new HashSet<T>())
         {
         }
 
-        public override T Resolve()
+        public override bool ConflictsWith(T other) => throw new NotSupportedException();
+
+        protected override T ResolveSelf()
         {
-            try
-            {
-                return Mergers
-                    .Select(m => m.Resolve())
-                    .Where(m => m != null)
-                    .Single();
-            }
-            catch (InvalidOperationException)
-            {
-                throw new ConflictException<T>(new HashSet<Conflict<T>> { this });
-            }
+            return Mergers
+                .Select(m => m.Resolve())
+                .Where(m => m != null)
+                .SingleOrDefault();
         }
+
+        protected override Task LoadSelfAsync() => throw new NotSupportedException();
     }
 }

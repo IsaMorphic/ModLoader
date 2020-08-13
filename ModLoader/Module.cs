@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ModLoader
 {
@@ -9,15 +10,28 @@ namespace ModLoader
 
         public Stream Data { get; }
 
-        public override Module Fallback { get => Parent.Fallback.Members.Single(m => m.Name == Name); set => throw new System.NotImplementedException(); }
+        public override Unit<Module> Fallback => 
+            Parent.Fallback.Resolve().Members
+            .Single(m => m.Name == Name);
 
-        private bool _enabled = true;
-        public override bool Enabled { get => Parent.Enabled && _enabled; set => _enabled = value; }
+        public override bool Enabled => Parent.Enabled;
 
-        public Module(Pack parent, string name) : base(name)
+        public Module(string name, Pack parent) : base(name)
         {
             Parent = parent;
-            Data = Parent.Archive.GetEntry(name).Open();
+        }
+
+        public override bool ConflictsWith(Module other)
+        {
+            return Name == other.Name;
+        }
+
+        protected override Module ResolveSelf() => this;
+
+        protected override Task LoadSelfAsync()
+        {
+            var path = Path.Combine("");
+            Data.CopyToAsync();
         }
     }
 }

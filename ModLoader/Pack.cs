@@ -11,35 +11,14 @@ namespace ModLoader
 
         public ZipArchive Archive { get; }
 
-        public override Pack Fallback { get; set; }
-        public override bool Enabled { get; set; } = true;
-
-        public Pack(string name, HashSet<Module> modules) : base(name, modules)
+        public Pack() : this("_none_", new HashSet<Unit<Module>>(), null)
         {
         }
 
-        public Pack(string name, PackGroup parent) : base(name, new HashSet<Module>())
+        public Pack(string name, HashSet<Unit<Module>> modules, PackGroup parent) : base(name, modules)
         {
-            Parent = parent;
-
-            string path = Path.Combine(Parent.BaseDirectory, "Mods", $"{name}.zip");
-            Archive = new ZipArchive(File.OpenRead(path));
-
-            foreach (var entry in Archive.Entries)
-            {
-                var ext = Path.GetExtension(entry.FullName);
-                var fname = Path.GetFileNameWithoutExtension(entry.FullName);
-
-                Module module;
-                switch (ext.ToLower())
-                {
-                    default:
-                        module = new Module(this, fname);
-                        break;
-                }
-
-                Members.Add(module);
-            }
         }
+
+        protected override Pack ResolveSelf() => this;
     }
 }

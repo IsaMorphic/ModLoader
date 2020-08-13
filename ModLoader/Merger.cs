@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace ModLoader
 {
@@ -9,7 +10,9 @@ namespace ModLoader
 
         public Merger(string name, HashSet<T> mergers) : base(name)
         {
-            Mergers = new HashSet<T>(mergers);
+            Mergers = mergers;
         }
+
+        public bool Empty() => Mergers.Any();
     }
 }
