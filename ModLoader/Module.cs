@@ -1,23 +1,23 @@
 ﻿using System.IO;
+using System.Linq;
 
 namespace ModLoader
 {
-    public abstract class Module : Unit
+    public class Module : Unit<Module>
     {
-        public new Pack Parent => base.Parent as Pack;
-
-        public PackList PackList => Parent.Parent;
-
-        public Module(Pack parent, string name) : base(parent, name)
-        {
-            Data = Parent.Archive.GetEntry(name).Open();
-        }
+        public Pack Parent { get; }
 
         public Stream Data { get; }
 
-        public virtual bool ConflictsWith(Module module)
+        public override Module Fallback { get => Parent.Fallback.Members.Single(m => m.Name == Name); set => throw new System.NotImplementedException(); }
+
+        private bool _enabled = true;
+        public override bool Enabled { get => Parent.Enabled && _enabled; set => _enabled = value; }
+
+        public Module(Pack parent, string name) : base(name)
         {
-            return Name == module.Name;
+            Parent = parent;
+            Data = Parent.Archive.GetEntry(name).Open();
         }
     }
 }

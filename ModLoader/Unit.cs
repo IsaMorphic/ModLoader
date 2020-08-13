@@ -1,26 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ModLoader
+﻿namespace ModLoader
 {
-    public abstract class Unit
+    public abstract class Unit<T>
+        where T : Unit<T>
     {
-        public Guid Id { get; }
         public string Name { get; }
 
-        public Unit Parent { get; }
+        public abstract T Fallback { get; set; }
+        public abstract bool Enabled { get; set; }
 
-        public Unit(Unit parent, string name)
+        public Unit(string name)
         {
-            Id = Guid.NewGuid();
             Name = name;
-
-            Parent = parent;
         }
 
-        public abstract Task Load();
+        public virtual bool ConflictsWith(T other) => Name == other.Name;
+
+        public virtual T Resolve() => Enabled ? this as T : Fallback.Resolve();
     }
 }

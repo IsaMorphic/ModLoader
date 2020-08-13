@@ -1,18 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Threading.Tasks;
+using System.Linq;
 
 namespace ModLoader
 {
-    public class Pack : Unit
+    public class Pack : Group<Pack, Module>
     {
-        public new PackList Parent => base.Parent as PackList;
+        public PackGroup Parent { get; }
 
-        public Pack(PackList parent, string name) : base(parent, name)
+        public ZipArchive Archive { get; }
+
+        public override Pack Fallback { get; set; }
+        public override bool Enabled { get; set; } = true;
+
+        public Pack(string name, HashSet<Module> modules) : base(name, modules)
         {
-            string path = Path.Combine(parent.BaseDirectory, "Mods", $"{name}.zip");
+        }
+
+        public Pack(string name, PackGroup parent) : base(name, new HashSet<Module>())
+        {
+            Parent = parent;
+
+            string path = Path.Combine(Parent.BaseDirectory, "Mods", $"{name}.zip");
             Archive = new ZipArchive(File.OpenRead(path));
 
             foreach (var entry in Archive.Entries)
@@ -23,28 +33,13 @@ namespace ModLoader
                 Module module;
                 switch (ext.ToLower())
                 {
-                    case "patch":
-                        module = new Patch(this, fname);
-                        break;
-                    case "diff":
-                        module = null; // Placeholder
-                        break;
                     default:
-                        module = new Replacement(this, fname);
+                        module = new Module(this, fname);
                         break;
                 }
 
-                Modules.Add(module.Name, module);
+                Members.Add(module);
             }
-        }
-
-        public ZipArchive Archive { get; }
-
-        public Dictionary<string, Module> Modules { get; }
-
-        public override Task Load()
-        {
-            throw new NotImplementedException();
         }
     }
 }
