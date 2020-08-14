@@ -22,7 +22,7 @@ namespace ModLoader
             {
                 foreach (var theirMember in other.Members)
                 {
-                    if (myMember.Resolve().ConflictsWith(theirMember.Resolve()))
+                    if ((myMember.Resolve()?.ConflictsWith(theirMember.Resolve())).GetValueOrDefault())
                     {
                         return true;
                     }

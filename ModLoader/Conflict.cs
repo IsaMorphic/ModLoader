@@ -18,12 +18,12 @@ namespace ModLoader
 
         public override bool Enabled { get; set; }
 
-        public Conflict(string name, T instigator, HashSet<T> mergers) : base(name, mergers)
+        public Conflict(T instigator, HashSet<T> mergers) : base("(conflict)", mergers)
         {
             Instigator = instigator;
         }
 
-        public Conflict(string name, T instigator) : this(name, instigator, new HashSet<T>())
+        public Conflict(T instigator) : this(instigator, new HashSet<T>())
         {
         }
 

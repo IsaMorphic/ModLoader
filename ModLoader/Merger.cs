@@ -13,6 +13,6 @@ namespace ModLoader
             Mergers = mergers;
         }
 
-        public bool Empty() => Mergers.Any();
+        public bool Empty() => !Mergers.Any();
     }
 }

@@ -17,12 +17,12 @@ namespace ModLoader
         class ConflictedUnit
         {
             public U Unit { get; }
-            public HashSet<U> Conflictors { get; set; }
+            public HashSet<ConflictedUnit> Conflictors { get; set; }
 
             public ConflictedUnit(U unit)
             {
                 Unit = unit;
-                Conflictors = new HashSet<U>();
+                Conflictors = new HashSet<ConflictedUnit>();
             }
         }
 
@@ -42,22 +42,22 @@ namespace ModLoader
 
             foreach (var thisUnit in modules)
             {
-                Conflict<U> conflict = new Conflict<U>(thisUnit.Unit.Name, thisUnit.Unit);
+                Conflict<U> conflict = new Conflict<U>(thisUnit.Unit);
 
-                foreach (var otherUnit in modules.Where(u => !u.Conflictors.Contains(thisUnit.Unit)))
+                foreach (var otherUnit in modules.Where(u => !u.Conflictors.Contains(thisUnit) && u != thisUnit))
                 {
                     if (thisUnit.Unit.ConflictsWith(otherUnit.Unit))
                     {
-                        thisUnit.Conflictors.Add(otherUnit.Unit);
-                        otherUnit.Conflictors.Add(thisUnit.Unit);
+                        thisUnit.Conflictors.Add(otherUnit);
+                        otherUnit.Conflictors.Add(thisUnit);
 
                         conflict.Mergers.Add(otherUnit.Unit);
                     }
                 }
 
-                if (conflict.Empty())
+                if (!thisUnit.Conflictors.Any())
                     merged.Add(thisUnit.Unit);
-                else
+                else if(!conflict.Empty())
                     merged.Add(conflict);
             }
 
