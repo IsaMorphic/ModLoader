@@ -12,13 +12,13 @@ namespace ModLoader
 
         public override Unit<T> Fallback
         {
-            get => Instigator;
+            get => null;
             set => throw new NotSupportedException();
         }
 
         public override bool Enabled { get; set; }
 
-        public Conflict(T instigator, HashSet<T> mergers) : base("(conflict)", mergers)
+        public Conflict(T instigator, HashSet<T> mergers) : base("_none_", mergers)
         {
             Instigator = instigator;
         }
@@ -38,5 +38,10 @@ namespace ModLoader
         }
 
         protected override Task LoadSelfAsync() => throw new NotSupportedException();
+
+        public override string ToString()
+        {
+            return $"(CONFLICT) {Instigator.Name}";
+        }
     }
 }

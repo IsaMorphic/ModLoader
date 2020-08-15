@@ -42,10 +42,10 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.RunGameButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
-            this.ModuleList = new System.Windows.Forms.ListBox();
             this.ChangeGroup = new System.Windows.Forms.GroupBox();
             this.ConflictList = new System.Windows.Forms.CheckedListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.ModuleList = new System.Windows.Forms.CheckedListBox();
             this.ModuleGroup.SuspendLayout();
             this.PackGroup.SuspendLayout();
             this.NoteGroup.SuspendLayout();
@@ -58,10 +58,10 @@
             // 
             // ChangeList
             // 
-            this.ChangeList.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ChangeList.FormattingEnabled = true;
             this.ChangeList.HorizontalScrollbar = true;
-            this.ChangeList.ItemHeight = 25;
+            this.ChangeList.IntegralHeight = false;
+            this.ChangeList.ItemHeight = 29;
             this.ChangeList.Location = new System.Drawing.Point(8, 36);
             this.ChangeList.Margin = new System.Windows.Forms.Padding(5);
             this.ChangeList.Name = "ChangeList";
@@ -113,10 +113,10 @@
             // 
             // PackList
             // 
-            this.PackList.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.PackList.FormattingEnabled = true;
             this.PackList.HorizontalScrollbar = true;
-            this.PackList.ItemHeight = 25;
+            this.PackList.IntegralHeight = false;
+            this.PackList.ItemHeight = 29;
             this.PackList.Location = new System.Drawing.Point(8, 36);
             this.PackList.Margin = new System.Windows.Forms.Padding(5);
             this.PackList.Name = "PackList";
@@ -203,18 +203,6 @@
             this.LoadButton.Text = "Load All Mods";
             this.LoadButton.UseVisualStyleBackColor = true;
             // 
-            // ModuleList
-            // 
-            this.ModuleList.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ModuleList.FormattingEnabled = true;
-            this.ModuleList.HorizontalScrollbar = true;
-            this.ModuleList.ItemHeight = 25;
-            this.ModuleList.Location = new System.Drawing.Point(8, 36);
-            this.ModuleList.Margin = new System.Windows.Forms.Padding(5);
-            this.ModuleList.Name = "ModuleList";
-            this.ModuleList.Size = new System.Drawing.Size(811, 304);
-            this.ModuleList.TabIndex = 1;
-            // 
             // ChangeGroup
             // 
             this.ChangeGroup.Controls.Add(this.ConflictList);
@@ -227,15 +215,14 @@
             // 
             // ConflictList
             // 
-            this.ConflictList.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ConflictList.FormattingEnabled = true;
             this.ConflictList.HorizontalScrollbar = true;
+            this.ConflictList.IntegralHeight = false;
             this.ConflictList.Location = new System.Drawing.Point(8, 32);
             this.ConflictList.Name = "ConflictList";
             this.ConflictList.Size = new System.Drawing.Size(543, 480);
             this.ConflictList.TabIndex = 0;
-            this.ConflictList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ConflictList_ItemCheck);
-            this.ConflictList.SelectedIndexChanged += new System.EventHandler(this.ChangeList_SelectedIndexChanged);
+            this.ConflictList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleList_ItemCheck);
             // 
             // groupBox2
             // 
@@ -246,6 +233,17 @@
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Modules";
+            // 
+            // ModuleList
+            // 
+            this.ModuleList.FormattingEnabled = true;
+            this.ModuleList.HorizontalScrollbar = true;
+            this.ModuleList.IntegralHeight = false;
+            this.ModuleList.Location = new System.Drawing.Point(8, 34);
+            this.ModuleList.Name = "ModuleList";
+            this.ModuleList.Size = new System.Drawing.Size(811, 308);
+            this.ModuleList.TabIndex = 1;
+            this.ModuleList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleList_ItemCheck);
             // 
             // MainForm
             // 
@@ -285,7 +283,6 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button RunGameButton;
         private System.Windows.Forms.Button LoadButton;
-        private System.Windows.Forms.ListBox ModuleList;
         private System.Windows.Forms.GroupBox ChangeGroup;
         private System.Windows.Forms.CheckBox EnabledCheckBox;
         private System.Windows.Forms.Label FallbackLabel;
@@ -295,6 +292,7 @@
         private System.Windows.Forms.GroupBox NoteGroup;
         private System.Windows.Forms.TextBox PackNotes;
         private System.Windows.Forms.CheckedListBox ConflictList;
+        private System.Windows.Forms.CheckedListBox ModuleList;
     }
 }
 
