@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -6,6 +7,8 @@ namespace ModLoader
 {
     public class Module : Unit<Module>
     {
+        public Guid Id { get; }
+
         public Pack Parent { get; }
         public PackGroup Root { get; }
 
@@ -21,8 +24,10 @@ namespace ModLoader
             set => base.Enabled = value; 
         }
 
-        public Module(string name, Pack parent) : base(name)
+        public Module(string name, Guid id, Pack parent) : base(name)
         {
+            Id = id;
+
             Parent = parent;
             Root = Parent.Parent;
 
@@ -36,10 +41,16 @@ namespace ModLoader
 
         protected override Module ResolveSelf() => this;
 
-        protected override Task LoadSelfAsync()
+        protected override async Task LoadSelfAsync()
         {
+            if (Root.Graph.Table[Name] == Id) return;
+
             var path = Path.Combine(Root.GamePath, Name);
-            return Data.CopyToAsync(File.OpenRead(path));
+
+            using (var stream = File.Create(path))
+                await Data.CopyToAsync(stream);
+
+            Root.Graph.Table[Name] = Id;
         }
 
         public override string ToString()

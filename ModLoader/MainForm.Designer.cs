@@ -203,6 +203,7 @@
             this.LoadButton.TabIndex = 0;
             this.LoadButton.Text = "Load All Mods";
             this.LoadButton.UseVisualStyleBackColor = true;
+            this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
             // 
             // ChangeGroup
             // 

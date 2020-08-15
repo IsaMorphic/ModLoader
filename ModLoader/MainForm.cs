@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -96,7 +91,7 @@ namespace ModLoader
 
         private void PackList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (Refreshing || PackList.SelectedItem == null) 
+            if (Refreshing || PackList.SelectedItem == null)
             {
                 PropGroup.Enabled = false;
                 return;
@@ -124,6 +119,7 @@ namespace ModLoader
             pack.Enabled = EnabledCheckBox.Checked;
 
             RefreshChangeList();
+            RefreshModuleList();
         }
 
         private void ModuleList_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -142,6 +138,16 @@ namespace ModLoader
         {
             var conflict = ChangeList.SelectedItem as Conflict<Module>;
             RefreshConflictPane(conflict);
+        }
+
+        private void LoadButton_Click(object sender, EventArgs e)
+        {
+            Mods.LoadAsync().ContinueWith(t =>
+            {
+                MessageBox.Show("Load operation completed!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            });
+
+            Mods.SaveConfig();
         }
     }
 }
