@@ -38,6 +38,8 @@ namespace ModLoader
                     .Select(m => new ConflictedUnit(m))
                     );
 
+            HashSet<ConflictedUnit> instigators = new HashSet<ConflictedUnit>();
+
             HashSet<Unit<U>> merged = new HashSet<Unit<U>>();
 
             foreach (var thisUnit in modules)
@@ -55,10 +57,16 @@ namespace ModLoader
                     }
                 }
 
-                if (!thisUnit.Conflictors.Any())
-                    merged.Add(thisUnit.Unit);
-                else if(!conflict.Empty())
-                    merged.Add(conflict);
+                if (!thisUnit.Conflictors.Intersect(instigators).Any())
+                {
+                    if (conflict.Empty())
+                        merged.Add(thisUnit.Unit);
+                    else
+                    {
+                        instigators.Add(thisUnit);
+                        merged.Add(conflict);
+                    }
+                }
             }
 
             var result = new T();

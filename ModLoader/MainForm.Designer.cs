@@ -138,6 +138,7 @@
             this.PropGroup.Controls.Add(this.EnabledCheckBox);
             this.PropGroup.Controls.Add(this.FallbackLabel);
             this.PropGroup.Controls.Add(this.comboBox1);
+            this.PropGroup.Enabled = false;
             this.PropGroup.Location = new System.Drawing.Point(577, 554);
             this.PropGroup.Name = "PropGroup";
             this.PropGroup.Size = new System.Drawing.Size(415, 164);

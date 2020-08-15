@@ -102,6 +102,8 @@ namespace ModLoader
                 return;
             }
 
+            PropGroup.Enabled = true;
+
             var pack = PackList.SelectedItem as Pack;
 
             EnabledCheckBox.Checked = pack.Enabled;
