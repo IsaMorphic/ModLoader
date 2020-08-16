@@ -3,6 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.IO.Compression;
+using System.Threading.Tasks;
 
 namespace ModLoader
 {
@@ -39,7 +40,7 @@ namespace ModLoader
             return this;
         }
 
-        public void Build()
+        public async Task BuildAsync()
         {
             ModuleGraph graph = new ModuleGraph();
 
@@ -50,21 +51,28 @@ namespace ModLoader
             {
                 foreach (var file in Directory.EnumerateFiles(Path, "*.*", SearchOption.AllDirectories))
                 {
+
                     var name = file.Replace(Path, "").Trim('\\');
-                    archive.CreateEntryFromFile(file, name);
+                    var entry = archive.CreateEntry(name);
+
+                    using (var fileStream = File.OpenRead(file))
+                    using (var entryStream = entry.Open())
+                    {
+                        await fileStream.CopyToAsync(entryStream);
+                    }
 
                     graph.Table.Add(name, Guid.NewGuid());
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())
-                    Bitmap.Save(entryStream, ImageFormat.Png);
+                    await Task.Run(() => Bitmap.Save(entryStream, ImageFormat.Png));
 
                 using (var entryStream = archive.CreateEntry("_pack.txt").Open())
                 using (var writer = new StreamWriter(entryStream))
-                    writer.Write(Note);
+                    await writer.WriteAsync(Note);
 
                 using (var entryStream = archive.CreateEntry("_pack.json").Open())
-                    graph.WriteToStream(entryStream);
+                    await graph.WriteToStreamAsync(entryStream);
             }
         }
 

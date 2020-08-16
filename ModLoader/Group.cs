@@ -33,7 +33,9 @@ namespace ModLoader
 
         protected override Task LoadSelfAsync()
         {
-            return Task.WhenAll(Members.Select(m => m.Resolve().LoadAsync()));
+            return Task.WhenAll(Members
+                .Select(m => m.Resolve()?.LoadAsync())
+                .Where(m => m != null));
         }
     }
 }

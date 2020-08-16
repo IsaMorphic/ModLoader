@@ -10,12 +10,11 @@ namespace ModLoader
     {
         private bool Refreshing { get; set; }
 
-        public PackGroup Mods { get; }
+        public PackGroup Mods { get; set; }
 
         public MainForm()
         {
             InitializeComponent();
-            Mods = new PackGroup(Environment.CurrentDirectory);
         }
 
         private void RefreshChangeList()
@@ -27,6 +26,8 @@ namespace ModLoader
             ChangeList.Items.AddRange(Mods.Resolve().Members.ToArray());
 
             ChangeList.SelectedItem = item;
+
+            RefreshConflictPane(ChangeList.SelectedItem as Conflict<Module>);
             Refreshing = false;
         }
 
@@ -60,6 +61,10 @@ namespace ModLoader
             PackList.Items.Clear();
             PackList.Items.AddRange(Mods.Mergers.ToArray());
 
+            FallbackSelect.Items.Clear();
+            FallbackSelect.Items.Add("");
+            FallbackSelect.Items.AddRange(Mods.Mergers.ToArray());
+
             PackList.SelectedItem = item;
             Refreshing = false;
         }
@@ -85,6 +90,10 @@ namespace ModLoader
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            Hide();
+            new LoaderForm(this).ShowDialog();
+            Show();
+
             RefreshPackList();
             RefreshChangeList();
         }
@@ -102,6 +111,7 @@ namespace ModLoader
             var pack = PackList.SelectedItem as Pack;
 
             EnabledCheckBox.Checked = pack.Enabled;
+            FallbackSelect.SelectedItem = pack.Fallback;
 
             RefreshModuleList();
 
@@ -140,14 +150,23 @@ namespace ModLoader
             RefreshConflictPane(conflict);
         }
 
-        private void LoadButton_Click(object sender, EventArgs e)
+        private async void LoadButton_Click(object sender, EventArgs e)
         {
-            Mods.LoadAsync().ContinueWith(t =>
-            {
-                MessageBox.Show("Load operation completed!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            });
+            await Mods.LoadAsync();
+            await Mods.ReloadBaseModulesAsync();
+            await Mods.SaveConfigAsync();
+            await Mods.SaveGraphAsync();
 
-            Mods.SaveConfig();
+            MessageBox.Show("Load operation completed!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void FallbackSelect_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var pack = PackList.SelectedItem as Pack;
+
+            pack.Fallback = FallbackSelect.SelectedItem as Pack;
+
+            RefreshChangeList();
         }
     }
 }

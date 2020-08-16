@@ -16,11 +16,13 @@ namespace ModLoader
         class ConflictedUnit
         {
             public U Unit { get; }
+            public HashSet<ConflictedUnit> Resolvers { get; set; }
             public HashSet<ConflictedUnit> Conflictors { get; set; }
 
             public ConflictedUnit(U unit)
             {
                 Unit = unit;
+                Resolvers = new HashSet<ConflictedUnit>();
                 Conflictors = new HashSet<ConflictedUnit>();
             }
         }
@@ -29,7 +31,7 @@ namespace ModLoader
 
         protected override T ResolveSelf()
         {
-            HashSet<ConflictedUnit> modules = 
+            HashSet<ConflictedUnit> units =
                 new HashSet<ConflictedUnit>(Mergers
                     .SelectMany(m => m.Members)
                     .Select(m => m.Resolve())
@@ -38,11 +40,24 @@ namespace ModLoader
                     .Select(m => new ConflictedUnit(m))
                     );
 
-            foreach (var thisUnit in modules)
+            foreach (var thisUnit in units)
             {
-                foreach (var otherUnit in modules.Where(u => u != thisUnit))
+                foreach (var otherUnit in units)
                 {
-                    if (thisUnit.Unit.ConflictsWith(otherUnit.Unit))
+                    if (thisUnit.Unit.ResolveFull().Contains(otherUnit.Unit))
+                    {
+                        otherUnit.Resolvers.Add(thisUnit);
+                    }
+                }
+            }
+
+            var filtered = units.Where(u => !u.Resolvers.Any());
+
+            foreach (var thisUnit in filtered)
+            {
+                foreach (var otherUnit in filtered)
+                {
+                    if (thisUnit != otherUnit && thisUnit.Unit.ConflictsWith(otherUnit.Unit))
                     {
                         thisUnit.Conflictors.Add(otherUnit);
                         otherUnit.Conflictors.Add(thisUnit);
@@ -50,15 +65,15 @@ namespace ModLoader
                 }
             }
 
-            HashSet<Unit<U>> merged = 
-                new HashSet<Unit<U>>(modules
+            HashSet<Unit<U>> merged =
+                new HashSet<Unit<U>>(filtered
                 .Where(u => !u.Conflictors.Any())
                 .Select(u => u.Unit)
                 );
 
             HashSet<ConflictedUnit> instigators = new HashSet<ConflictedUnit>();
 
-            foreach (var thisUnit in modules.Where(u => u.Conflictors.Any()))
+            foreach (var thisUnit in filtered.Where(u => u.Conflictors.Any()))
             {
                 var members = thisUnit.Conflictors
                     .Except(instigators.Concat(instigators.SelectMany(u => u.Conflictors)).Distinct())
@@ -66,8 +81,8 @@ namespace ModLoader
 
                 var conflict = new Conflict<U>(thisUnit.Unit, new HashSet<U>(members));
 
-                if (!conflict.Empty()) 
-                { 
+                if (!conflict.Empty())
+                {
                     instigators.Add(thisUnit);
                     merged.Add(conflict);
                 }

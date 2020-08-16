@@ -12,16 +12,24 @@ namespace ModLoader
         public Pack Parent { get; }
         public PackGroup Root { get; }
 
-        public Stream Data { get; }
+        public Stream Data { get; private set; }
 
-        public override Unit<Module> Fallback => 
-            Parent.Fallback?.Resolve().Members
-            .Single(m => m.Name == Name);
+        public override Unit<Module> Fallback
+        {
+            get
+            {
+                var resolved = Parent.ResolveAsIfDisabled();
+                if (resolved == null) return null;
+                else return resolved.Members
+                        .SingleOrDefault(m => m.Name == Name) ?? 
+                        new GhostModule(Name, resolved);
+            }
+        }
 
-        public override bool Enabled 
-        { 
-            get => base.Enabled && Parent.Enabled; 
-            set => base.Enabled = value; 
+        public override bool Enabled
+        {
+            get => base.Enabled && Parent.Enabled;
+            set => base.Enabled = value;
         }
 
         public Module(string name, Guid id, Pack parent) : base(name)
@@ -30,8 +38,11 @@ namespace ModLoader
 
             Parent = parent;
             Root = Parent.Parent;
+        }
 
-            Data = Parent.Archive.GetEntry(Name).Open();
+        public Task InitializeAsync()
+        {
+            return Task.Run(() => Data = Parent.Archive.GetEntry(Name).Open());
         }
 
         public override bool ConflictsWith(Module other)

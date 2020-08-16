@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace ModLoader
@@ -17,6 +17,16 @@ namespace ModLoader
         }
 
         public T Resolve() => Enabled ? ResolveSelf() : Fallback?.Resolve();
+        public T ResolveAsIfDisabled() => Fallback?.Resolve();
+
+        public List<Unit<T>> ResolveFull() => ResolveFull(new List<Unit<T>>());
+        private List<Unit<T>> ResolveFull(List<Unit<T>> list)
+        {
+            var next = ResolveAsIfDisabled();
+            list.Add(next);
+            return Fallback?.ResolveFull(list) ?? list;
+        }
+
         public Task LoadAsync() => Resolve()?.LoadSelfAsync();
 
         public abstract bool ConflictsWith(T other);

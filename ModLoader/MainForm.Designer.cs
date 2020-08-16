@@ -38,7 +38,7 @@
             this.PropGroup = new System.Windows.Forms.GroupBox();
             this.EnabledCheckBox = new System.Windows.Forms.CheckBox();
             this.FallbackLabel = new System.Windows.Forms.Label();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.FallbackSelect = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.RunGameButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
@@ -137,7 +137,7 @@
             // 
             this.PropGroup.Controls.Add(this.EnabledCheckBox);
             this.PropGroup.Controls.Add(this.FallbackLabel);
-            this.PropGroup.Controls.Add(this.comboBox1);
+            this.PropGroup.Controls.Add(this.FallbackSelect);
             this.PropGroup.Enabled = false;
             this.PropGroup.Location = new System.Drawing.Point(577, 554);
             this.PropGroup.Name = "PropGroup";
@@ -167,13 +167,14 @@
             this.FallbackLabel.TabIndex = 1;
             this.FallbackLabel.Text = "Fallback:";
             // 
-            // comboBox1
+            // FallbackSelect
             // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Location = new System.Drawing.Point(258, 32);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(151, 37);
-            this.comboBox1.TabIndex = 0;
+            this.FallbackSelect.FormattingEnabled = true;
+            this.FallbackSelect.Location = new System.Drawing.Point(258, 32);
+            this.FallbackSelect.Name = "FallbackSelect";
+            this.FallbackSelect.Size = new System.Drawing.Size(151, 37);
+            this.FallbackSelect.TabIndex = 0;
+            this.FallbackSelect.SelectedIndexChanged += new System.EventHandler(this.FallbackSelect_SelectedIndexChanged);
             // 
             // groupBox1
             // 
@@ -288,7 +289,7 @@
         private System.Windows.Forms.GroupBox ChangeGroup;
         private System.Windows.Forms.CheckBox EnabledCheckBox;
         private System.Windows.Forms.Label FallbackLabel;
-        private System.Windows.Forms.ComboBox comboBox1;
+        private System.Windows.Forms.ComboBox FallbackSelect;
         private System.Windows.Forms.PictureBox PackImage;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.GroupBox NoteGroup;

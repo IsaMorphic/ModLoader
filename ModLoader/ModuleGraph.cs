@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ModLoader
 {
@@ -19,16 +20,16 @@ namespace ModLoader
             Table = table;
         }
 
-        public void WriteToStream(Stream stream)
+        public async Task WriteToStreamAsync(Stream stream)
         {
             using (var writer = new StreamWriter(stream))
-                writer.Write(JsonConvert.SerializeObject(this));
+                await writer.WriteAsync(JsonConvert.SerializeObject(this));
         }
 
-        public static ModuleGraph LoadFromStream(Stream stream)
+        public static async Task<ModuleGraph> LoadFromStreamAsync(Stream stream)
         {
             using (var reader = new StreamReader(stream))
-                return JsonConvert.DeserializeObject<ModuleGraph>(reader.ReadToEnd());
+                return JsonConvert.DeserializeObject<ModuleGraph>(await reader.ReadToEndAsync());
         }
     }
 }
