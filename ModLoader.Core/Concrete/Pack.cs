@@ -4,8 +4,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
+    using Persistence;
+
     public class Pack : Group<Pack, Module>
     {
         public PackGroup Parent { get; }

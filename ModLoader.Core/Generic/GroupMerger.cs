@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
     public abstract class GroupMerger<T, U> : Merger<T>
         where T : Group<T, U>, new()

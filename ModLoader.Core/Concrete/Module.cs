@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
     public class Module : Unit<Module>
     {

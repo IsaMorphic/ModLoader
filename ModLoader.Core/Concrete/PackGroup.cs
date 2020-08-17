@@ -1,12 +1,15 @@
-﻿using System;
+﻿using SkiaSharp;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Resources;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
+    using Persistence;
+    using Utilities;
+
     public class PackGroup : GroupMerger<Pack, Module>
     {
         public string BasePath { get; }
@@ -46,7 +49,7 @@ namespace ModLoader
             {
                 await PackBuilder
                     .FromDirectory(GamePath)
-                    .WithBitmap(new System.Drawing.Bitmap(100, 100))
+                    .WithBitmap(new SKBitmap(100, 100))
                     .WithNote("Base Game (DO NOT DELETE!)")
                     .WithName("_base_")
                     .BuildAsync()

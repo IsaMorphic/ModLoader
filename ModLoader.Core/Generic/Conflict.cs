@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
     public class Conflict<T> : Merger<T>
         where T : Unit<T>

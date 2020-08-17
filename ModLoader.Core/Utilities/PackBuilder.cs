@@ -1,17 +1,17 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Imaging;
+﻿using ModLoader.Core.Persistence;
+using SkiaSharp;
+using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core.Utilities
 {
     public class PackBuilder
     {
         private string Path { get; }
 
-        private Bitmap Bitmap { get; set; }
+        private SKBitmap Bitmap { get; set; }
         private string Note { get; set; }
 
         private string Name { get; set; }
@@ -21,7 +21,7 @@ namespace ModLoader
             Path = path;
         }
 
-        public PackBuilder WithBitmap(Bitmap bitmap)
+        public PackBuilder WithBitmap(SKBitmap bitmap)
         {
             Bitmap = bitmap;
             return this;
@@ -65,7 +65,7 @@ namespace ModLoader
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())
-                    await Task.Run(() => Bitmap.Save(entryStream, ImageFormat.Png));
+                    await Task.Run(() => Bitmap.Encode(entryStream, SKEncodedImageFormat.Png, 100));
 
                 using (var entryStream = archive.CreateEntry("_pack.txt").Open())
                 using (var writer = new StreamWriter(entryStream))

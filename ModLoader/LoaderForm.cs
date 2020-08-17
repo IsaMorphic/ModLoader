@@ -1,8 +1,8 @@
-﻿using System;
-using System.Drawing;
+﻿using ModLoader.Core;
+using ModLoader.Core.Utilities;
+using SkiaSharp;
+using System;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -26,7 +26,7 @@ namespace ModLoader
             {
                 await PackBuilder
                     .FromDirectory(dir)
-                    .WithBitmap(new Bitmap(100, 100))
+                    .WithBitmap(new SKBitmap(100, 100))
                     .WithNote("Mod Packaging Test")
                     .WithName(Path.GetFileName(dir))
                     .BuildAsync();

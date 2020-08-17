@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
     public abstract class Unit<T>
         where T : Unit<T>

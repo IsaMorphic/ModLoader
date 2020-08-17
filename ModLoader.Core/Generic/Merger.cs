@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace ModLoader
+namespace ModLoader.Core
 {
     public abstract class Merger<T> : Unit<T> 
         where T : Unit<T>
