@@ -1,6 +1,7 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Utilities;
-using SkiaSharp;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.IO;
 using System.Windows.Forms;
@@ -26,7 +27,7 @@ namespace ModLoader
             {
                 await PackBuilder
                     .FromDirectory(dir)
-                    .WithBitmap(new SKBitmap(100, 100))
+                    .WithBitmap(new Image<Rgba32>(100, 100))
                     .WithNote("Mod Packaging Test")
                     .WithName(Path.GetFileName(dir))
                     .BuildAsync();

@@ -58,6 +58,8 @@ namespace ModLoader.Core
 
             var path = Path.Combine(Root.GamePath, Name);
 
+            Directory.CreateDirectory(Path.GetDirectoryName(path));
+
             using (var stream = File.Create(path))
                 await Data.CopyToAsync(stream);
 

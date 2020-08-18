@@ -1,12 +1,15 @@
-﻿using SkiaSharp;
+﻿using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
+    using Exceptions;
     using Persistence;
     using Utilities;
 
@@ -19,6 +22,7 @@ namespace ModLoader.Core
 
         public string GraphPath { get; }
         public string ConfigPath { get; }
+        public string ScriptPath { get; }
 
         public Pack BasePack { get; private set; }
 
@@ -35,6 +39,7 @@ namespace ModLoader.Core
 
             GraphPath = Path.Combine(GamePath, "_pack.json");
             ConfigPath = Path.Combine(GamePath, "_config.json");
+            ScriptPath = Path.Combine(GamePath, "_script.bat");
         }
 
         public async Task InitializeAsync()
@@ -49,7 +54,7 @@ namespace ModLoader.Core
             {
                 await PackBuilder
                     .FromDirectory(GamePath)
-                    .WithBitmap(new SKBitmap(100, 100))
+                    .WithBitmap(new Image<Rgba32>(100, 100))
                     .WithNote("Base Game (DO NOT DELETE!)")
                     .WithName("_base_")
                     .BuildAsync()
@@ -68,6 +73,8 @@ namespace ModLoader.Core
 
                 Config = new GameConfig();
                 await SaveConfigAsync();
+
+                File.WriteAllText(ScriptPath, "echo Nothing to do!");
             }
 
             await LoadGraphAsync();
@@ -147,6 +154,14 @@ namespace ModLoader.Core
         {
             using (var stream = File.Create(GraphPath))
                 await Graph.WriteToStreamAsync(stream);
+        }
+
+        public async Task ExecuteLoadScript()
+        {
+            var proc = Process.Start(ScriptPath);
+            await Task.Run(proc.WaitForExit);
+
+            if (proc.ExitCode != 0) throw new ScriptExecutionException($"_script.bat halted with exit code: {proc.ExitCode}", proc.ExitCode);
         }
 
         public Task ReloadBaseModulesAsync()

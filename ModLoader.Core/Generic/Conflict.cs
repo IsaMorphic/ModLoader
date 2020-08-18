@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
+    using Exceptions;
+
     public class Conflict<T> : Merger<T>
         where T : Unit<T>
     {
@@ -15,8 +17,6 @@ namespace ModLoader.Core
             get => null;
             set => throw new NotSupportedException();
         }
-
-        public override bool Enabled { get; set; }
 
         public Conflict(T instigator, HashSet<T> mergers) : base("_none_", mergers)
         {
@@ -31,10 +31,17 @@ namespace ModLoader.Core
 
         protected override T ResolveSelf()
         {
-            return Mergers
-                .Select(m => m.Resolve())
-                .Where(m => m != null)
-                .SingleOrDefault();
+            try
+            {
+                return Mergers
+                    .Select(m => m.Resolve())
+                    .Where(m => m != null)
+                    .Single();
+            }
+            catch (InvalidOperationException) 
+            {
+                throw new ConflictException<T>("Execution halted because a module instigated a conflict.\nPlease resolve the conflict before trying again.", this);
+            }
         }
 
         protected override Task LoadSelfAsync() => throw new NotSupportedException();

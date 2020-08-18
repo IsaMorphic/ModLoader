@@ -153,12 +153,21 @@ namespace ModLoader
 
         private async void LoadButton_Click(object sender, EventArgs e)
         {
-            await Mods.LoadAsync();
-            await Mods.ReloadBaseModulesAsync();
-            await Mods.SaveConfigAsync();
-            await Mods.SaveGraphAsync();
+            try
+            {
+                await Mods.LoadAsync();
+                await Mods.ReloadBaseModulesAsync();
+                await Mods.SaveConfigAsync();
+                await Mods.SaveGraphAsync();
 
-            MessageBox.Show("Load operation completed!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                await Mods.ExecuteLoadScript();
+
+                MessageBox.Show("Load operation completed successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void FallbackSelect_SelectedIndexChanged(object sender, EventArgs e)
