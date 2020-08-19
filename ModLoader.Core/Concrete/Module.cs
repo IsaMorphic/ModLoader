@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace ModLoader.Core
         public Pack Parent { get; }
         public PackGroup Root { get; }
 
-        public Stream Data { get; private set; }
+        public Stream Data { get; protected set; }
 
         public override Unit<Module> Fallback
         {
@@ -21,7 +22,7 @@ namespace ModLoader.Core
                 var resolved = Parent.ResolveAsIfDisabled();
                 if (resolved == null) return null;
                 else return resolved.Members
-                        .SingleOrDefault(m => m.Name == Name) ?? 
+                        .SingleOrDefault(m => m.Name == Name) ??
                         new GhostModule(Name, resolved);
             }
         }
@@ -40,7 +41,7 @@ namespace ModLoader.Core
             Root = Parent.Parent;
         }
 
-        public Task InitializeAsync()
+        public virtual Task InitializeAsync()
         {
             return Task.Run(() => Data = Parent.Archive.GetEntry(Name).Open());
         }
@@ -54,7 +55,11 @@ namespace ModLoader.Core
 
         protected override async Task LoadSelfAsync()
         {
-            if (Root.Graph.Table[Name] == Id) return;
+            try
+            {
+                if (Root.Graph.Table[Name].Single() == Id) return;
+            }
+            catch (InvalidOperationException) { }
 
             var path = Path.Combine(Root.GamePath, Name);
 
@@ -63,7 +68,7 @@ namespace ModLoader.Core
             using (var stream = File.Create(path))
                 await Data.CopyToAsync(stream);
 
-            Root.Graph.Table[Name] = Id;
+            Root.Graph.Table[Name] = new HashSet<Guid> { Id };
         }
 
         public override string ToString()

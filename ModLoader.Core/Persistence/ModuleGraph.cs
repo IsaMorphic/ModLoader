@@ -8,14 +8,14 @@ namespace ModLoader.Core.Persistence
 {
     public class ModuleGraph
     {
-        public Dictionary<string, Guid> Table { get; }
+        public Dictionary<string, HashSet<Guid>> Table { get; }
 
         public ModuleGraph()
         {
-            Table = new Dictionary<string, Guid>();
+            Table = new Dictionary<string, HashSet<Guid>>();
         }
 
-        public ModuleGraph(Dictionary<string, Guid> table)
+        public ModuleGraph(Dictionary<string, HashSet<Guid>> table)
         {
             Table = table;
         }

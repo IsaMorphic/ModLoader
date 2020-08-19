@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Persistence;
+    using System;
 
     public class Pack : Group<Pack, Module>
     {
@@ -34,7 +35,15 @@ namespace ModLoader.Core
 
             foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.StartsWith("_pack") && !entry.FullName.EndsWith("/")))
             {
-                var module = new Module(entry.FullName, Graph.Table[entry.FullName], this);
+                string name = entry.FullName;
+                Guid id = Graph.Table[entry.FullName].Single();
+
+                Module module;
+                if (entry.FullName.EndsWith(".patch"))
+                    module = new Patch(Path.GetFileNameWithoutExtension(name), id, this);
+                else
+                    module = new Module(name, id, this);
+
                 await module.InitializeAsync();
 
                 Members.Add(module);

@@ -170,7 +170,7 @@ namespace ModLoader.Core
                 .SelectMany(m => m.Members)
                 .Cast<Module>()
                 .Where(m => m.Resolve() == null)
-                .Where(m => Graph.Table.Values.Contains(m.Id))
+                .Where(m => Graph.Table.Values.Any(s => s.Contains(m.Id)))
                 .Select(m => BasePack.Members.Single(b => b.Name == m.Name))
                 .Distinct()
                 .Select(m => m.LoadAsync()));
