@@ -166,11 +166,11 @@ namespace ModLoader.Core
 
         public Task ReloadBaseModulesAsync()
         {
-            return Task.WhenAll(Mergers
+            var modules = Mergers
                 .SelectMany(m => m.Members)
-                .Cast<Module>()
-                .Where(m => m.Resolve() == null)
-                .Where(m => Graph.Table.Values.Any(s => s.Contains(m.Id)))
+                .Where(m => m.Resolve() == null);
+
+            return Task.WhenAll(modules
                 .Select(m => BasePack.Members.Single(b => b.Name == m.Name))
                 .Distinct()
                 .Select(m => m.LoadAsync()));

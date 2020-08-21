@@ -28,7 +28,6 @@ namespace ModLoader
 
             ChangeList.SelectedItem = item;
 
-            RefreshConflictPane(ChangeList.SelectedItem as Conflict<Module>);
             Refreshing = false;
         }
 
@@ -155,8 +154,8 @@ namespace ModLoader
         {
             try
             {
-                await Mods.LoadAsync();
                 await Mods.ReloadBaseModulesAsync();
+                await Mods.LoadAsync();
                 await Mods.SaveConfigAsync();
                 await Mods.SaveGraphAsync();
 

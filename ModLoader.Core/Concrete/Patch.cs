@@ -38,11 +38,30 @@ namespace ModLoader.Core
 
         public override bool ConflictsWith(Module other)
         {
-            if (other is Patch)
-                return base.ConflictsWith(other) &&
-                    (other as Patch).Patches.Keys
-                    .Intersect(Patches.Keys).Any();
-            else
+            bool conflicted = base.ConflictsWith(other);
+            if (conflicted && other is Patch)
+            {
+                var patch = other as Patch;
+
+                var combined = Patches
+                    .Concat(patch.Patches)
+                    .OrderBy(p => p.Key)
+                    .ToArray();
+
+                for (int i = 0; i < combined.Length - 1; i++)
+                {
+                    long patchStart = combined[i].Key;
+                    int patchLength = combined[i].Value.Length;
+
+                    long nextStart = combined[i + 1].Key;
+
+                    if (patchStart + patchLength > nextStart) 
+                        return true;
+                }
+
+                return false;
+            }
+            else 
                 return base.ConflictsWith(other);
         }
 
