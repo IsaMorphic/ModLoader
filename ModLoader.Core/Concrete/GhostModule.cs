@@ -20,7 +20,7 @@ namespace ModLoader.Core
 
         protected override Task LoadSelfAsync()
         {
-            throw new NotSupportedException();
+            throw new NotImplementedException();
         }
     }
 }

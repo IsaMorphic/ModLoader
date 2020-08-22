@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     public abstract class Group<T, U> : Unit<T>
-        where T : Group<T, U>
+        where T : Unit<T>
         where U : Unit<U>
     {
         public HashSet<Unit<U>> Members { get; }
@@ -13,28 +13,6 @@ namespace ModLoader.Core
         public Group(string name, HashSet<Unit<U>> members) : base(name)
         {
             Members = members;
-        }
-
-        public override bool ConflictsWith(T other)
-        {
-            foreach (var myMember in Members)
-            {
-                foreach (var theirMember in other.Members)
-                {
-                    if ((myMember.Resolve()?.ConflictsWith(theirMember.Resolve())).GetValueOrDefault())
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        protected override Task LoadSelfAsync()
-        {
-            return Task.WhenAll(Members
-                .Select(m => m.Resolve()?.LoadAsync())
-                .Where(m => m != null));
         }
     }
 }

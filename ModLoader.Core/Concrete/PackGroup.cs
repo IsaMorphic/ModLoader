@@ -93,6 +93,12 @@ namespace ModLoader.Core
             await LoadConfigAsync();
         }
 
+        public override bool CanMergeWith(Pack other) => throw new NotImplementedException();
+
+        public override Merger<Pack> MergeWith(HashSet<Pack> others) => throw new NotImplementedException();
+
+        protected override Task LoadSelfAsync() => throw new NotImplementedException();
+
         public async Task LoadConfigAsync()
         {
             using (var stream = File.OpenRead(ConfigPath))

@@ -50,6 +50,18 @@ namespace ModLoader.Core
             }
         }
 
+        public override bool CanMergeWith(Pack other) => throw new NotImplementedException();
+
+        public override Merger<Pack> MergeWith(HashSet<Pack> others) => throw new NotImplementedException();
+
         protected override Pack ResolveSelf() => this;
+
+        protected override async Task LoadSelfAsync()
+        {
+            foreach (var module in Members)
+            {
+                await module.LoadAsync();
+            }
+        }
     }
 }

@@ -36,9 +36,9 @@ namespace ModLoader.Core
             });
         }
 
-        public override bool ConflictsWith(Module other)
+        public override bool CanMergeWith(Module other)
         {
-            bool conflicted = base.ConflictsWith(other);
+            bool conflicted = base.CanMergeWith(other);
             if (conflicted && other is Patch)
             {
                 var patch = other as Patch;
@@ -62,7 +62,7 @@ namespace ModLoader.Core
                 return false;
             }
             else 
-                return base.ConflictsWith(other);
+                return base.CanMergeWith(other);
         }
 
         protected override async Task LoadSelfAsync()

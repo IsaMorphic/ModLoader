@@ -29,7 +29,8 @@ namespace ModLoader.Core
 
         public Task LoadAsync() => Resolve()?.LoadSelfAsync();
 
-        public abstract bool ConflictsWith(T other);
+        public abstract bool CanMergeWith(T other);
+        public abstract Merger<T> MergeWith(HashSet<T> others);
 
         protected abstract T ResolveSelf();
         protected abstract Task LoadSelfAsync();

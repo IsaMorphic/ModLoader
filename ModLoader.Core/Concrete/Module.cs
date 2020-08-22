@@ -46,9 +46,14 @@ namespace ModLoader.Core
             return Task.Run(() => Data = Parent.Archive.GetEntry(Name).Open());
         }
 
-        public override bool ConflictsWith(Module other)
+        public override bool CanMergeWith(Module other)
         {
             return Name == other.Name;
+        }
+
+        public override Merger<Module> MergeWith(HashSet<Module> others)
+        {
+            return new Conflict<Module>(this, others);
         }
 
         protected override Module ResolveSelf() => this;

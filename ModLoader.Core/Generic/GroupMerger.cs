@@ -13,31 +13,29 @@ namespace ModLoader.Core
         {
         }
 
-        class ConflictedUnit
+        class MergingUnit
         {
             public U Unit { get; }
-            public HashSet<ConflictedUnit> Resolvers { get; set; }
-            public HashSet<ConflictedUnit> Conflictors { get; set; }
+            public HashSet<MergingUnit> Resolvers { get; set; }
+            public HashSet<MergingUnit> Mergers { get; set; }
 
-            public ConflictedUnit(U unit)
+            public MergingUnit(U unit)
             {
                 Unit = unit;
-                Resolvers = new HashSet<ConflictedUnit>();
-                Conflictors = new HashSet<ConflictedUnit>();
+                Resolvers = new HashSet<MergingUnit>();
+                Mergers = new HashSet<MergingUnit>();
             }
         }
 
-        public override bool ConflictsWith(T other) => throw new NotSupportedException();
-
         protected override T ResolveSelf()
         {
-            HashSet<ConflictedUnit> units =
-                new HashSet<ConflictedUnit>(Mergers
+            HashSet<MergingUnit> units =
+                new HashSet<MergingUnit>(Mergers
                     .SelectMany(m => m.Members)
                     .Select(m => m.Resolve())
                     .Where(m => m != null)
                     .Distinct()
-                    .Select(m => new ConflictedUnit(m))
+                    .Select(m => new MergingUnit(m))
                     );
 
             foreach (var thisUnit in units)
@@ -57,34 +55,34 @@ namespace ModLoader.Core
             {
                 foreach (var otherUnit in filtered)
                 {
-                    if (thisUnit != otherUnit && thisUnit.Unit.ConflictsWith(otherUnit.Unit))
+                    if (thisUnit != otherUnit && thisUnit.Unit.CanMergeWith(otherUnit.Unit))
                     {
-                        thisUnit.Conflictors.Add(otherUnit);
-                        otherUnit.Conflictors.Add(thisUnit);
+                        thisUnit.Mergers.Add(otherUnit);
+                        otherUnit.Mergers.Add(thisUnit);
                     }
                 }
             }
 
             HashSet<Unit<U>> merged =
                 new HashSet<Unit<U>>(filtered
-                .Where(u => !u.Conflictors.Any())
+                .Where(u => !u.Mergers.Any())
                 .Select(u => u.Unit)
                 );
 
-            HashSet<ConflictedUnit> instigators = new HashSet<ConflictedUnit>();
+            HashSet<MergingUnit> instigators = new HashSet<MergingUnit>();
 
-            foreach (var thisUnit in filtered.Where(u => u.Conflictors.Any()))
+            foreach (var thisUnit in filtered.Where(u => u.Mergers.Any()))
             {
-                var members = thisUnit.Conflictors
-                    .Except(instigators.Concat(instigators.SelectMany(u => u.Conflictors)).Distinct())
+                var members = thisUnit.Mergers
+                    .Except(instigators.Concat(instigators.SelectMany(u => u.Mergers)).Distinct())
                     .Select(u => u.Unit);
 
-                var conflict = new Conflict<U>(thisUnit.Unit, new HashSet<U>(members));
+                var merger = thisUnit.Unit.MergeWith(new HashSet<U>(members));
 
-                if (!conflict.Empty())
+                if (!merger.Empty())
                 {
                     instigators.Add(thisUnit);
-                    merged.Add(conflict);
+                    merged.Add(merger);
                 }
             }
 
@@ -93,7 +91,5 @@ namespace ModLoader.Core
 
             return result;
         }
-
-        protected override Task LoadSelfAsync() => throw new NotSupportedException();
     }
 }

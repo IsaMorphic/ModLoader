@@ -15,7 +15,7 @@ namespace ModLoader.Core
         public override Unit<T> Fallback
         {
             get => null;
-            set => throw new NotSupportedException();
+            set => throw new NotImplementedException();
         }
 
         public Conflict(T instigator, HashSet<T> mergers) : base("_none_", mergers)
@@ -27,7 +27,9 @@ namespace ModLoader.Core
         {
         }
 
-        public override bool ConflictsWith(T other) => throw new NotSupportedException();
+        public override bool CanMergeWith(T other) => throw new NotImplementedException();
+
+        public override Merger<T> MergeWith(HashSet<T> others) => throw new NotImplementedException();
 
         protected override T ResolveSelf()
         {
@@ -44,7 +46,7 @@ namespace ModLoader.Core
             }
         }
 
-        protected override Task LoadSelfAsync() => throw new NotSupportedException();
+        protected override Task LoadSelfAsync() => throw new NotImplementedException();
 
         public override string ToString()
         {
