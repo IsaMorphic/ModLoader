@@ -1,29 +1,46 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
+    using Abstract;
     using Persistence;
-    using System;
 
-    public class Pack : Group<Pack, Module>
+    public class Pack : IGroup<Module>, ILoadable<Pack>
     {
-        public PackGroup Parent { get; }
+        public Game Parent { get; }
 
         public ZipArchive Archive { get; private set; }
 
         public ModuleGraph Graph { get; private set; }
 
-        public Pack() : base("_none_", new HashSet<Unit<Module>>())
+        public string Name { get; }
+
+        public IResolvable<Pack> Fallback { get; set; }
+        public bool Enabled { get; set; }
+
+        public HashSet<IResolvable<Module>> Members { get; }
+
+        public Pack(string name, HashSet<IResolvable<Module>> modules)
         {
+            Name = name;
+            Members = modules;
+
+            Enabled = true;
         }
 
-        public Pack(string name, PackGroup parent) : base(name, new HashSet<Unit<Module>>())
+        public Pack(Game parent, string name) : this(name, new HashSet<IResolvable<Module>>())
         {
             Parent = parent;
+        }
+
+        public Pack() : this(null, new HashSet<IResolvable<Module>>())
+        {
         }
 
         public async Task InitializeAsync()
@@ -40,28 +57,27 @@ namespace ModLoader.Core
 
                 Module module;
                 if (entry.FullName.EndsWith(".patch"))
-                    module = new Patch(Path.GetFileNameWithoutExtension(name), id, this);
+                    module = new Patch(this, Path.GetFileNameWithoutExtension(name), id);
                 else
-                    module = new Module(name, id, this);
-
-                await module.InitializeAsync();
+                    module = new Module(this, name, id);
 
                 Members.Add(module);
             }
         }
 
-        public override bool CanMergeWith(Pack other) => throw new NotImplementedException();
+        public Pack ResolveSelf() => this;
 
-        public override Merger<Pack> MergeWith(HashSet<Pack> others) => throw new NotImplementedException();
-
-        protected override Pack ResolveSelf() => this;
-
-        protected override async Task LoadSelfAsync()
+        public async Task LoadSelfAsync(CancellationToken token)
         {
             foreach (var module in Members)
             {
-                await module.LoadAsync();
+                await module.Resolve()?.LoadAsync(token);
             }
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

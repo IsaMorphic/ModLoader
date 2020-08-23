@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq;
 
-namespace ModLoader.Core.Concrete
+namespace ModLoader.Core
 {
+    using Abstract;
+    using Filters;
+
     public enum Operation
     {
         Remove,
@@ -23,65 +25,82 @@ namespace ModLoader.Core.Concrete
         }
     }
 
-    public class Hunk : Unit<Hunk>
+    public class Hunk : IMergeable<Hunk>
     {
-        public Diff Parent { get; }
-
-        public (int start, int end) Range { get; }
         public List<Line> Lines { get; }
+        public int StartOffset { get; }
 
-        public Hunk(Diff parent, (int start, int end) range, List<Line> lines) : base("_none_")
+        public IResolvable<Hunk> Fallback => null;
+        public bool Enabled { get; set; }
+
+        public Hunk(List<Line> lines, int startOffset)
         {
-            Parent = parent;
-
-            Range = range;
             Lines = lines;
+            StartOffset = startOffset;
         }
 
-        public override bool CanMergeWith(Hunk other)
+        public bool CanMergeWith(Hunk other)
         {
-            throw new NotImplementedException();
+            return StartOffset >= other.StartOffset && other.StartOffset + other.Lines.Count >= StartOffset;
         }
 
-        public override Merger<Hunk> MergeWith(HashSet<Hunk> others)
+        public IResolvable<Hunk> MergeWith(HashSet<Hunk> others)
         {
-            throw new NotImplementedException();
+            return new Conflict<Hunk>(this, others);
         }
 
-        protected override Hunk ResolveSelf() => this;
+        public Hunk ResolveSelf() => this;
+    }
 
-        protected override Task LoadSelfAsync()
+    public class DiffResolver : IResolvable<Module>
+    {
+        public IResolvable<IGroup<Hunk>> Resolver { get; }
+
+        public IResolvable<Module> Fallback { get; }
+        public bool Enabled { get; }
+
+        public DiffResolver(IResolvable<IGroup<Hunk>> resolver)
         {
-            throw new NotImplementedException();
+            Resolver = resolver;
+        }
+
+        public Module ResolveSelf()
+        {
+            return new Diff(Resolver.Resolve().Members);
         }
     }
 
-    public class Diff : Group<Module, Hunk>
+    public class Diff : Module, IGroup<Hunk>
     {
-        public Module Base { get; }
+        public HashSet<IResolvable<Hunk>> Members { get; }
 
-        public Diff(Module @base) : base(@base.Name, new HashSet<Unit<Hunk>>())
+        public Diff(Pack parent, string name, Guid id) : base(parent, name, id)
         {
+            Members = new HashSet<IResolvable<Hunk>>();
         }
 
-        public override bool CanMergeWith(Module other)
+        public Diff(HashSet<IResolvable<Hunk>> hunks) : this(null, null, Guid.Empty)
         {
-            throw new NotImplementedException();
+            Members = hunks;
         }
 
-        public override Merger<Module> MergeWith(HashSet<Module> others)
+        public override IResolvable<Module> MergeWith(HashSet<Module> others)
         {
-            throw new NotImplementedException();
-        }
+            if (others.All(m => m is Diff))
+            {
+                var otherGroups = new HashSet<IGroup<Hunk>>(
+                    others.Cast<IGroup<Hunk>>());
 
-        protected override Module ResolveSelf()
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override Task LoadSelfAsync()
-        {
-            throw new NotImplementedException();
+                return new DiffResolver(
+                    new MergeFilter<Hunk>() 
+                    {
+                        Fallback = new GroupMerger<Hunk>(otherGroups)
+                    });
+            }
+            else
+            {
+                return base.MergeWith(others);
+            }
         }
     }
 }

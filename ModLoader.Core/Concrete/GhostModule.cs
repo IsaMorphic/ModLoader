@@ -1,26 +1,31 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
+    using Abstract;
+    using Exceptions;
+
     public class GhostModule : Module
     {
-        public GhostModule(string name, Pack parent) : base(name, Guid.Empty, parent)
+        public GhostModule(Pack parent, string name) : base(parent, name, Guid.Empty)
         {
         }
 
-        protected override Module ResolveSelf()
+        public override Module ResolveSelf()
         {
             return Parent
                 .ResolveAsIfDisabled()?.Members
+                .Select(m => m.ResolveSelf())
                 .SingleOrDefault(m => m.Name == Name)
                 ?.Resolve();
         }
 
-        protected override Task LoadSelfAsync()
+        public override Task LoadSelfAsync(CancellationToken token)
         {
-            throw new NotImplementedException();
+            throw new GhostedModuleException("An attempt was made to directly load a ghosted module reference.\nThis is most likely a bug, please contact the developers so that the issue may be resolved.");
         }
     }
 }

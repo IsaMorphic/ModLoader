@@ -20,7 +20,7 @@ namespace ModLoader
 
         private async void FormLoad(object sender, EventArgs e)
         {
-            var mods = new PackGroup(Environment.CurrentDirectory);
+            var mods = new Game(Environment.CurrentDirectory);
             var dirs = Directory.GetDirectories(mods.ModPath);
 
             foreach (var dir in dirs)
@@ -35,7 +35,7 @@ namespace ModLoader
 
             await mods.InitializeAsync();
 
-            Form.Mods = mods;
+            Form.Game = mods;
 
             Close();
         }

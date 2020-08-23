@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -10,30 +11,28 @@ namespace ModLoader.Core
     {
         public Dictionary<long, byte[]> Patches { get; }
 
-        public Patch(string name, Guid id, Pack parent) : base(name, id, parent)
+        public Patch(Pack parent, string name, Guid id) : base(parent, name, id)
         {
             Patches = new Dictionary<long, byte[]>();
-        }
-
-        public override Task InitializeAsync()
-        {
-            return Task.Run(() =>
+            try
             {
-                try
+                using (var data = GetDataStream())
+                using (var reader = new BinaryReader(data))
                 {
-                    using (Data = Parent.Archive.GetEntry($"{Name}.patch").Open())
-                    using (var reader = new BinaryReader(Data))
+                    while (true)
                     {
-                        while (true)
-                        {
-                            long offset = reader.ReadInt64();
-                            byte[] bytes = reader.ReadBytes(reader.ReadInt32());
-                            Patches.Add(offset, bytes);
-                        }
+                        long offset = reader.ReadInt64();
+                        byte[] bytes = reader.ReadBytes(reader.ReadInt32());
+                        Patches.Add(offset, bytes);
                     }
                 }
-                catch (EndOfStreamException) { }
-            });
+            }
+            catch (EndOfStreamException) { }
+        }
+
+        public override Stream GetDataStream()
+        {
+            return Parent.Archive.GetEntry($"{Name}.patch").Open();
         }
 
         public override bool CanMergeWith(Module other)
@@ -65,7 +64,7 @@ namespace ModLoader.Core
                 return base.CanMergeWith(other);
         }
 
-        protected override async Task LoadSelfAsync()
+        public override async Task LoadSelfAsync(CancellationToken token)
         {
             if (Root.Graph.Table[Name].Contains(Id)) return;
 

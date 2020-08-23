@@ -1,8 +1,10 @@
 ﻿using ModLoader.Core;
+using ModLoader.Core.Abstract;
 using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -11,7 +13,7 @@ namespace ModLoader
     {
         private bool Refreshing { get; set; }
 
-        public PackGroup Mods { get; set; }
+        public Game Game { get; set; }
 
         public MainForm()
         {
@@ -24,7 +26,7 @@ namespace ModLoader
             var item = ChangeList.SelectedItem;
 
             ChangeList.Items.Clear();
-            ChangeList.Items.AddRange(Mods.Resolve().Members.ToArray());
+            ChangeList.Items.AddRange(Game.Modules.Resolve().Members.ToArray());
 
             ChangeList.SelectedItem = item;
 
@@ -59,11 +61,11 @@ namespace ModLoader
             var item = PackList.SelectedItem;
 
             PackList.Items.Clear();
-            PackList.Items.AddRange(Mods.Mergers.ToArray());
+            PackList.Items.AddRange(Game.Packs.ToArray());
 
             FallbackSelect.Items.Clear();
             FallbackSelect.Items.Add("");
-            FallbackSelect.Items.AddRange(Mods.Mergers.ToArray());
+            FallbackSelect.Items.AddRange(Game.Packs.ToArray());
 
             PackList.SelectedItem = item;
             Refreshing = false;
@@ -154,12 +156,12 @@ namespace ModLoader
         {
             try
             {
-                await Mods.ReloadBaseModulesAsync();
-                await Mods.LoadAsync();
-                await Mods.SaveConfigAsync();
-                await Mods.SaveGraphAsync();
+                await Game.ReloadBaseModulesAsync(CancellationToken.None);
+                await Game.LoadModulesAsync(CancellationToken.None);
+                await Game.SaveConfigAsync();
+                await Game.SaveGraphAsync();
 
-                await Mods.ExecuteLoadScript();
+                await Game.ExecuteLoadScript();
 
                 MessageBox.Show("Load operation completed successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }

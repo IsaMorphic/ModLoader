@@ -2,63 +2,68 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
-    public class Module : Unit<Module>
+    using Abstract;
+
+    public class Module : ILoadable<Module>, IMergeable<Module>
     {
         public Guid Id { get; }
 
+        public string Name { get; }
+
         public Pack Parent { get; }
-        public PackGroup Root { get; }
+        public Game Root { get; }
 
-        public Stream Data { get; protected set; }
-
-        public override Unit<Module> Fallback
+        public IResolvable<Module> Fallback
         {
             get
             {
                 var resolved = Parent.ResolveAsIfDisabled();
                 if (resolved == null) return null;
                 else return resolved.Members
-                        .SingleOrDefault(m => m.Name == Name) ??
-                        new GhostModule(Name, resolved);
+                        .SingleOrDefault(m => m.Resolve()?.Name == Name) ??
+                        new GhostModule(resolved, Name);
             }
         }
 
-        public override bool Enabled
+        private bool _enabled = true;
+        public bool Enabled
         {
-            get => base.Enabled && Parent.Enabled;
-            set => base.Enabled = value;
+            get => _enabled && Parent.Enabled;
+            set => _enabled = value;
         }
 
-        public Module(string name, Guid id, Pack parent) : base(name)
+        public Module(Pack parent, string name, Guid id)
         {
             Id = id;
+            Name = name;
 
             Parent = parent;
             Root = Parent.Parent;
         }
 
-        public virtual Task InitializeAsync()
-        {
-            return Task.Run(() => Data = Parent.Archive.GetEntry(Name).Open());
-        }
+        public virtual Module ResolveSelf() => this;
 
-        public override bool CanMergeWith(Module other)
+        public virtual bool CanMergeWith(Module other)
         {
             return Name == other.Name;
         }
 
-        public override Merger<Module> MergeWith(HashSet<Module> others)
+        public virtual IResolvable<Module> MergeWith(HashSet<Module> others)
         {
             return new Conflict<Module>(this, others);
         }
 
-        protected override Module ResolveSelf() => this;
+        public virtual Stream GetDataStream()
+        {
+            return Parent.Archive.GetEntry(Name).Open();
+        }
 
-        protected override async Task LoadSelfAsync()
+        public virtual async Task LoadSelfAsync(CancellationToken token)
         {
             try
             {
@@ -70,8 +75,11 @@ namespace ModLoader.Core
 
             Directory.CreateDirectory(Path.GetDirectoryName(path));
 
+            using (var data = GetDataStream())
             using (var stream = File.Create(path))
-                await Data.CopyToAsync(stream);
+            {
+                await data.CopyToAsync(stream);
+            }
 
             Root.Graph.Table[Name] = new HashSet<Guid> { Id };
         }

@@ -5,15 +5,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
+    using Abstract;
     using Exceptions;
+    using Filters;
     using Persistence;
     using Utilities;
 
-    public class PackGroup : GroupMerger<Pack, Module>
+    public class Game
     {
         public string BasePath { get; }
 
@@ -24,13 +27,19 @@ namespace ModLoader.Core
         public string ConfigPath { get; }
         public string ScriptPath { get; }
 
+        public IEnumerable<Pack> Packs { get; }
+
         public Pack BasePack { get; private set; }
 
         public ModuleGraph Graph { get; private set; }
 
         public GameConfig Config { get; private set; }
 
-        public PackGroup(string basePath) : base("_none_", new HashSet<Pack>())
+        public IMerger<IGroup<Module>> Merger { get; }
+
+        public IResolvable<IGroup<Module>> Modules { get; set; }
+
+        public Game(string basePath)
         {
             BasePath = basePath;
 
@@ -40,11 +49,23 @@ namespace ModLoader.Core
             GraphPath = Path.Combine(GamePath, "_pack.json");
             ConfigPath = Path.Combine(GamePath, "_config.json");
             ScriptPath = Path.Combine(GamePath, "_script.bat");
+
+            Merger = new GroupMerger<Module>();
+
+            Packs = Merger.Mergers.Cast<Pack>();
+
+            Modules = new MergeFilter<Module>
+            {
+                Fallback = new FallbackFilter<Module>
+                {
+                    Fallback = Merger
+                }
+            };
         }
 
         public async Task InitializeAsync()
         {
-            BasePack = new Pack("_base_", this);
+            BasePack = new Pack(this, "_base_");
 
             try
             {
@@ -84,20 +105,14 @@ namespace ModLoader.Core
                 var packName = Path.GetFileNameWithoutExtension(file);
                 if (packName == "_base_") continue;
 
-                var pack = new Pack(packName, this);
+                var pack = new Pack(this, packName);
                 await pack.InitializeAsync();
 
-                Mergers.Add(pack);
+                Merger.Mergers.Add(pack);
             }
 
             await LoadConfigAsync();
         }
-
-        public override bool CanMergeWith(Pack other) => throw new NotImplementedException();
-
-        public override Merger<Pack> MergeWith(HashSet<Pack> others) => throw new NotImplementedException();
-
-        protected override Task LoadSelfAsync() => throw new NotImplementedException();
 
         public async Task LoadConfigAsync()
         {
@@ -106,15 +121,19 @@ namespace ModLoader.Core
 
             foreach (var packConfig in Config.Packs)
             {
-                var pack = Mergers.Single(p => p.Name == packConfig.Key);
-                var fallback = Mergers.SingleOrDefault(p => p.Name == packConfig.Value.Fallback);
+                var pack = Packs.Single(p => p.Name == packConfig.Key);
+
+                var fallback = Packs.SingleOrDefault(p => p.Name == packConfig.Value.Fallback);
 
                 pack.Enabled = packConfig.Value.Enabled;
                 pack.Fallback = fallback;
 
                 foreach (var moduleConfig in packConfig.Value.Modules)
                 {
-                    var module = pack.Members.Single(m => m.Name == moduleConfig.Key);
+                    var module = pack.Members
+                        .Select(m => m.ResolveSelf())
+                        .Single(m => m.Name == moduleConfig.Key);
+
                     if (moduleConfig.Value.Enabled != packConfig.Value.Enabled)
                         module.Enabled = moduleConfig.Value.Enabled;
                 }
@@ -123,12 +142,12 @@ namespace ModLoader.Core
 
         public async Task SaveConfigAsync()
         {
-            foreach (var pack in Mergers)
+            foreach (var pack in Packs)
             {
                 var packConfig = new GameConfig.PackConfig()
                 {
                     Enabled = pack.Enabled,
-                    Fallback = pack.Fallback?.Name,
+                    Fallback = pack.Fallback?.ResolveSelf().Name,
                 };
 
                 foreach (var module in pack.Members.Cast<Module>())
@@ -170,16 +189,30 @@ namespace ModLoader.Core
             if (proc.ExitCode != 0) throw new ScriptExecutionException($"_script.bat halted with exit code: {proc.ExitCode}", proc.ExitCode);
         }
 
-        public Task ReloadBaseModulesAsync()
+        public async Task LoadModulesAsync(CancellationToken token)
         {
-            var modules = Mergers
-                .SelectMany(m => m.Members)
-                .Where(m => m.Resolve() == null);
+            foreach (var module in Modules.Resolve().Members.Select(m => m.ResolveSelf()))
+            {
+                await module.LoadAsync(token);
+            }
+        }
 
-            return Task.WhenAll(modules
-                .Select(m => BasePack.Members.Single(b => b.Name == m.Name))
-                .Distinct()
-                .Select(m => m.LoadAsync()));
+        public async Task ReloadBaseModulesAsync(CancellationToken token)
+        {
+            var modules = Packs
+                .SelectMany(m => m.Members)
+                .Select(m => m.ResolveSelf())
+                .Where(m => m.Resolve() == null)
+                .Select(m => BasePack.Members
+                    .Select(b => b.Resolve())
+                    .Where(b => b != null)
+                    .Single(b => b.Name == m.Name))
+                .Distinct();
+
+            foreach (var module in modules)
+            {
+                await module.LoadAsync(token);
+            }
         }
     }
 }
