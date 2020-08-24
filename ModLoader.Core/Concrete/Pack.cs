@@ -53,11 +53,13 @@ namespace ModLoader.Core
             foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.StartsWith("_pack") && !entry.FullName.EndsWith("/")))
             {
                 string name = entry.FullName;
-                Guid id = Graph.Table[entry.FullName].Single();
+                Guid id = Graph.Table[name].Single();
 
                 Module module;
-                if (entry.FullName.EndsWith(".patch"))
-                    module = new Patch(this, Path.GetFileNameWithoutExtension(name), id);
+                if (name.EndsWith(".diff"))
+                    module = new Diff(this, name.Replace(".diff", ""), id);
+                else if (name.EndsWith(".patch"))
+                    module = new Patch(this, name.Replace(".patch", ""), id);
                 else
                     module = new Module(this, name, id);
 

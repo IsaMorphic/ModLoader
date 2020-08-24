@@ -20,24 +20,33 @@ namespace ModLoader
 
         private async void FormLoad(object sender, EventArgs e)
         {
-            var mods = new Game(Environment.CurrentDirectory);
-            var dirs = Directory.GetDirectories(mods.ModPath);
-
-            foreach (var dir in dirs)
+            try
             {
-                await PackBuilder
-                    .FromDirectory(dir)
-                    .WithBitmap(new Image<Rgba32>(100, 100))
-                    .WithNote("Mod Packaging Test")
-                    .WithName(Path.GetFileName(dir))
-                    .BuildAsync();
+                var mods = new Game(Environment.CurrentDirectory);
+                var dirs = Directory.GetDirectories(mods.ModPath);
+
+                foreach (var dir in dirs)
+                {
+                    await PackBuilder
+                        .FromDirectory(dir)
+                        .WithBitmap(new Image<Rgba32>(100, 100))
+                        .WithNote("Mod Packaging Test")
+                        .WithName(Path.GetFileName(dir))
+                        .BuildAsync();
+                }
+
+                await mods.InitializeAsync();
+
+                Form.Game = mods;
             }
-
-            await mods.InitializeAsync();
-
-            Form.Game = mods;
-
-            Close();
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Close();
+            }
         }
     }
 }

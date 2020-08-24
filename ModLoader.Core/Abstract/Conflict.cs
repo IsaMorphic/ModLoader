@@ -31,14 +31,14 @@ namespace ModLoader.Core.Abstract
             try
             {
                 return Mergers
-                    .Concat(new HashSet<T> { Instigator })
+                    .Union(new HashSet<T> { Instigator })
                     .Select(m => m.Resolve())
                     .Where(m => m != null)
                     .Single();
             }
             catch (InvalidOperationException)
             {
-                throw new ConflictException<T>("Execution halted because a module instigated a conflict.\nPlease resolve the conflict before trying again.", this);
+                throw new ConflictException<T>("Execution halted because a mergable instigated a conflict.\nPlease resolve the conflict before trying again.", this);
             }
         }
 
