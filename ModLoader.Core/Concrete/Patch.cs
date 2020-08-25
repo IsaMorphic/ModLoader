@@ -87,7 +87,7 @@ namespace ModLoader.Core
                         if (conflictors.Any())
                         {
                             var conflict = new Conflict<Chunk>(chunk, new HashSet<Chunk>(conflictors));
-                            throw new ConflictException<Chunk>("Diff parse failed! Diff cannot have conflicting hunks. Contact the developer of this pack to resolve the issue.", conflict);
+                            throw new ConflictException<Chunk>("Patch parse failed! Patch cannot have conflicting chunks. Contact the developer of this pack to resolve the issue.", conflict);
                         }
                         else
                         {
