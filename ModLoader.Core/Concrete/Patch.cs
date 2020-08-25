@@ -7,13 +7,67 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
-    public class Patch : Module
+    using Abstract;
+    using Filters;
+    using Exceptions;
+
+    public class Chunk : IMergeable<Chunk>
     {
-        public Dictionary<long, byte[]> Patches { get; }
+        public IResolvable<Chunk> Fallback => null;
+        public bool Enabled { get; set; }
+
+        public long Offset { get; }
+        public byte[] Data { get; }
+
+        public Chunk(long offset, byte[] data)
+        {
+            Offset = offset;
+            Data = data;
+
+            Enabled = true;
+        }
+
+        public bool CanMergeWith(Chunk other)
+        {
+            return Offset >= other.Offset && other.Offset + other.Data.Length >= Offset;
+        }
+
+        public IResolvable<Chunk> MergeWith(HashSet<Chunk> others)
+        {
+            return new Conflict<Chunk>(this, others);
+        }
+
+        public Chunk ResolveSelf() => this;
+    }
+
+    public class ResolvingPatch : Patch
+    {
+        public IResolvable<IGroup<Chunk>> Resolver { get; }
+
+        public ResolvingPatch(Pack parent, string name, IResolvable<IGroup<Chunk>> resolver) : base(parent, name, Guid.Empty)
+        {
+            Resolver = resolver;
+        }
+
+        public override Module ResolveSelf()
+        {
+            return new Patch(Parent, Name, Resolver.Resolve().Members);
+        }
+
+        public override string ToString()
+        {
+            return "(MERGED PATCH)";
+        }
+    }
+
+    public class Patch : Module, IGroup<Chunk>
+    {
+        public HashSet<IResolvable<Chunk>> Members { get; }
 
         public Patch(Pack parent, string name, Guid id) : base(parent, name, id)
         {
-            Patches = new Dictionary<long, byte[]>();
+            Members = new HashSet<IResolvable<Chunk>>();
+
             try
             {
                 using (var data = GetDataStream())
@@ -23,11 +77,31 @@ namespace ModLoader.Core
                     {
                         long offset = reader.ReadInt64();
                         byte[] bytes = reader.ReadBytes(reader.ReadInt32());
-                        Patches.Add(offset, bytes);
+
+                        var chunk = new Chunk(offset, bytes);
+
+                        var conflictors = Members
+                            .Select(c => c.ResolveSelf())
+                            .Where(c => c.CanMergeWith(chunk));
+
+                        if (conflictors.Any())
+                        {
+                            var conflict = new Conflict<Chunk>(chunk, new HashSet<Chunk>(conflictors));
+                            throw new ConflictException<Chunk>("Diff parse failed! Diff cannot have conflicting hunks. Contact the developer of this pack to resolve the issue.", conflict);
+                        }
+                        else
+                        {
+                            Members.Add(chunk);
+                        }
                     }
                 }
             }
             catch (EndOfStreamException) { }
+        }
+
+        public Patch(Pack parent, string name, HashSet<IResolvable<Chunk>> chunks) : base(parent, name, Guid.Empty)
+        {
+            Members = chunks;
         }
 
         public override Stream GetDataStream()
@@ -35,33 +109,25 @@ namespace ModLoader.Core
             return Parent.Archive.GetEntry($"{Name}.patch").Open();
         }
 
-        public override bool CanMergeWith(Module other)
+        public override IResolvable<Module> MergeWith(HashSet<Module> others)
         {
-            bool conflicted = base.CanMergeWith(other);
-            if (conflicted && other is Patch)
+            if (others.All(m => m is Patch))
             {
-                var patch = other as Patch;
+                var otherGroups = new HashSet<IGroup<Chunk>>(
+                    others.Cast<IGroup<Chunk>>());
 
-                var combined = Patches
-                    .Concat(patch.Patches)
-                    .OrderBy(p => p.Key)
-                    .ToArray();
+                otherGroups.Add(this);
 
-                for (int i = 0; i < combined.Length - 1; i++)
-                {
-                    long patchStart = combined[i].Key;
-                    int patchLength = combined[i].Value.Length;
-
-                    long nextStart = combined[i + 1].Key;
-
-                    if (patchStart + patchLength > nextStart) 
-                        return true;
-                }
-
-                return false;
+                return new ResolvingPatch(Parent, Name,
+                    new MergeFilter<Chunk>()
+                    {
+                        Fallback = new GroupMerger<Chunk>(otherGroups)
+                    });
             }
-            else 
-                return base.CanMergeWith(other);
+            else
+            {
+                return base.MergeWith(others);
+            }
         }
 
         public override async Task LoadSelfAsync(CancellationToken token)
@@ -71,10 +137,10 @@ namespace ModLoader.Core
             var path = Path.Combine(Root.GamePath, Name);
             using (var stream = File.OpenWrite(path))
             {
-                foreach (var patch in Patches)
+                foreach (var chunk in Members.Select(m => m.ResolveSelf()))
                 {
-                    stream.Seek(patch.Key, SeekOrigin.Begin);
-                    await stream.WriteAsync(patch.Value, 0, patch.Value.Length);
+                    stream.Seek(chunk.Offset, SeekOrigin.Begin);
+                    await stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
                 }
             }
 

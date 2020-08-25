@@ -9,6 +9,7 @@ namespace ModLoader.Core
 {
     using Abstract;
     using Filters;
+    using Exceptions;
 
     public enum Operation
     {
@@ -47,7 +48,7 @@ namespace ModLoader.Core
         public bool CanMergeWith(Hunk other)
         {
             int otherLength = other.Lines.Aggregate(0, (c, l) => l.Op == Operation.Add ? c + 1 : c - 1);
-            return (StartOffset >= other.StartOffset && other.StartOffset + otherLength >= StartOffset) || other.CanMergeWith(this);
+            return StartOffset >= other.StartOffset && other.StartOffset + otherLength >= StartOffset;
         }
 
         public IResolvable<Hunk> MergeWith(HashSet<Hunk> others)
@@ -116,7 +117,7 @@ namespace ModLoader.Core
                         }
                         else
                         {
-                            throw new FormatException("Bad hunk format! Check your syntax or contact pack developer to resolve the issue.");
+                            throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax or contact pack developer to resolve the issue.");
                         }
 
                         if (reader.EndOfStream)
@@ -126,7 +127,20 @@ namespace ModLoader.Core
                     }
 
                     var hunk = new Hunk(lines, offset);
-                    Members.Add(hunk);
+
+                    var conflictors = Members
+                            .Select(h => h.ResolveSelf())
+                            .Where(h => h.CanMergeWith(hunk));
+
+                    if (conflictors.Any())
+                    {
+                        var conflict = new Conflict<Hunk>(hunk, new HashSet<Hunk>(conflictors));
+                        throw new ConflictException<Hunk>("Diff parse failed! Diff cannot have conflicting hunks. Contact the developer of this pack to resolve the issue.", conflict);
+                    }
+                    else
+                    {
+                        Members.Add(hunk);
+                    }
                 }
             }
         }
