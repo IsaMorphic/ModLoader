@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Persistence
 {
-    public class ModuleGraph
+    public class Graph
     {
         public Dictionary<string, HashSet<Guid>> Table { get; }
 
-        public ModuleGraph()
+        public Graph()
         {
             Table = new Dictionary<string, HashSet<Guid>>();
         }
 
-        public ModuleGraph(Dictionary<string, HashSet<Guid>> table)
+        public Graph(Dictionary<string, HashSet<Guid>> table)
         {
             Table = table;
         }
@@ -26,10 +26,10 @@ namespace ModLoader.Core.Persistence
                 await writer.WriteAsync(JsonConvert.SerializeObject(this));
         }
 
-        public static async Task<ModuleGraph> LoadFromStreamAsync(Stream stream)
+        public static async Task<Graph> LoadFromStreamAsync(Stream stream)
         {
             using (var reader = new StreamReader(stream))
-                return JsonConvert.DeserializeObject<ModuleGraph>(await reader.ReadToEndAsync());
+                return JsonConvert.DeserializeObject<Graph>(await reader.ReadToEndAsync());
         }
     }
 }

@@ -33,13 +33,19 @@ namespace ModLoader
         {
             this.TextBox = new System.Windows.Forms.RichTextBox();
             this.ConflictList = new System.Windows.Forms.CheckedListBox();
-            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.ConflictGroup = new System.Windows.Forms.GroupBox();
+            this.ChangeList = new System.Windows.Forms.CheckedListBox();
+            this.ChangeGroup = new System.Windows.Forms.GroupBox();
+            this.ContentGroup = new System.Windows.Forms.GroupBox();
+            this.ModuleGroup = new System.Windows.Forms.GroupBox();
+            this.ModuleList = new System.Windows.Forms.CheckedListBox();
+            this.MemberGroup = new System.Windows.Forms.GroupBox();
             this.MemberList = new System.Windows.Forms.CheckedListBox();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
-            this.groupBox1.SuspendLayout();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.ConflictGroup.SuspendLayout();
+            this.ChangeGroup.SuspendLayout();
+            this.ContentGroup.SuspendLayout();
+            this.ModuleGroup.SuspendLayout();
+            this.MemberGroup.SuspendLayout();
             this.SuspendLayout();
             // 
             // TextBox
@@ -47,7 +53,7 @@ namespace ModLoader
             this.TextBox.Font = new System.Drawing.Font("Lucida Console", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TextBox.Location = new System.Drawing.Point(6, 34);
             this.TextBox.Name = "TextBox";
-            this.TextBox.Size = new System.Drawing.Size(529, 714);
+            this.TextBox.Size = new System.Drawing.Size(625, 937);
             this.TextBox.TabIndex = 1;
             this.TextBox.Text = "Select a member from the list(s) to view its contents...";
             // 
@@ -58,20 +64,84 @@ namespace ModLoader
             this.ConflictList.IntegralHeight = false;
             this.ConflictList.Location = new System.Drawing.Point(6, 34);
             this.ConflictList.Name = "ConflictList";
-            this.ConflictList.Size = new System.Drawing.Size(402, 335);
+            this.ConflictList.Size = new System.Drawing.Size(402, 428);
             this.ConflictList.TabIndex = 3;
             this.ConflictList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListItemCheck);
             this.ConflictList.SelectedIndexChanged += new System.EventHandler(this.ListSelectedIndexChanged);
             // 
-            // groupBox1
+            // ConflictGroup
             // 
-            this.groupBox1.Controls.Add(this.ConflictList);
-            this.groupBox1.Location = new System.Drawing.Point(13, 392);
-            this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(414, 375);
-            this.groupBox1.TabIndex = 4;
-            this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Conflict";
+            this.ConflictGroup.Controls.Add(this.ConflictList);
+            this.ConflictGroup.Location = new System.Drawing.Point(575, 520);
+            this.ConflictGroup.Name = "ConflictGroup";
+            this.ConflictGroup.Size = new System.Drawing.Size(414, 468);
+            this.ConflictGroup.TabIndex = 4;
+            this.ConflictGroup.TabStop = false;
+            this.ConflictGroup.Text = "Conflict";
+            // 
+            // ChangeList
+            // 
+            this.ChangeList.FormattingEnabled = true;
+            this.ChangeList.HorizontalScrollbar = true;
+            this.ChangeList.IntegralHeight = false;
+            this.ChangeList.Location = new System.Drawing.Point(6, 34);
+            this.ChangeList.Name = "ChangeList";
+            this.ChangeList.Size = new System.Drawing.Size(402, 462);
+            this.ChangeList.TabIndex = 2;
+            this.ChangeList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListItemCheck);
+            this.ChangeList.SelectedIndexChanged += new System.EventHandler(this.ListSelectedIndexChanged);
+            // 
+            // ChangeGroup
+            // 
+            this.ChangeGroup.Controls.Add(this.ChangeList);
+            this.ChangeGroup.Location = new System.Drawing.Point(575, 12);
+            this.ChangeGroup.Name = "ChangeGroup";
+            this.ChangeGroup.Size = new System.Drawing.Size(414, 502);
+            this.ChangeGroup.TabIndex = 5;
+            this.ChangeGroup.TabStop = false;
+            this.ChangeGroup.Text = "Changes";
+            // 
+            // ContentGroup
+            // 
+            this.ContentGroup.Controls.Add(this.TextBox);
+            this.ContentGroup.Location = new System.Drawing.Point(995, 12);
+            this.ContentGroup.Name = "ContentGroup";
+            this.ContentGroup.Size = new System.Drawing.Size(637, 977);
+            this.ContentGroup.TabIndex = 6;
+            this.ContentGroup.TabStop = false;
+            this.ContentGroup.Text = "Contents";
+            // 
+            // ModuleGroup
+            // 
+            this.ModuleGroup.Controls.Add(this.ModuleList);
+            this.ModuleGroup.Location = new System.Drawing.Point(12, 12);
+            this.ModuleGroup.Name = "ModuleGroup";
+            this.ModuleGroup.Size = new System.Drawing.Size(556, 502);
+            this.ModuleGroup.TabIndex = 6;
+            this.ModuleGroup.TabStop = false;
+            this.ModuleGroup.Text = "Modules";
+            // 
+            // ModuleList
+            // 
+            this.ModuleList.FormattingEnabled = true;
+            this.ModuleList.HorizontalScrollbar = true;
+            this.ModuleList.IntegralHeight = false;
+            this.ModuleList.Location = new System.Drawing.Point(6, 34);
+            this.ModuleList.Name = "ModuleList";
+            this.ModuleList.Size = new System.Drawing.Size(544, 462);
+            this.ModuleList.TabIndex = 2;
+            this.ModuleList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListItemCheck);
+            this.ModuleList.SelectedIndexChanged += new System.EventHandler(this.ListSelectedIndexChanged);
+            // 
+            // MemberGroup
+            // 
+            this.MemberGroup.Controls.Add(this.MemberList);
+            this.MemberGroup.Location = new System.Drawing.Point(12, 520);
+            this.MemberGroup.Name = "MemberGroup";
+            this.MemberGroup.Size = new System.Drawing.Size(556, 468);
+            this.MemberGroup.TabIndex = 7;
+            this.MemberGroup.TabStop = false;
+            this.MemberGroup.Text = "Members";
             // 
             // MemberList
             // 
@@ -80,47 +150,31 @@ namespace ModLoader
             this.MemberList.IntegralHeight = false;
             this.MemberList.Location = new System.Drawing.Point(6, 34);
             this.MemberList.Name = "MemberList";
-            this.MemberList.Size = new System.Drawing.Size(402, 333);
+            this.MemberList.Size = new System.Drawing.Size(544, 428);
             this.MemberList.TabIndex = 2;
             this.MemberList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ListItemCheck);
             this.MemberList.SelectedIndexChanged += new System.EventHandler(this.ListSelectedIndexChanged);
             // 
-            // groupBox2
-            // 
-            this.groupBox2.Controls.Add(this.MemberList);
-            this.groupBox2.Location = new System.Drawing.Point(13, 13);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(414, 373);
-            this.groupBox2.TabIndex = 5;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Members";
-            // 
-            // groupBox3
-            // 
-            this.groupBox3.Controls.Add(this.TextBox);
-            this.groupBox3.Location = new System.Drawing.Point(433, 13);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(541, 754);
-            this.groupBox3.TabIndex = 6;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "Contents";
-            // 
-            // ResolverForm
+            // MergerForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Inherit;
-            this.ClientSize = new System.Drawing.Size(990, 779);
-            this.Controls.Add(this.groupBox3);
-            this.Controls.Add(this.groupBox2);
-            this.Controls.Add(this.groupBox1);
+            this.ClientSize = new System.Drawing.Size(1644, 1001);
+            this.Controls.Add(this.MemberGroup);
+            this.Controls.Add(this.ModuleGroup);
+            this.Controls.Add(this.ContentGroup);
+            this.Controls.Add(this.ChangeGroup);
+            this.Controls.Add(this.ConflictGroup);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(5);
-            this.Name = "ResolverForm";
+            this.Name = "MergerForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Merge Modules";
             this.Load += new System.EventHandler(this.FormLoad);
-            this.groupBox1.ResumeLayout(false);
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox3.ResumeLayout(false);
+            this.ConflictGroup.ResumeLayout(false);
+            this.ChangeGroup.ResumeLayout(false);
+            this.ContentGroup.ResumeLayout(false);
+            this.ModuleGroup.ResumeLayout(false);
+            this.MemberGroup.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -129,10 +183,14 @@ namespace ModLoader
 
         private System.Windows.Forms.RichTextBox TextBox;
         private System.Windows.Forms.CheckedListBox ConflictList;
-        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.GroupBox ConflictGroup;
+        private System.Windows.Forms.CheckedListBox ChangeList;
+        private System.Windows.Forms.GroupBox ChangeGroup;
+        private System.Windows.Forms.GroupBox ContentGroup;
+        private System.Windows.Forms.GroupBox ModuleGroup;
+        private System.Windows.Forms.CheckedListBox ModuleList;
+        private System.Windows.Forms.GroupBox MemberGroup;
         private System.Windows.Forms.CheckedListBox MemberList;
-        private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.GroupBox groupBox3;
     }
 }
 

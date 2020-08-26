@@ -35,7 +35,7 @@ namespace ModLoader.Core
 
         public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Add ? c + 1 : c - 1);
 
-        public Hunk(List<Line> lines, int offset)
+        public Hunk(Diff parent, List<Line> lines, int offset) : base(parent)
         {
             Lines = lines;
             Offset = offset;
@@ -162,7 +162,7 @@ namespace ModLoader.Core
                         line = reader.ReadLine();
                     }
 
-                    var hunk = new Hunk(lines, offset);
+                    var hunk = new Hunk(this, lines, offset);
 
                     var conflictors = Members
                             .Select(h => h.Resolve())

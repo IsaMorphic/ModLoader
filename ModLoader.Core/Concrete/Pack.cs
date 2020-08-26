@@ -17,7 +17,7 @@ namespace ModLoader.Core
 
         public ZipArchive Archive { get; private set; }
 
-        public ModuleGraph Graph { get; private set; }
+        public Graph Graph { get; private set; }
 
         public string Name { get; }
 
@@ -48,7 +48,7 @@ namespace ModLoader.Core
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
 
-            Graph = await ModuleGraph.LoadFromStreamAsync(Archive.GetEntry("_pack.json").Open());
+            Graph = await Graph.LoadFromStreamAsync(Archive.GetEntry("_pack.json").Open());
 
             foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.StartsWith("_pack") && !entry.FullName.EndsWith("/")))
             {

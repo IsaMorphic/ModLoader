@@ -159,6 +159,11 @@ namespace ModLoader
                 var merger = ChangeList.SelectedItem as XunkMerger<Hunk>;
                 new MergerForm<Hunk>(merger).ShowDialog();
             }
+            else if (ChangeList.SelectedItem is XunkMerger<Chunk>)
+            {
+                var merger = ChangeList.SelectedItem as XunkMerger<Chunk>;
+                new MergerForm<Chunk>(merger).ShowDialog();
+            }
         }
 
         private async void LoadButton_Click(object sender, EventArgs e)

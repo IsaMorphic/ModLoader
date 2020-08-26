@@ -13,7 +13,7 @@ namespace ModLoader.Core.Abstract
 
         public IResolvable<IGroup<T>> Resolver { get; }
 
-        public XunkMerger(Pack parent, string name, IXunkGroupLoader<T> loader, HashSet<XunkGroup<T>> mergers) : base(parent, name, Guid.NewGuid(), loader)
+        public XunkMerger(Pack parent, string name, IXunkGroupLoader<T> loader, HashSet<XunkGroup<T>> mergers) : base(parent, name, Guid.Empty, loader)
         {
             Mergers = mergers;
 

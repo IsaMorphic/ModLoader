@@ -5,8 +5,21 @@ namespace ModLoader.Core.Abstract
     public abstract class Xunk<T> : IMergeable<T>
         where T : Xunk<T>
     {
+        public Xunk(XunkGroup<T> parent)
+        {
+            Parent = parent;
+        }
+
+        public XunkGroup<T> Parent { get; }
+
         public IResolvable<T> Fallback => null;
-        public bool Enabled { get; set; }
+
+        private bool _enabled = true;
+        public bool Enabled
+        {
+            get => _enabled && Parent.Enabled;
+            set => _enabled = value;
+        }
 
         public abstract long Offset { get; }
         public abstract long Length { get; }

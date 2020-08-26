@@ -43,7 +43,7 @@ namespace ModLoader.Core.Utilities
 
         public async Task BuildAsync()
         {
-            ModuleGraph graph = new ModuleGraph();
+            Graph graph = new Graph();
 
             var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), $"{Name}.zip");
 

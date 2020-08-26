@@ -1,4 +1,5 @@
-﻿using ModLoader.Core.Abstract;
+﻿using ModLoader.Core;
+using ModLoader.Core.Abstract;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -20,14 +21,39 @@ namespace ModLoader
 
         private void FormLoad(object sender, EventArgs e)
         {
-            RefreshMemberList();
+            RefreshModuleList();
+            RefreshChangeList();
+        }
+
+        private void RefreshModuleList()
+        {
+            Refreshing = true;
+
+            var modules = Merger.Mergers.ToArray();
+
+            ModuleList.Items.Clear();
+            ModuleList.Items.AddRange(modules);
+
+            for (int i = 0; i < ModuleList.Items.Count; i++)
+            {
+                ModuleList.SetItemChecked(i, (ModuleList.Items[i] as IResolvable<Module>).Enabled);
+            }
+
+            Refreshing = false;
         }
 
         private void RefreshMemberList()
         {
             Refreshing = true;
 
-            var members = Merger.Resolver.Resolve().Members.ToArray();
+            var module = ModuleList.SelectedItem as XunkGroup<T>;
+            if (module == null)
+            {
+                Refreshing = false;
+                return;
+            }
+
+            var members = module.Members.ToArray();
 
             MemberList.Items.Clear();
             MemberList.Items.AddRange(members);
@@ -40,13 +66,34 @@ namespace ModLoader
             Refreshing = false;
         }
 
+        private void RefreshChangeList()
+        {
+            Refreshing = true;
+
+            var members = Merger.Resolver.Resolve().Members.ToArray();
+
+            ChangeList.Items.Clear();
+            ChangeList.Items.AddRange(members);
+
+            for (int i = 0; i < ChangeList.Items.Count; i++)
+            {
+                ChangeList.SetItemChecked(i, (ChangeList.Items[i] as IResolvable<T>).Enabled);
+            }
+
+            Refreshing = false;
+        }
+
         private void RefreshConflictPane(Conflict<T> conflict)
         {
             Refreshing = true;
 
             ConflictList.Items.Clear();
 
-            if (conflict == null) return;
+            if (conflict == null)
+            {
+                Refreshing = false;
+                return;
+            }
 
             ConflictList.Items.Add(conflict.Instigator);
             ConflictList.Items.AddRange(conflict.Conflictors.ToArray());
@@ -67,11 +114,19 @@ namespace ModLoader
             if (item == null)
             {
                 var conflict = listBox.SelectedItem as Conflict<T>;
-                RefreshConflictPane(conflict);
+                if (conflict == null && listBox == ModuleList)
+                {
+                    RefreshMemberList();
+                    RefreshConflictPane(null);
+                }
+                else
+                {
+                    RefreshConflictPane(conflict);
+                }
             }
             else
             {
-                if (listBox == MemberList)
+                if (listBox != ConflictList)
                     RefreshConflictPane(null);
 
                 TextBox.Lines = item.GetDisplayText();
@@ -80,17 +135,26 @@ namespace ModLoader
 
         private void ListItemCheck(object sender, ItemCheckEventArgs e)
         {
-            if (Refreshing) return;
-
             var listBox = sender as CheckedListBox;
 
-            var item = listBox.Items[e.Index] as T;
+            var item = listBox.Items[e.Index];
 
-            if (item != null)
-                item.Enabled = e.NewValue == CheckState.Checked;
+            if (item is T)
+                (item as T).Enabled = e.NewValue == CheckState.Checked;
+            else if (item is Module)
+                (item as Module).Enabled = e.NewValue == CheckState.Checked;
 
-            if (listBox == ConflictList)
-                RefreshMemberList();
+            if (!Refreshing)
+            {
+                if (listBox != MemberList)
+                {
+                    RefreshMemberList();
+                }
+                if (listBox != ChangeList)
+                {
+                    RefreshChangeList();
+                }
+            }
         }
     }
 }

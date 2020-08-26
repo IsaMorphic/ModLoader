@@ -13,11 +13,11 @@ namespace ModLoader.Core
     public class Chunk : Xunk<Chunk>
     {
         public override long Offset { get; }
-        public override long Length => Data.Length;
+        public override long Length => Data.Length - 1;
 
         public byte[] Data { get; }
 
-        public Chunk(long offset, byte[] data)
+        public Chunk(Patch parent, long offset, byte[] data) : base(parent)
         {
             Offset = offset;
             Data = data;
@@ -29,12 +29,20 @@ namespace ModLoader.Core
 
         public override string[] GetDisplayText()
         {
-            throw new NotImplementedException();
+            List<string> lines = new List<string>();
+            lines.Add($"Starting at offset 0x{Offset:X}:");
+            lines.AddRange(Data
+                .Select((n, idx) => new { idx, n })
+                .GroupBy(x => x.idx / 8)
+                .Select(g => g
+                .Aggregate("", (acc, x) => $"{acc} {x.n:X2}"))
+                .ToArray());
+            return lines.ToArray();
         }
 
         public override string ToString()
         {
-            return $"CHUNK;[offset:0x{Offset : X},length:{Length : X}]";
+            return $"CHUNK;[offset:0x{Offset:X},length:{Length:X}]";
         }
     }
 
@@ -72,7 +80,7 @@ namespace ModLoader.Core
                         long offset = reader.ReadInt64();
                         byte[] bytes = reader.ReadBytes(reader.ReadInt32());
 
-                        var chunk = new Chunk(offset, bytes);
+                        var chunk = new Chunk(this, offset, bytes);
 
                         var conflictors = Members
                             .Select(c => c.Resolve())

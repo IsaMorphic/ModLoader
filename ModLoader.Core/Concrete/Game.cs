@@ -14,6 +14,7 @@ namespace ModLoader.Core
     using Exceptions;
     using Filters;
     using Persistence;
+    using System.Security.Cryptography.X509Certificates;
     using Utilities;
 
     public class Game
@@ -31,9 +32,9 @@ namespace ModLoader.Core
 
         public Pack BasePack { get; private set; }
 
-        public ModuleGraph Graph { get; private set; }
+        public Graph Graph { get; private set; }
 
-        public GameConfig Config { get; private set; }
+        public Config Config { get; private set; }
 
         public GroupMerger<Module> Merger { get; }
 
@@ -92,7 +93,7 @@ namespace ModLoader.Core
                 using (var stream = File.Create(GraphPath))
                     await BasePack.Graph.WriteToStreamAsync(stream);
 
-                Config = new GameConfig();
+                Config = new Config();
                 await SaveConfigAsync();
 
                 File.WriteAllText(ScriptPath, "echo Nothing to do!");
@@ -117,7 +118,7 @@ namespace ModLoader.Core
         public async Task LoadConfigAsync()
         {
             using (var stream = File.OpenRead(ConfigPath))
-                Config = await GameConfig.LoadFromStreamAsync(stream);
+                Config = await Config.LoadFromStreamAsync(stream);
 
             foreach (var packConfig in Config.Packs)
             {
@@ -136,6 +137,27 @@ namespace ModLoader.Core
 
                     if (moduleConfig.Value.Enabled != packConfig.Value.Enabled)
                         module.Enabled = moduleConfig.Value.Enabled;
+
+                    void LoadXunks<T>()
+                        where T : Xunk<T>
+                    {
+                        if (moduleConfig.Value.Xunks == null) return;
+
+                        var group = module as XunkGroup<T>;
+                        foreach (var xunkConfig in moduleConfig.Value.Xunks)
+                        {
+                            var xunk = group.Members.Select(x => x.ResolveSelf())
+                                .Single(x => x.Offset == xunkConfig.Key);
+
+                            if (xunkConfig.Value.Enabled != moduleConfig.Value.Enabled)
+                                xunk.Enabled = xunkConfig.Value.Enabled;
+                        }
+                    }
+
+                    if (module is Diff)
+                        LoadXunks<Hunk>();
+                    else if (module is Patch)
+                        LoadXunks<Chunk>();
                 }
             }
         }
@@ -144,7 +166,7 @@ namespace ModLoader.Core
         {
             foreach (var pack in Packs)
             {
-                var packConfig = new GameConfig.PackConfig()
+                var packConfig = new Config.Pack()
                 {
                     Enabled = pack.Enabled,
                     Fallback = pack.Fallback?.ResolveSelf().Name,
@@ -154,9 +176,32 @@ namespace ModLoader.Core
                 {
                     if (!packConfig.Modules.ContainsKey(module.Name))
                         packConfig.Modules.Add(module.Name, null);
-                    packConfig.Modules[module.Name] = new GameConfig.ModuleConfig()
+
+                    Dictionary<long, Config.Xunk> xunks = null;
+
+                    void SaveXunks<T>()
+                        where T : Xunk<T>
                     {
-                        Enabled = module.Enabled,
+                        var group = module as XunkGroup<T>;
+
+                        xunks = new Dictionary<long, Config.Xunk>();
+                        foreach (var member in group.Members.Select(m => m.ResolveSelf()))
+                        {
+                            xunks.Add(member.Offset, new Config.Xunk
+                            {
+                                Enabled = member.Enabled
+                            });
+                        }
+                    }
+
+                    if (module is Diff)
+                        SaveXunks<Hunk>();
+                    else if (module is Patch)
+                        SaveXunks<Chunk>();
+
+                    packConfig.Modules[module.Name] = new Config.Module(xunks)
+                    {
+                        Enabled = module.Enabled
                     };
                 }
 
@@ -172,7 +217,7 @@ namespace ModLoader.Core
         public async Task LoadGraphAsync()
         {
             using (var stream = File.OpenRead(GraphPath))
-                Graph = await ModuleGraph.LoadFromStreamAsync(stream);
+                Graph = await Graph.LoadFromStreamAsync(stream);
         }
 
         public async Task SaveGraphAsync()
@@ -203,6 +248,9 @@ namespace ModLoader.Core
                 .SelectMany(m => m.Members)
                 .Select(m => m.ResolveSelf())
                 .Where(m => m.Resolve() == null)
+                .Concat(Modules.Resolve().Members
+                    .Select(m => m.Resolve())
+                    .Where(m => m.Id == Guid.Empty))
                 .Select(m => BasePack.Members
                     .Select(b => b.Resolve())
                     .Where(b => b != null)
