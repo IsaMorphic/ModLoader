@@ -8,15 +8,13 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
-    using Filters;
     using Exceptions;
 
-    public class Chunk : IMergeable<Chunk>
+    public class Chunk : Xunk<Chunk>
     {
-        public IResolvable<Chunk> Fallback => null;
-        public bool Enabled { get; set; }
+        public override long Offset { get; }
+        public override long Length => Data.Length;
 
-        public long Offset { get; }
         public byte[] Data { get; }
 
         public Chunk(long offset, byte[] data)
@@ -27,47 +25,43 @@ namespace ModLoader.Core
             Enabled = true;
         }
 
-        public bool CanMergeWith(Chunk other)
+        public override Chunk ResolveSelf() => this;
+
+        public override string[] GetDisplayText()
         {
-            return Offset >= other.Offset && other.Offset + other.Data.Length >= Offset;
-        }
-
-        public IResolvable<Chunk> MergeWith(HashSet<Chunk> others)
-        {
-            return new Conflict<Chunk>(this, others);
-        }
-
-        public Chunk ResolveSelf() => this;
-    }
-
-    public class ResolvingPatch : Patch
-    {
-        public IResolvable<IGroup<Chunk>> Resolver { get; }
-
-        public ResolvingPatch(Pack parent, string name, IResolvable<IGroup<Chunk>> resolver) : base(parent, name, Guid.Empty)
-        {
-            Resolver = resolver;
-        }
-
-        public override Module ResolveSelf()
-        {
-            return new Patch(Parent, Name, Resolver.Resolve().Members);
+            throw new NotImplementedException();
         }
 
         public override string ToString()
         {
-            return "(MERGED PATCH)";
+            return $"CHUNK;[offset:0x{Offset : X},length:{Length : X}]";
         }
     }
 
-    public class Patch : Module, IGroup<Chunk>
+    public class Patch : XunkGroup<Chunk>
     {
-        public HashSet<IResolvable<Chunk>> Members { get; }
-
-        public Patch(Pack parent, string name, Guid id) : base(parent, name, id)
+        public class PatchLoader : IXunkGroupLoader<Chunk>
         {
-            Members = new HashSet<IResolvable<Chunk>>();
+            public async Task LoadAsync(XunkGroup<Chunk> group, CancellationToken token)
+            {
+                if (group.Root.Graph.Table[group.Name].Contains(group.Id)) return;
 
+                var path = Path.Combine(group.Root.GamePath, group.Name);
+                using (var stream = File.OpenWrite(path))
+                {
+                    foreach (var chunk in group.Members.Select(m => m.Resolve()))
+                    {
+                        stream.Seek(chunk.Offset, SeekOrigin.Begin);
+                        await stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
+                    }
+                }
+
+                group.Root.Graph.Table[group.Name].Add(group.Id);
+            }
+        }
+
+        public Patch(Pack parent, string name, Guid id) : base(parent, name, id, new PatchLoader())
+        {
             try
             {
                 using (var data = GetDataStream())
@@ -81,12 +75,12 @@ namespace ModLoader.Core
                         var chunk = new Chunk(offset, bytes);
 
                         var conflictors = Members
-                            .Select(c => c.ResolveSelf())
+                            .Select(c => c.Resolve())
                             .Where(c => c.CanMergeWith(chunk));
 
                         if (conflictors.Any())
                         {
-                            var conflict = new Conflict<Chunk>(chunk, new HashSet<Chunk>(conflictors));
+                            var conflict = new Conflict<Chunk>(chunk.ToString(), chunk, new HashSet<Chunk>(conflictors));
                             throw new ConflictException<Chunk>("Patch parse failed! Patch cannot have conflicting chunks. Contact the developer of this pack to resolve the issue.", conflict);
                         }
                         else
@@ -99,52 +93,9 @@ namespace ModLoader.Core
             catch (EndOfStreamException) { }
         }
 
-        public Patch(Pack parent, string name, HashSet<IResolvable<Chunk>> chunks) : base(parent, name, Guid.Empty)
-        {
-            Members = chunks;
-        }
-
         public override Stream GetDataStream()
         {
             return Parent.Archive.GetEntry($"{Name}.patch").Open();
-        }
-
-        public override IResolvable<Module> MergeWith(HashSet<Module> others)
-        {
-            if (others.All(m => m is Patch))
-            {
-                var otherGroups = new HashSet<IGroup<Chunk>>(
-                    others.Cast<IGroup<Chunk>>());
-
-                otherGroups.Add(this);
-
-                return new ResolvingPatch(Parent, Name,
-                    new MergeFilter<Chunk>()
-                    {
-                        Fallback = new GroupMerger<Chunk>(otherGroups)
-                    });
-            }
-            else
-            {
-                return base.MergeWith(others);
-            }
-        }
-
-        public override async Task LoadSelfAsync(CancellationToken token)
-        {
-            if (Root.Graph.Table[Name].Contains(Id)) return;
-
-            var path = Path.Combine(Root.GamePath, Name);
-            using (var stream = File.OpenWrite(path))
-            {
-                foreach (var chunk in Members.Select(m => m.ResolveSelf()))
-                {
-                    stream.Seek(chunk.Offset, SeekOrigin.Begin);
-                    await stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
-                }
-            }
-
-            Root.Graph.Table[Name].Add(Id);
         }
     }
 }

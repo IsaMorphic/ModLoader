@@ -55,7 +55,7 @@ namespace ModLoader.Core
 
         public virtual IResolvable<Module> MergeWith(HashSet<Module> others)
         {
-            return new Conflict<Module>(this, others);
+            return new Conflict<Module>(Name, this, others);
         }
 
         public virtual Stream GetDataStream()

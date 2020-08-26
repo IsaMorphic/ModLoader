@@ -4,6 +4,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -80,7 +81,7 @@ namespace ModLoader
             if (conflict != null)
             {
                 ConflictList.Items.Add(conflict.Instigator);
-                ConflictList.Items.AddRange(conflict.Mergers.ToArray());
+                ConflictList.Items.AddRange(conflict.Conflictors.ToArray());
                 for (int i = 0; i < ConflictList.Items.Count; i++)
                 {
                     ConflictList.SetItemChecked(i, (ConflictList.Items[i] as Module).Enabled);
@@ -148,8 +149,16 @@ namespace ModLoader
 
         private void ChangeList_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var conflict = ChangeList.SelectedItem as Conflict<Module>;
-            RefreshConflictPane(conflict);
+            if (ChangeList.SelectedItem is Conflict<Module>)
+            {
+                var conflict = ChangeList.SelectedItem as Conflict<Module>;
+                RefreshConflictPane(conflict);
+            }
+            else if (ChangeList.SelectedItem is XunkMerger<Hunk>)
+            {
+                var merger = ChangeList.SelectedItem as XunkMerger<Hunk>;
+                new MergerForm<Hunk>(merger).ShowDialog();
+            }
         }
 
         private async void LoadButton_Click(object sender, EventArgs e)

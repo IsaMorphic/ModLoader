@@ -24,7 +24,7 @@ namespace ModLoader.Core.Filters
         {
             HashSet<MergingUnit> units =
                 new HashSet<MergingUnit>(group.Members
-                    .Select(m => new MergingUnit(m.ResolveSelf()))
+                    .Select(m => new MergingUnit(m.Resolve()))
                     );
 
             foreach (var thisUnit in units)

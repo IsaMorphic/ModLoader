@@ -35,7 +35,7 @@ namespace ModLoader.Core
 
         public GameConfig Config { get; private set; }
 
-        public IMerger<IGroup<Module>> Merger { get; }
+        public GroupMerger<Module> Merger { get; }
 
         public IResolvable<IGroup<Module>> Modules { get; set; }
 
@@ -191,7 +191,7 @@ namespace ModLoader.Core
 
         public async Task LoadModulesAsync(CancellationToken token)
         {
-            foreach (var module in Modules.Resolve().Members.Select(m => m.ResolveSelf()))
+            foreach (var module in Modules.Resolve().Members.Select(m => m.Resolve()))
             {
                 await module.LoadAsync(token);
             }

@@ -6,23 +6,27 @@ namespace ModLoader.Core.Abstract
 {
     using Exceptions;
 
-    public class Conflict<T> : IMerger<T>
+    public class Conflict<T> : IResolvable<T>
         where T : class, IResolvable<T>
     {
         public IResolvable<T> Fallback => null;
         public bool Enabled => true;
 
+        public string Name { get; }
+
         public T Instigator { get; }
 
-        public HashSet<T> Mergers { get; }
+        public HashSet<T> Conflictors { get; }
 
-        public Conflict(T instigator, HashSet<T> mergers)
+        public Conflict(string name, T instigator, HashSet<T> conflictors)
         {
+            Name = name;
+
             Instigator = instigator;
-            Mergers = mergers;
+            Conflictors = conflictors;
         }
 
-        public Conflict(T instigator) : this(instigator, new HashSet<T>())
+        public Conflict(string name, T instigator) : this(name, instigator, new HashSet<T>())
         {
         }
 
@@ -30,7 +34,7 @@ namespace ModLoader.Core.Abstract
         {
             try
             {
-                return Mergers
+                return Conflictors
                     .Union(new HashSet<T> { Instigator })
                     .Select(m => m.Resolve())
                     .Where(m => m != null)
@@ -44,7 +48,7 @@ namespace ModLoader.Core.Abstract
 
         public override string ToString()
         {
-            return "(CONFLICT)";
+            return $"(CONFLICT) {Name}";
         }
     }
 }

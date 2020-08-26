@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace ModLoader.Core.Abstract
 {
-    public class GroupMerger<T> : IMerger<IGroup<T>>
+    public class GroupMerger<T> : IResolvable<IGroup<T>>
         where T : class, IResolvable<T>
     {
         public HashSet<IGroup<T>> Mergers { get; }
