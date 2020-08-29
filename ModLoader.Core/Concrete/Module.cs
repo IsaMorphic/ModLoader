@@ -30,12 +30,9 @@ namespace ModLoader.Core
             }
         }
 
-        private bool _enabled = true;
-        public bool Enabled
-        {
-            get => _enabled && Parent.Enabled;
-            set => _enabled = value;
-        }
+        public bool? Enabled { get; set; }
+
+        bool IResolvable<Module>.Enabled => (Enabled ?? true) && (Parent as IResolvable<Pack>).Enabled;
 
         public Module(Pack parent, string name, Guid id)
         {

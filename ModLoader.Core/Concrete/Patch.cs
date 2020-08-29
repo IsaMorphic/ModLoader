@@ -21,8 +21,6 @@ namespace ModLoader.Core
         {
             Offset = offset;
             Data = data;
-
-            Enabled = true;
         }
 
         public override Chunk ResolveSelf() => this;

@@ -36,7 +36,8 @@ namespace ModLoader
 
             for (int i = 0; i < ModuleList.Items.Count; i++)
             {
-                ModuleList.SetItemChecked(i, (ModuleList.Items[i] as IResolvable<Module>).Enabled);
+                var state = (ModuleList.Items[i] as Module).Enabled;
+                ModuleList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
             }
 
             Refreshing = false;
@@ -60,7 +61,8 @@ namespace ModLoader
 
             for (int i = 0; i < MemberList.Items.Count; i++)
             {
-                MemberList.SetItemChecked(i, (MemberList.Items[i] as IResolvable<T>).Enabled);
+                var state = (MemberList.Items[i] as T).Enabled;
+                MemberList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
             }
 
             Refreshing = false;
@@ -77,7 +79,8 @@ namespace ModLoader
 
             for (int i = 0; i < ChangeList.Items.Count; i++)
             {
-                ChangeList.SetItemChecked(i, (ChangeList.Items[i] as IResolvable<T>).Enabled);
+                var state = (ChangeList.Items[i] as T)?.Enabled;
+                ChangeList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
             }
 
             Refreshing = false;
@@ -100,7 +103,8 @@ namespace ModLoader
 
             for (int i = 0; i < ConflictList.Items.Count; i++)
             {
-                ConflictList.SetItemChecked(i, (ConflictList.Items[i] as IResolvable<T>).Enabled);
+                var state = (ConflictList.Items[i] as T)?.Enabled;
+                ConflictList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
             }
 
             Refreshing = false;
@@ -140,9 +144,9 @@ namespace ModLoader
             var item = listBox.Items[e.Index];
 
             if (item is T)
-                (item as T).Enabled = e.NewValue == CheckState.Checked;
+                (item as T).Enabled = e.NewValue == CheckState.Indeterminate ? null : (bool?)(e.NewValue == CheckState.Checked);
             else if (item is Module)
-                (item as Module).Enabled = e.NewValue == CheckState.Checked;
+                (item as Module).Enabled = e.NewValue == CheckState.Indeterminate ? null : (bool?)(e.NewValue == CheckState.Checked);
 
             if (!Refreshing)
             {

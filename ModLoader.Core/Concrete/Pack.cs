@@ -22,7 +22,9 @@ namespace ModLoader.Core
         public string Name { get; }
 
         public IResolvable<Pack> Fallback { get; set; }
-        public bool Enabled { get; set; }
+        
+        public bool? Enabled { get; set; }
+        bool IResolvable<Pack>.Enabled => Enabled ?? true;
 
         public HashSet<IResolvable<Module>> Members { get; }
 
@@ -30,8 +32,6 @@ namespace ModLoader.Core
         {
             Name = name;
             Members = modules;
-
-            Enabled = true;
         }
 
         public Pack(Game parent, string name) : this(name, new HashSet<IResolvable<Module>>())

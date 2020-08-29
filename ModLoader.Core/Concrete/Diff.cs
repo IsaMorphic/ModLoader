@@ -39,8 +39,6 @@ namespace ModLoader.Core
         {
             Lines = lines;
             Offset = offset;
-
-            Enabled = true;
         }
 
         public override Hunk ResolveSelf() => this;

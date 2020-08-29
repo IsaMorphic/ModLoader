@@ -10,7 +10,7 @@ namespace ModLoader.Core.Persistence
     {
         public class Pack
         {
-            public bool Enabled { get; set; }
+            public bool? Enabled { get; set; }
             public string Fallback { get; set; }
 
             public Dictionary<string, Module> Modules { get; }
@@ -28,7 +28,7 @@ namespace ModLoader.Core.Persistence
 
         public class Module
         {
-            public bool Enabled { get; set; }
+            public bool? Enabled { get; set; }
             public Dictionary<long, Xunk> Xunks { get; }
 
             public Module()
@@ -44,7 +44,7 @@ namespace ModLoader.Core.Persistence
 
         public class Xunk
         {
-            public bool Enabled { get; set; }
+            public bool? Enabled { get; set; }
         }
 
         public string LaunchPath { get; set; }

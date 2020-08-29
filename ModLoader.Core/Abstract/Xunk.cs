@@ -14,12 +14,9 @@ namespace ModLoader.Core.Abstract
 
         public IResolvable<T> Fallback => null;
 
-        private bool _enabled = true;
-        public bool Enabled
-        {
-            get => _enabled && Parent.Enabled;
-            set => _enabled = value;
-        }
+        public bool? Enabled { get; set; }
+
+        bool IResolvable<T>.Enabled => (Enabled ?? true) && (Parent as IResolvable<Module>).Enabled;
 
         public abstract long Offset { get; }
         public abstract long Length { get; }

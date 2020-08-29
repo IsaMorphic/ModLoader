@@ -135,8 +135,7 @@ namespace ModLoader.Core
                         .Select(m => m.ResolveSelf())
                         .Single(m => m.Name == moduleConfig.Key);
 
-                    if (moduleConfig.Value.Enabled != packConfig.Value.Enabled)
-                        module.Enabled = moduleConfig.Value.Enabled;
+                    module.Enabled = moduleConfig.Value.Enabled;
 
                     void LoadXunks<T>()
                         where T : Xunk<T>
@@ -149,8 +148,7 @@ namespace ModLoader.Core
                             var xunk = group.Members.Select(x => x.ResolveSelf())
                                 .Single(x => x.Offset == xunkConfig.Key);
 
-                            if (xunkConfig.Value.Enabled != moduleConfig.Value.Enabled)
-                                xunk.Enabled = xunkConfig.Value.Enabled;
+                            xunk.Enabled = xunkConfig.Value.Enabled;
                         }
                     }
 
