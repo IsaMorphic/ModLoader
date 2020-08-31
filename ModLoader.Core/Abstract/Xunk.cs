@@ -8,15 +8,17 @@ namespace ModLoader.Core.Abstract
         public Xunk(XunkGroup<T> parent)
         {
             Parent = parent;
+
+            Enabled = true;
         }
 
         public XunkGroup<T> Parent { get; }
 
         public IResolvable<T> Fallback => null;
 
-        public bool? Enabled { get; set; }
+        public bool Enabled { get; set; }
 
-        bool IResolvable<T>.Enabled => (Enabled ?? true) && (Parent as IResolvable<Module>).Enabled;
+        bool IResolvable<T>.Enabled => Enabled && (Parent as IResolvable<Module>).Enabled;
 
         public abstract long Offset { get; }
         public abstract long Length { get; }

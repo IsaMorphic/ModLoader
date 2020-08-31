@@ -49,7 +49,7 @@ namespace ModLoader
                 for (int i = 0; i < ModuleList.Items.Count; i++)
                 {
                     var state = (ModuleList.Items[i] as Module).Enabled;
-                    ModuleList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
+                    ModuleList.SetItemChecked(i, state);
                 }
             }
 
@@ -86,7 +86,7 @@ namespace ModLoader
                 for (int i = 0; i < ConflictList.Items.Count; i++)
                 {
                     var state = (ConflictList.Items[i] as Module).Enabled;
-                    ConflictList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
+                    ConflictList.SetItemChecked(i, state);
                 }
             }
 
@@ -115,7 +115,7 @@ namespace ModLoader
 
             var pack = PackList.SelectedItem as Pack;
 
-            EnabledCheckBox.CheckState = pack.Enabled.HasValue ? (pack.Enabled.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate;
+            EnabledCheckBox.Checked = pack.Enabled;
             FallbackSelect.SelectedItem = pack.Fallback;
 
             RefreshModuleList();
@@ -139,7 +139,7 @@ namespace ModLoader
 
         private void ModuleList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
-            ((sender as CheckedListBox).Items[e.Index] as Module).Enabled = e.NewValue == CheckState.Indeterminate ? null : (bool?)(e.NewValue == CheckState.Checked);
+            ((sender as CheckedListBox).Items[e.Index] as Module).Enabled = e.NewValue == CheckState.Checked;
             if (!Refreshing)
             {
                 RefreshChangeList();

@@ -30,9 +30,9 @@ namespace ModLoader.Core
             }
         }
 
-        public bool? Enabled { get; set; }
+        public bool Enabled { get; set; }
 
-        bool IResolvable<Module>.Enabled => (Enabled ?? true) && (Parent as IResolvable<Pack>).Enabled;
+        bool IResolvable<Module>.Enabled => Enabled && (Parent as IResolvable<Pack>).Enabled;
 
         public Module(Pack parent, string name, Guid id)
         {
@@ -41,6 +41,8 @@ namespace ModLoader.Core
 
             Parent = parent;
             Root = Parent.Parent;
+
+            Enabled = true;
         }
 
         public virtual Module ResolveSelf() => this;

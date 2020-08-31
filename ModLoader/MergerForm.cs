@@ -37,7 +37,7 @@ namespace ModLoader
             for (int i = 0; i < ModuleList.Items.Count; i++)
             {
                 var state = (ModuleList.Items[i] as Module).Enabled;
-                ModuleList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
+                ModuleList.SetItemChecked(i, state);
             }
 
             Refreshing = false;
@@ -62,7 +62,7 @@ namespace ModLoader
             for (int i = 0; i < MemberList.Items.Count; i++)
             {
                 var state = (MemberList.Items[i] as T).Enabled;
-                MemberList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
+                MemberList.SetItemChecked(i, state);
             }
 
             Refreshing = false;
@@ -144,9 +144,9 @@ namespace ModLoader
             var item = listBox.Items[e.Index];
 
             if (item is T)
-                (item as T).Enabled = e.NewValue == CheckState.Indeterminate ? null : (bool?)(e.NewValue == CheckState.Checked);
+                (item as T).Enabled = e.NewValue == CheckState.Checked;
             else if (item is Module)
-                (item as Module).Enabled = e.NewValue == CheckState.Indeterminate ? null : (bool?)(e.NewValue == CheckState.Checked);
+                (item as Module).Enabled = e.NewValue == CheckState.Checked;
 
             if (!Refreshing)
             {
