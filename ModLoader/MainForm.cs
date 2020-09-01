@@ -195,5 +195,10 @@ namespace ModLoader
 
             RefreshChangeList();
         }
+
+        private void RebuildButton_Click(object sender, EventArgs e)
+        {
+            Application.Restart();
+        }
     }
 }

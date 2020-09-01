@@ -30,7 +30,7 @@ namespace ModLoader
                     await PackBuilder
                         .FromDirectory(dir)
                         .WithBitmap(new Image<Rgba32>(100, 100))
-                        .WithNote("Mod Packaging Test")
+                        .WithNote("Your mod pack (under construction)")
                         .WithName(Path.GetFileName(dir))
                         .BuildAsync();
                 }

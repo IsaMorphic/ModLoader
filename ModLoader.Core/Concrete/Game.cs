@@ -122,7 +122,9 @@ namespace ModLoader.Core
 
             foreach (var packConfig in Config.Packs)
             {
-                var pack = Packs.Single(p => p.Name == packConfig.Key);
+                var pack = Packs.SingleOrDefault(p => p.Name == packConfig.Key);
+
+                if (pack == null) continue;
 
                 var fallback = Packs.SingleOrDefault(p => p.Name == packConfig.Value.Fallback);
 
@@ -133,7 +135,9 @@ namespace ModLoader.Core
                 {
                     var module = pack.Members
                         .Select(m => m.ResolveSelf())
-                        .Single(m => m.Name == moduleConfig.Key);
+                        .SingleOrDefault(m => m.Name == moduleConfig.Key);
+
+                    if (module == null) continue;
 
                     module.Enabled = moduleConfig.Value.Enabled;
 
@@ -146,7 +150,9 @@ namespace ModLoader.Core
                         foreach (var xunkConfig in moduleConfig.Value.Xunks)
                         {
                             var xunk = group.Members.Select(x => x.ResolveSelf())
-                                .Single(x => x.Offset == xunkConfig.Key);
+                                .SingleOrDefault(x => x.Offset == xunkConfig.Key);
+
+                            if (xunk == null) continue;
 
                             xunk.Enabled = xunkConfig.Value.Enabled;
                         }

@@ -40,6 +40,7 @@
             this.FallbackLabel = new System.Windows.Forms.Label();
             this.FallbackSelect = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.RebuildButton = new System.Windows.Forms.Button();
             this.RunGameButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
             this.ChangeGroup = new System.Windows.Forms.GroupBox();
@@ -65,7 +66,7 @@
             this.ChangeList.Location = new System.Drawing.Point(8, 36);
             this.ChangeList.Margin = new System.Windows.Forms.Padding(5);
             this.ChangeList.Name = "ChangeList";
-            this.ChangeList.Size = new System.Drawing.Size(543, 479);
+            this.ChangeList.Size = new System.Drawing.Size(543, 491);
             this.ChangeList.TabIndex = 1;
             this.ChangeList.SelectedIndexChanged += new System.EventHandler(this.ChangeList_SelectedIndexChanged);
             // 
@@ -120,7 +121,7 @@
             this.PackList.Location = new System.Drawing.Point(8, 36);
             this.PackList.Margin = new System.Windows.Forms.Padding(5);
             this.PackList.Name = "PackList";
-            this.PackList.Size = new System.Drawing.Size(407, 479);
+            this.PackList.Size = new System.Drawing.Size(407, 491);
             this.PackList.TabIndex = 1;
             this.PackList.SelectedIndexChanged += new System.EventHandler(this.PackList_SelectedIndexChanged);
             // 
@@ -141,7 +142,7 @@
             this.PropGroup.Enabled = false;
             this.PropGroup.Location = new System.Drawing.Point(577, 554);
             this.PropGroup.Name = "PropGroup";
-            this.PropGroup.Size = new System.Drawing.Size(415, 164);
+            this.PropGroup.Size = new System.Drawing.Size(415, 205);
             this.PropGroup.TabIndex = 5;
             this.PropGroup.TabStop = false;
             this.PropGroup.Text = "Properties";
@@ -178,18 +179,29 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.RebuildButton);
             this.groupBox1.Controls.Add(this.RunGameButton);
             this.groupBox1.Controls.Add(this.LoadButton);
             this.groupBox1.Location = new System.Drawing.Point(1002, 554);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(402, 164);
+            this.groupBox1.Size = new System.Drawing.Size(402, 205);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Actions";
             // 
+            // RebuildButton
+            // 
+            this.RebuildButton.Location = new System.Drawing.Point(7, 27);
+            this.RebuildButton.Name = "RebuildButton";
+            this.RebuildButton.Size = new System.Drawing.Size(389, 54);
+            this.RebuildButton.TabIndex = 2;
+            this.RebuildButton.Text = "Rebuild Packs / Reload";
+            this.RebuildButton.UseVisualStyleBackColor = true;
+            this.RebuildButton.Click += new System.EventHandler(this.RebuildButton_Click);
+            // 
             // RunGameButton
             // 
-            this.RunGameButton.Location = new System.Drawing.Point(6, 93);
+            this.RunGameButton.Location = new System.Drawing.Point(6, 146);
             this.RunGameButton.Name = "RunGameButton";
             this.RunGameButton.Size = new System.Drawing.Size(390, 53);
             this.RunGameButton.TabIndex = 1;
@@ -198,7 +210,7 @@
             // 
             // LoadButton
             // 
-            this.LoadButton.Location = new System.Drawing.Point(6, 34);
+            this.LoadButton.Location = new System.Drawing.Point(6, 87);
             this.LoadButton.Name = "LoadButton";
             this.LoadButton.Size = new System.Drawing.Size(390, 53);
             this.LoadButton.TabIndex = 0;
@@ -230,9 +242,9 @@
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.ModuleList);
-            this.groupBox2.Location = new System.Drawing.Point(577, 724);
+            this.groupBox2.Location = new System.Drawing.Point(577, 765);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(827, 349);
+            this.groupBox2.Size = new System.Drawing.Size(827, 308);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Modules";
@@ -244,7 +256,7 @@
             this.ModuleList.IntegralHeight = false;
             this.ModuleList.Location = new System.Drawing.Point(8, 34);
             this.ModuleList.Name = "ModuleList";
-            this.ModuleList.Size = new System.Drawing.Size(811, 308);
+            this.ModuleList.Size = new System.Drawing.Size(811, 267);
             this.ModuleList.TabIndex = 1;
             this.ModuleList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleList_ItemCheck);
             // 
@@ -258,7 +270,9 @@
             this.Controls.Add(this.PropGroup);
             this.Controls.Add(this.PackGroup);
             this.Controls.Add(this.ModuleGroup);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Margin = new System.Windows.Forms.Padding(5);
+            this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "ModLoader";
             this.Load += new System.EventHandler(this.MainForm_Load);
@@ -296,6 +310,7 @@
         private System.Windows.Forms.TextBox PackNotes;
         private System.Windows.Forms.CheckedListBox ConflictList;
         private System.Windows.Forms.CheckedListBox ModuleList;
+        private System.Windows.Forms.Button RebuildButton;
     }
 }
 
