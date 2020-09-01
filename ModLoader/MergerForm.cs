@@ -103,8 +103,8 @@ namespace ModLoader
 
             for (int i = 0; i < ConflictList.Items.Count; i++)
             {
-                var state = (ConflictList.Items[i] as T)?.Enabled;
-                ConflictList.SetItemCheckState(i, state.HasValue ? (state.Value ? CheckState.Checked : CheckState.Unchecked) : CheckState.Indeterminate);
+                var state = (ConflictList.Items[i] as T).Enabled;
+                ConflictList.SetItemChecked(i, state);
             }
 
             Refreshing = false;
