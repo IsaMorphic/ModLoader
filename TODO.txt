@@ -1,0 +1,6 @@
+Pack list should be CheckedListBox
+all CheckedListBoxes should have CheckOnClick enabled
+
+questions from Polly:
+Is there a way to automatically build the file system?
+And maybe a bar at the top with an option to open the mods folder and another to import? (as in it opens up a file window for you to search for a file and you select the mod and it puts it into the mods folder and reloads?)
