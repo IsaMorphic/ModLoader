@@ -33,7 +33,7 @@
             this.PackGroup = new System.Windows.Forms.GroupBox();
             this.NoteGroup = new System.Windows.Forms.GroupBox();
             this.PackNotes = new System.Windows.Forms.TextBox();
-            this.PackList = new System.Windows.Forms.ListBox();
+            this.PackList = new System.Windows.Forms.CheckedListBox();
             this.PackImage = new System.Windows.Forms.PictureBox();
             this.PropGroup = new System.Windows.Forms.GroupBox();
             this.EnabledCheckBox = new System.Windows.Forms.CheckBox();
@@ -62,7 +62,7 @@
             this.ChangeList.FormattingEnabled = true;
             this.ChangeList.HorizontalScrollbar = true;
             this.ChangeList.IntegralHeight = false;
-            this.ChangeList.ItemHeight = 29;
+            this.ChangeList.ItemHeight = 16;
             this.ChangeList.Location = new System.Drawing.Point(8, 36);
             this.ChangeList.Margin = new System.Windows.Forms.Padding(5);
             this.ChangeList.Name = "ChangeList";
@@ -117,12 +117,12 @@
             this.PackList.FormattingEnabled = true;
             this.PackList.HorizontalScrollbar = true;
             this.PackList.IntegralHeight = false;
-            this.PackList.ItemHeight = 29;
             this.PackList.Location = new System.Drawing.Point(8, 36);
             this.PackList.Margin = new System.Windows.Forms.Padding(5);
             this.PackList.Name = "PackList";
             this.PackList.Size = new System.Drawing.Size(407, 491);
             this.PackList.TabIndex = 1;
+            this.PackList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PackList_ItemCheck);
             this.PackList.SelectedIndexChanged += new System.EventHandler(this.PackList_SelectedIndexChanged);
             // 
             // PackImage
@@ -151,20 +151,20 @@
             // 
             this.EnabledCheckBox.AutoSize = true;
             this.EnabledCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.EnabledCheckBox.Enabled = false;
             this.EnabledCheckBox.Location = new System.Drawing.Point(6, 34);
             this.EnabledCheckBox.Name = "EnabledCheckBox";
-            this.EnabledCheckBox.Size = new System.Drawing.Size(135, 33);
+            this.EnabledCheckBox.Size = new System.Drawing.Size(92, 27);
             this.EnabledCheckBox.TabIndex = 2;
             this.EnabledCheckBox.Text = "Enabled";
             this.EnabledCheckBox.UseVisualStyleBackColor = true;
-            this.EnabledCheckBox.CheckedChanged += new System.EventHandler(this.EnabledCheckBox_CheckedChanged);
             // 
             // FallbackLabel
             // 
             this.FallbackLabel.AutoSize = true;
             this.FallbackLabel.Location = new System.Drawing.Point(147, 35);
             this.FallbackLabel.Name = "FallbackLabel";
-            this.FallbackLabel.Size = new System.Drawing.Size(110, 29);
+            this.FallbackLabel.Size = new System.Drawing.Size(64, 17);
             this.FallbackLabel.TabIndex = 1;
             this.FallbackLabel.Text = "Fallback:";
             // 
@@ -173,7 +173,7 @@
             this.FallbackSelect.FormattingEnabled = true;
             this.FallbackSelect.Location = new System.Drawing.Point(258, 32);
             this.FallbackSelect.Name = "FallbackSelect";
-            this.FallbackSelect.Size = new System.Drawing.Size(151, 37);
+            this.FallbackSelect.Size = new System.Drawing.Size(151, 24);
             this.FallbackSelect.TabIndex = 0;
             this.FallbackSelect.SelectedIndexChanged += new System.EventHandler(this.FallbackSelect_SelectedIndexChanged);
             // 
@@ -230,6 +230,7 @@
             // 
             // ConflictList
             // 
+            this.ConflictList.CheckOnClick = true;
             this.ConflictList.FormattingEnabled = true;
             this.ConflictList.HorizontalScrollbar = true;
             this.ConflictList.IntegralHeight = false;
@@ -251,6 +252,7 @@
             // 
             // ModuleList
             // 
+            this.ModuleList.CheckOnClick = true;
             this.ModuleList.FormattingEnabled = true;
             this.ModuleList.HorizontalScrollbar = true;
             this.ModuleList.IntegralHeight = false;
@@ -295,7 +297,7 @@
         private System.Windows.Forms.ListBox ChangeList;
         private System.Windows.Forms.GroupBox ModuleGroup;
         private System.Windows.Forms.GroupBox PackGroup;
-        private System.Windows.Forms.ListBox PackList;
+        private System.Windows.Forms.CheckedListBox PackList;
         private System.Windows.Forms.GroupBox PropGroup;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button RunGameButton;

@@ -4,7 +4,6 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -64,6 +63,12 @@ namespace ModLoader
 
             PackList.Items.Clear();
             PackList.Items.AddRange(Game.Packs.ToArray());
+
+            for (int i = 0; i < PackList.Items.Count; i++)
+            {
+                var state = (PackList.Items[i] as Pack).Enabled;
+                PackList.SetItemChecked(i, state);
+            }
 
             FallbackSelect.Items.Clear();
             FallbackSelect.Items.Add("");
@@ -127,28 +132,6 @@ namespace ModLoader
                 PackNotes.Text = new StreamReader(stream).ReadToEnd();
         }
 
-        private void EnabledCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            var pack = PackList.SelectedItem as Pack;
-
-            pack.Enabled = EnabledCheckBox.Checked;
-
-            RefreshChangeList();
-            RefreshModuleList();
-        }
-
-        private void ModuleList_ItemCheck(object sender, ItemCheckEventArgs e)
-        {
-            ((sender as CheckedListBox).Items[e.Index] as Module).Enabled = e.NewValue == CheckState.Checked;
-            if (!Refreshing)
-            {
-                RefreshChangeList();
-
-                if (sender != ModuleList)
-                    RefreshModuleList();
-            }
-        }
-
         private void ChangeList_SelectedIndexChanged(object sender, EventArgs e)
         {
             if (ChangeList.SelectedItem is Conflict<Module>)
@@ -165,6 +148,27 @@ namespace ModLoader
             {
                 var merger = ChangeList.SelectedItem as XunkMerger<Chunk>;
                 new MergerForm<Chunk>(merger).ShowDialog();
+            }
+        }
+
+        private void PackList_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            var pack = PackList.SelectedItem as Pack;
+            pack.Enabled = e.NewValue == CheckState.Checked;
+
+            RefreshChangeList();
+            RefreshModuleList();
+        }
+
+        private void ModuleList_ItemCheck(object sender, ItemCheckEventArgs e)
+        {
+            ((sender as CheckedListBox).Items[e.Index] as Module).Enabled = e.NewValue == CheckState.Checked;
+            if (!Refreshing)
+            {
+                RefreshChangeList();
+
+                if (sender != ModuleList)
+                    RefreshModuleList();
             }
         }
 
