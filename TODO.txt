@@ -1,8 +1,11 @@
 Pack list should be CheckedListBox (done)
 all CheckedListBoxes should have CheckOnClick enabled (done)
-"Launch Game" button should automatically locate the game exe and launch it.
 
-Mod maker todos:
+Bugs:
+"Launch Game" button should automatically locate the game exe and launch it.
+Exception occurs when you attempt to load all mods after disabling a mod that adds a file that isn't in the base game
+
+Mod maker:
 Make simple pack builder (done)
 Make diff creator/editor (maybe, since text files are easier to create so it might not be necessary)
 Make patch creator/editor (maybe create it automatically based off comparing original against modified)
