@@ -154,6 +154,8 @@ namespace ModLoader
         private void PackList_ItemCheck(object sender, ItemCheckEventArgs e)
         {
             var pack = PackList.SelectedItem as Pack;
+            if (pack == null) return;
+
             pack.Enabled = e.NewValue == CheckState.Checked;
 
             RefreshChangeList();
