@@ -64,6 +64,11 @@ namespace ModLoader.Core
 
         public virtual async Task LoadSelfAsync(CancellationToken token)
         {
+            if (!Root.Graph.Table.ContainsKey(Name))
+            {
+                Root.Graph.Table.Add(Name, new HashSet<Guid>());
+            }
+
             try
             {
                 if (Root.Graph.Table[Name].Single() == Id) return;
