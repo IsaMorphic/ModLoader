@@ -1,6 +1,7 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Abstract;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -139,14 +140,20 @@ namespace ModLoader
                 var conflict = ChangeList.SelectedItem as Conflict<Module>;
                 RefreshConflictPane(conflict);
             }
-            else if (ChangeList.SelectedItem is XunkMerger<Hunk>)
+            else if (ChangeList.SelectedItem is XunkGroup<Hunk>)
             {
                 var merger = ChangeList.SelectedItem as XunkMerger<Hunk>;
+                if (merger == null)
+                    merger = new XunkMerger<Hunk>(null, null, null, new HashSet<XunkGroup<Hunk>>
+                    { ChangeList.SelectedItem as XunkGroup<Hunk> });
                 new MergerForm<Hunk>(merger).ShowDialog();
             }
-            else if (ChangeList.SelectedItem is XunkMerger<Chunk>)
+            else if (ChangeList.SelectedItem is XunkGroup<Chunk>)
             {
                 var merger = ChangeList.SelectedItem as XunkMerger<Chunk>;
+                if (merger == null)
+                    merger = new XunkMerger<Chunk>(null, null, null, new HashSet<XunkGroup<Chunk>> 
+                    { ChangeList.SelectedItem as XunkGroup<Chunk> });
                 new MergerForm<Chunk>(merger).ShowDialog();
             }
         }

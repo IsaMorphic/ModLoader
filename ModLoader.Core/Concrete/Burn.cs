@@ -27,5 +27,10 @@ namespace ModLoader.Core.Concrete
 
             Root.Graph.Table[Name] = new HashSet<Guid> { Id };
         }
+
+        public override string ToString()
+        {
+            return $"({Parent.Name}) [BURN] {Name}";
+        }
     }
 }

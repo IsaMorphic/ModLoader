@@ -40,7 +40,7 @@ namespace ModLoader.Core
             Name = name;
 
             Parent = parent;
-            Root = Parent.Parent;
+            Root = Parent?.Parent;
 
             Enabled = true;
         }

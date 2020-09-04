@@ -123,7 +123,6 @@ namespace ModLoader
             // 
             // ModuleList
             // 
-            this.ModuleList.CheckOnClick = true;
             this.ModuleList.FormattingEnabled = true;
             this.ModuleList.HorizontalScrollbar = true;
             this.ModuleList.IntegralHeight = false;
