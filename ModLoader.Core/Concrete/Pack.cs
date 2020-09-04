@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using ModLoader.Core.Concrete;
     using Persistence;
 
     public class Pack : IGroup<Module>, ILoadable<Pack>
@@ -61,6 +62,8 @@ namespace ModLoader.Core
                     module = new Diff(this, name.Replace(".diff", ""), id);
                 else if (name.EndsWith(".patch"))
                     module = new Patch(this, name.Replace(".patch", ""), id);
+                else if (name.EndsWith(".burn"))
+                    module = new Burn(this, name.Replace(".burn", ""), id);
                 else
                     module = new Module(this, name, id);
 

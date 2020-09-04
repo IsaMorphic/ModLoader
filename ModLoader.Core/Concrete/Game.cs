@@ -254,16 +254,32 @@ namespace ModLoader.Core
                 .Where(m => m.Resolve() == null)
                 .Concat(Modules.Resolve().Members
                     .Select(m => m.Resolve())
-                    .Where(m => m.Id == Guid.Empty))
+                    .Where(m => m.Id == Guid.Empty));
+
+            var toLoad = modules
                 .Select(m => BasePack.Members
                     .Select(b => b.Resolve())
                     .Where(b => b != null)
-                    .Single(b => b.Name == m.Name))
+                    .SingleOrDefault(b => b.Name == m.Name))
+                .Where(m => m != null)
                 .Distinct();
 
-            foreach (var module in modules)
+            var toRemove = modules
+                .Where(m => !BasePack.Members
+                    .Select(b => b.Resolve())
+                    .Where(b => b != null)
+                    .Any(b => b.Name == m.Name))
+                .Distinct();
+
+            foreach (var module in toLoad)
             {
                 await module.LoadAsync(token);
+            }
+
+            foreach (var module in toRemove)
+            {
+                var path = Path.Combine(GamePath, module.Name);
+                await Task.Run(() => File.Delete(path));
             }
         }
     }
