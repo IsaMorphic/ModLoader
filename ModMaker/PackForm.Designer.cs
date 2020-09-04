@@ -44,9 +44,10 @@
             // Step1Label
             // 
             this.Step1Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Step1Label.Location = new System.Drawing.Point(12, 9);
+            this.Step1Label.Location = new System.Drawing.Point(7, 5);
+            this.Step1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step1Label.Name = "Step1Label";
-            this.Step1Label.Size = new System.Drawing.Size(601, 42);
+            this.Step1Label.Size = new System.Drawing.Size(334, 23);
             this.Step1Label.TabIndex = 0;
             this.Step1Label.Text = "Step 1: Select Pack Folder";
             this.Step1Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -54,9 +55,10 @@
             // FolderBrowseButton
             // 
             this.FolderBrowseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.FolderBrowseButton.Location = new System.Drawing.Point(12, 54);
+            this.FolderBrowseButton.Location = new System.Drawing.Point(7, 30);
+            this.FolderBrowseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.FolderBrowseButton.Name = "FolderBrowseButton";
-            this.FolderBrowseButton.Size = new System.Drawing.Size(595, 78);
+            this.FolderBrowseButton.Size = new System.Drawing.Size(331, 43);
             this.FolderBrowseButton.TabIndex = 2;
             this.FolderBrowseButton.Text = "Browse";
             this.FolderBrowseButton.UseVisualStyleBackColor = true;
@@ -65,9 +67,10 @@
             // ImageBrowseButton
             // 
             this.ImageBrowseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.ImageBrowseButton.Location = new System.Drawing.Point(12, 231);
+            this.ImageBrowseButton.Location = new System.Drawing.Point(7, 128);
+            this.ImageBrowseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.ImageBrowseButton.Name = "ImageBrowseButton";
-            this.ImageBrowseButton.Size = new System.Drawing.Size(595, 78);
+            this.ImageBrowseButton.Size = new System.Drawing.Size(331, 43);
             this.ImageBrowseButton.TabIndex = 3;
             this.ImageBrowseButton.Text = "Browse";
             this.ImageBrowseButton.UseVisualStyleBackColor = true;
@@ -76,9 +79,10 @@
             // Step2Label
             // 
             this.Step2Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Step2Label.Location = new System.Drawing.Point(12, 178);
+            this.Step2Label.Location = new System.Drawing.Point(7, 99);
+            this.Step2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step2Label.Name = "Step2Label";
-            this.Step2Label.Size = new System.Drawing.Size(595, 50);
+            this.Step2Label.Size = new System.Drawing.Size(331, 28);
             this.Step2Label.TabIndex = 4;
             this.Step2Label.Text = "Step 2: Select Pack Image";
             this.Step2Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -86,18 +90,20 @@
             // NoteEntry
             // 
             this.NoteEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NoteEntry.Location = new System.Drawing.Point(12, 522);
+            this.NoteEntry.Location = new System.Drawing.Point(7, 290);
+            this.NoteEntry.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.NoteEntry.Multiline = true;
             this.NoteEntry.Name = "NoteEntry";
-            this.NoteEntry.Size = new System.Drawing.Size(595, 111);
+            this.NoteEntry.Size = new System.Drawing.Size(332, 63);
             this.NoteEntry.TabIndex = 5;
             // 
             // Step4Label
             // 
             this.Step4Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Step4Label.Location = new System.Drawing.Point(12, 468);
+            this.Step4Label.Location = new System.Drawing.Point(7, 260);
+            this.Step4Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step4Label.Name = "Step4Label";
-            this.Step4Label.Size = new System.Drawing.Size(595, 51);
+            this.Step4Label.Size = new System.Drawing.Size(331, 28);
             this.Step4Label.TabIndex = 6;
             this.Step4Label.Text = "Step 4: Describe your Mod";
             this.Step4Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -105,9 +111,10 @@
             // BuildButton
             // 
             this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.BuildButton.Location = new System.Drawing.Point(12, 688);
+            this.BuildButton.Location = new System.Drawing.Point(7, 382);
+            this.BuildButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.BuildButton.Name = "BuildButton";
-            this.BuildButton.Size = new System.Drawing.Size(595, 78);
+            this.BuildButton.Size = new System.Drawing.Size(331, 43);
             this.BuildButton.TabIndex = 7;
             this.BuildButton.Text = "Build Pack";
             this.BuildButton.UseVisualStyleBackColor = true;
@@ -116,9 +123,10 @@
             // Step33Label
             // 
             this.Step33Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.Step33Label.Location = new System.Drawing.Point(12, 346);
+            this.Step33Label.Location = new System.Drawing.Point(7, 192);
+            this.Step33Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step33Label.Name = "Step33Label";
-            this.Step33Label.Size = new System.Drawing.Size(595, 51);
+            this.Step33Label.Size = new System.Drawing.Size(331, 28);
             this.Step33Label.TabIndex = 8;
             this.Step33Label.Text = "Step 3: Name your Mod";
             this.Step33Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
@@ -126,16 +134,17 @@
             // NameEntry
             // 
             this.NameEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NameEntry.Location = new System.Drawing.Point(12, 400);
+            this.NameEntry.Location = new System.Drawing.Point(7, 222);
+            this.NameEntry.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.NameEntry.Name = "NameEntry";
-            this.NameEntry.Size = new System.Drawing.Size(595, 41);
+            this.NameEntry.Size = new System.Drawing.Size(332, 26);
             this.NameEntry.TabIndex = 9;
             // 
             // PackForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(216F, 216F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Dpi;
-            this.ClientSize = new System.Drawing.Size(619, 778);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(344, 432);
             this.Controls.Add(this.NameEntry);
             this.Controls.Add(this.Step33Label);
             this.Controls.Add(this.BuildButton);
@@ -146,6 +155,7 @@
             this.Controls.Add(this.FolderBrowseButton);
             this.Controls.Add(this.Step1Label);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.MaximizeBox = false;
             this.Name = "PackForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
