@@ -52,9 +52,9 @@ namespace ModLoader.Core
 
             Graph = await Graph.LoadFromStreamAsync(Archive.GetEntry("_pack.json").Open());
 
-            foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.StartsWith("_pack") && !entry.FullName.EndsWith("/")))
+            foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().EndsWith("/")))
             {
-                string name = entry.FullName;
+                string name = entry.FullName.ToLowerInvariant();
                 Guid id = Graph.Table[name].Single();
 
                 Module module;

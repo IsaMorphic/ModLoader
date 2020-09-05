@@ -52,8 +52,7 @@ namespace ModLoader.Core.Utilities
             {
                 foreach (var file in Directory.EnumerateFiles(Path, "*.*", SearchOption.AllDirectories))
                 {
-
-                    var name = file.Replace(Path, "").Trim('\\');
+                    var name = file.Replace(Path, "").Trim('\\').ToLowerInvariant();
                     var entry = archive.CreateEntry(name);
 
                     using (var fileStream = File.OpenRead(file))

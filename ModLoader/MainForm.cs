@@ -185,6 +185,11 @@ namespace ModLoader
         {
             try
             {
+                RebuildButton.Enabled = false;
+                LoadButton.Enabled = false;
+                RunGameButton.Enabled = false;
+                LoadButton.Text = "Loading mods...";
+
                 await Game.ReloadBaseModulesAsync(CancellationToken.None);
                 await Game.LoadModulesAsync(CancellationToken.None);
                 await Game.SaveConfigAsync();
@@ -192,12 +197,32 @@ namespace ModLoader
 
                 await Game.ExecuteLoadScript();
 
+                RebuildButton.Enabled = true;
+                LoadButton.Enabled = true;
+                RunGameButton.Enabled = true;
+                LoadButton.Text = "Load All Mods";
+
                 MessageBox.Show("Load operation completed successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private async void RunGameButton_Click(object sender, EventArgs e)
+        {
+            RebuildButton.Enabled = false;
+            LoadButton.Enabled = false;
+            RunGameButton.Enabled = false;
+            RunGameButton.Text = "Game is running...";
+
+            await Game.RunGameAsync();
+
+            RebuildButton.Enabled = true;
+            LoadButton.Enabled = true;
+            RunGameButton.Enabled = true;
+            RunGameButton.Text = "Launch Game";
         }
 
         private void FallbackSelect_SelectedIndexChanged(object sender, EventArgs e)

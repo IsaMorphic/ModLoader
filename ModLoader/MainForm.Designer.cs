@@ -62,20 +62,22 @@
             this.ChangeList.FormattingEnabled = true;
             this.ChangeList.HorizontalScrollbar = true;
             this.ChangeList.IntegralHeight = false;
-            this.ChangeList.ItemHeight = 16;
-            this.ChangeList.Location = new System.Drawing.Point(8, 23);
-            this.ChangeList.Margin = new System.Windows.Forms.Padding(5);
+            this.ChangeList.ItemHeight = 29;
+            this.ChangeList.Location = new System.Drawing.Point(14, 42);
+            this.ChangeList.Margin = new System.Windows.Forms.Padding(9, 9, 9, 9);
             this.ChangeList.Name = "ChangeList";
-            this.ChangeList.Size = new System.Drawing.Size(286, 395);
+            this.ChangeList.Size = new System.Drawing.Size(498, 713);
             this.ChangeList.TabIndex = 1;
             this.ChangeList.SelectedIndexChanged += new System.EventHandler(this.ChangeList_SelectedIndexChanged);
             // 
             // ModuleGroup
             // 
             this.ModuleGroup.Controls.Add(this.ChangeList);
-            this.ModuleGroup.Location = new System.Drawing.Point(12, 13);
+            this.ModuleGroup.Location = new System.Drawing.Point(21, 24);
+            this.ModuleGroup.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.ModuleGroup.Name = "ModuleGroup";
-            this.ModuleGroup.Size = new System.Drawing.Size(302, 424);
+            this.ModuleGroup.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.ModuleGroup.Size = new System.Drawing.Size(528, 768);
             this.ModuleGroup.TabIndex = 3;
             this.ModuleGroup.TabStop = false;
             this.ModuleGroup.Text = "Changes";
@@ -85,9 +87,11 @@
             this.PackGroup.Controls.Add(this.NoteGroup);
             this.PackGroup.Controls.Add(this.PackList);
             this.PackGroup.Controls.Add(this.PackImage);
-            this.PackGroup.Location = new System.Drawing.Point(320, 13);
+            this.PackGroup.Location = new System.Drawing.Point(560, 24);
+            this.PackGroup.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.PackGroup.Name = "PackGroup";
-            this.PackGroup.Size = new System.Drawing.Size(643, 424);
+            this.PackGroup.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.PackGroup.Size = new System.Drawing.Size(1125, 768);
             this.PackGroup.TabIndex = 4;
             this.PackGroup.TabStop = false;
             this.PackGroup.Text = "Mod Packs";
@@ -95,9 +99,11 @@
             // NoteGroup
             // 
             this.NoteGroup.Controls.Add(this.PackNotes);
-            this.NoteGroup.Location = new System.Drawing.Point(353, 257);
+            this.NoteGroup.Location = new System.Drawing.Point(618, 466);
+            this.NoteGroup.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.NoteGroup.Name = "NoteGroup";
-            this.NoteGroup.Size = new System.Drawing.Size(276, 161);
+            this.NoteGroup.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.NoteGroup.Size = new System.Drawing.Size(483, 292);
             this.NoteGroup.TabIndex = 3;
             this.NoteGroup.TabStop = false;
             this.NoteGroup.Text = "Notes";
@@ -105,11 +111,12 @@
             // PackNotes
             // 
             this.PackNotes.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.PackNotes.Location = new System.Drawing.Point(7, 21);
+            this.PackNotes.Location = new System.Drawing.Point(12, 38);
+            this.PackNotes.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.PackNotes.Multiline = true;
             this.PackNotes.Name = "PackNotes";
             this.PackNotes.ReadOnly = true;
-            this.PackNotes.Size = new System.Drawing.Size(263, 134);
+            this.PackNotes.Size = new System.Drawing.Size(457, 240);
             this.PackNotes.TabIndex = 0;
             // 
             // PackList
@@ -117,19 +124,20 @@
             this.PackList.FormattingEnabled = true;
             this.PackList.HorizontalScrollbar = true;
             this.PackList.IntegralHeight = false;
-            this.PackList.Location = new System.Drawing.Point(8, 23);
-            this.PackList.Margin = new System.Windows.Forms.Padding(5);
+            this.PackList.Location = new System.Drawing.Point(14, 42);
+            this.PackList.Margin = new System.Windows.Forms.Padding(9, 9, 9, 9);
             this.PackList.Name = "PackList";
-            this.PackList.Size = new System.Drawing.Size(337, 395);
+            this.PackList.Size = new System.Drawing.Size(587, 713);
             this.PackList.TabIndex = 1;
             this.PackList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PackList_ItemCheck);
             this.PackList.SelectedIndexChanged += new System.EventHandler(this.PackList_SelectedIndexChanged);
             // 
             // PackImage
             // 
-            this.PackImage.Location = new System.Drawing.Point(353, 23);
+            this.PackImage.Location = new System.Drawing.Point(618, 42);
+            this.PackImage.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.PackImage.Name = "PackImage";
-            this.PackImage.Size = new System.Drawing.Size(276, 228);
+            this.PackImage.Size = new System.Drawing.Size(483, 413);
             this.PackImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.PackImage.TabIndex = 2;
             this.PackImage.TabStop = false;
@@ -140,9 +148,11 @@
             this.PropGroup.Controls.Add(this.FallbackLabel);
             this.PropGroup.Controls.Add(this.FallbackSelect);
             this.PropGroup.Enabled = false;
-            this.PropGroup.Location = new System.Drawing.Point(320, 443);
+            this.PropGroup.Location = new System.Drawing.Point(560, 803);
+            this.PropGroup.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.PropGroup.Name = "PropGroup";
-            this.PropGroup.Size = new System.Drawing.Size(345, 148);
+            this.PropGroup.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.PropGroup.Size = new System.Drawing.Size(604, 268);
             this.PropGroup.TabIndex = 5;
             this.PropGroup.TabStop = false;
             this.PropGroup.Text = "Properties";
@@ -152,9 +162,10 @@
             this.EnabledCheckBox.AutoSize = true;
             this.EnabledCheckBox.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.EnabledCheckBox.Enabled = false;
-            this.EnabledCheckBox.Location = new System.Drawing.Point(6, 21);
+            this.EnabledCheckBox.Location = new System.Drawing.Point(10, 38);
+            this.EnabledCheckBox.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.EnabledCheckBox.Name = "EnabledCheckBox";
-            this.EnabledCheckBox.Size = new System.Drawing.Size(82, 21);
+            this.EnabledCheckBox.Size = new System.Drawing.Size(135, 33);
             this.EnabledCheckBox.TabIndex = 2;
             this.EnabledCheckBox.Text = "Enabled";
             this.EnabledCheckBox.UseVisualStyleBackColor = true;
@@ -162,18 +173,20 @@
             // FallbackLabel
             // 
             this.FallbackLabel.AutoSize = true;
-            this.FallbackLabel.Location = new System.Drawing.Point(93, 22);
+            this.FallbackLabel.Location = new System.Drawing.Point(163, 40);
+            this.FallbackLabel.Margin = new System.Windows.Forms.Padding(5, 0, 5, 0);
             this.FallbackLabel.Name = "FallbackLabel";
-            this.FallbackLabel.Size = new System.Drawing.Size(64, 17);
+            this.FallbackLabel.Size = new System.Drawing.Size(110, 29);
             this.FallbackLabel.TabIndex = 1;
             this.FallbackLabel.Text = "Fallback:";
             // 
             // FallbackSelect
             // 
             this.FallbackSelect.FormattingEnabled = true;
-            this.FallbackSelect.Location = new System.Drawing.Point(163, 19);
+            this.FallbackSelect.Location = new System.Drawing.Point(285, 34);
+            this.FallbackSelect.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.FallbackSelect.Name = "FallbackSelect";
-            this.FallbackSelect.Size = new System.Drawing.Size(176, 24);
+            this.FallbackSelect.Size = new System.Drawing.Size(305, 37);
             this.FallbackSelect.TabIndex = 0;
             this.FallbackSelect.SelectedIndexChanged += new System.EventHandler(this.FallbackSelect_SelectedIndexChanged);
             // 
@@ -182,18 +195,21 @@
             this.groupBox1.Controls.Add(this.RebuildButton);
             this.groupBox1.Controls.Add(this.RunGameButton);
             this.groupBox1.Controls.Add(this.LoadButton);
-            this.groupBox1.Location = new System.Drawing.Point(673, 443);
+            this.groupBox1.Location = new System.Drawing.Point(1178, 803);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(290, 148);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.groupBox1.Size = new System.Drawing.Size(508, 268);
             this.groupBox1.TabIndex = 6;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Actions";
             // 
             // RebuildButton
             // 
-            this.RebuildButton.Location = new System.Drawing.Point(7, 21);
+            this.RebuildButton.Location = new System.Drawing.Point(12, 38);
+            this.RebuildButton.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.RebuildButton.Name = "RebuildButton";
-            this.RebuildButton.Size = new System.Drawing.Size(277, 36);
+            this.RebuildButton.Size = new System.Drawing.Size(485, 65);
             this.RebuildButton.TabIndex = 2;
             this.RebuildButton.Text = "Rebuild Packs / Reload";
             this.RebuildButton.UseVisualStyleBackColor = true;
@@ -201,18 +217,21 @@
             // 
             // RunGameButton
             // 
-            this.RunGameButton.Location = new System.Drawing.Point(7, 103);
+            this.RunGameButton.Location = new System.Drawing.Point(12, 187);
+            this.RunGameButton.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.RunGameButton.Name = "RunGameButton";
-            this.RunGameButton.Size = new System.Drawing.Size(277, 33);
+            this.RunGameButton.Size = new System.Drawing.Size(485, 60);
             this.RunGameButton.TabIndex = 1;
             this.RunGameButton.Text = "Launch Game";
             this.RunGameButton.UseVisualStyleBackColor = true;
+            this.RunGameButton.Click += new System.EventHandler(this.RunGameButton_Click);
             // 
             // LoadButton
             // 
-            this.LoadButton.Location = new System.Drawing.Point(7, 63);
+            this.LoadButton.Location = new System.Drawing.Point(12, 114);
+            this.LoadButton.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.LoadButton.Name = "LoadButton";
-            this.LoadButton.Size = new System.Drawing.Size(277, 34);
+            this.LoadButton.Size = new System.Drawing.Size(485, 62);
             this.LoadButton.TabIndex = 0;
             this.LoadButton.Text = "Load All Mods";
             this.LoadButton.UseVisualStyleBackColor = true;
@@ -221,9 +240,11 @@
             // ChangeGroup
             // 
             this.ChangeGroup.Controls.Add(this.ConflictList);
-            this.ChangeGroup.Location = new System.Drawing.Point(12, 443);
+            this.ChangeGroup.Location = new System.Drawing.Point(21, 803);
+            this.ChangeGroup.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.ChangeGroup.Name = "ChangeGroup";
-            this.ChangeGroup.Size = new System.Drawing.Size(302, 362);
+            this.ChangeGroup.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.ChangeGroup.Size = new System.Drawing.Size(528, 656);
             this.ChangeGroup.TabIndex = 5;
             this.ChangeGroup.TabStop = false;
             this.ChangeGroup.Text = "Conflict";
@@ -234,18 +255,21 @@
             this.ConflictList.FormattingEnabled = true;
             this.ConflictList.HorizontalScrollbar = true;
             this.ConflictList.IntegralHeight = false;
-            this.ConflictList.Location = new System.Drawing.Point(6, 19);
+            this.ConflictList.Location = new System.Drawing.Point(10, 34);
+            this.ConflictList.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.ConflictList.Name = "ConflictList";
-            this.ConflictList.Size = new System.Drawing.Size(288, 335);
+            this.ConflictList.Size = new System.Drawing.Size(501, 604);
             this.ConflictList.TabIndex = 0;
             this.ConflictList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleList_ItemCheck);
             // 
             // groupBox2
             // 
             this.groupBox2.Controls.Add(this.ModuleList);
-            this.groupBox2.Location = new System.Drawing.Point(320, 597);
+            this.groupBox2.Location = new System.Drawing.Point(560, 1082);
+            this.groupBox2.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(643, 208);
+            this.groupBox2.Padding = new System.Windows.Forms.Padding(5, 5, 5, 5);
+            this.groupBox2.Size = new System.Drawing.Size(1125, 377);
             this.groupBox2.TabIndex = 4;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Modules";
@@ -256,17 +280,18 @@
             this.ModuleList.FormattingEnabled = true;
             this.ModuleList.HorizontalScrollbar = true;
             this.ModuleList.IntegralHeight = false;
-            this.ModuleList.Location = new System.Drawing.Point(6, 20);
+            this.ModuleList.Location = new System.Drawing.Point(10, 36);
+            this.ModuleList.Margin = new System.Windows.Forms.Padding(5, 5, 5, 5);
             this.ModuleList.Name = "ModuleList";
-            this.ModuleList.Size = new System.Drawing.Size(631, 180);
+            this.ModuleList.Size = new System.Drawing.Size(1101, 323);
             this.ModuleList.TabIndex = 1;
             this.ModuleList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleList_ItemCheck);
             // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(14F, 29F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(970, 812);
+            this.ClientSize = new System.Drawing.Size(1698, 1472);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.ChangeGroup);
             this.Controls.Add(this.groupBox1);
@@ -274,7 +299,7 @@
             this.Controls.Add(this.PackGroup);
             this.Controls.Add(this.ModuleGroup);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(5);
+            this.Margin = new System.Windows.Forms.Padding(9, 9, 9, 9);
             this.MaximizeBox = false;
             this.Name = "MainForm";
             this.Text = "ModLoader";

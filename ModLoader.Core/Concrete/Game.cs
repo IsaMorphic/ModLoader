@@ -14,7 +14,6 @@ namespace ModLoader.Core
     using Exceptions;
     using Filters;
     using Persistence;
-    using System.Security.Cryptography.X509Certificates;
     using Utilities;
 
     public class Game
@@ -103,7 +102,7 @@ namespace ModLoader.Core
 
             foreach (var file in Directory.EnumerateFiles(ModPath, "*.zip"))
             {
-                var packName = Path.GetFileNameWithoutExtension(file);
+                var packName = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
                 if (packName == "_base_") continue;
 
                 var pack = new Pack(this, packName);
@@ -236,6 +235,14 @@ namespace ModLoader.Core
             await Task.Run(proc.WaitForExit);
 
             if (proc.ExitCode != 0) throw new ScriptExecutionException($"_script.bat halted with exit code: {proc.ExitCode}", proc.ExitCode);
+        }
+
+        public Task RunGameAsync()
+        {
+            var exePath = Directory.EnumerateFiles(GamePath, "*.exe").Single();
+
+            var proc = Process.Start(exePath);
+            return Task.Run(proc.WaitForExit);
         }
 
         public async Task LoadModulesAsync(CancellationToken token)
