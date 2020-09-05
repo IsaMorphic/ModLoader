@@ -207,6 +207,7 @@
             this.RunGameButton.TabIndex = 1;
             this.RunGameButton.Text = "Launch Game";
             this.RunGameButton.UseVisualStyleBackColor = true;
+            this.RunGameButton.Click += new System.EventHandler(this.RunGameButton_Click);
             // 
             // LoadButton
             // 
