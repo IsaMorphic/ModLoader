@@ -152,7 +152,7 @@ namespace ModLoader
             {
                 var merger = ChangeList.SelectedItem as XunkMerger<Chunk>;
                 if (merger == null)
-                    merger = new XunkMerger<Chunk>(null, null, null, new HashSet<XunkGroup<Chunk>> 
+                    merger = new XunkMerger<Chunk>(null, null, null, new HashSet<XunkGroup<Chunk>>
                     { ChangeList.SelectedItem as XunkGroup<Chunk> });
                 new MergerForm<Chunk>(merger).ShowDialog();
             }
@@ -197,16 +197,18 @@ namespace ModLoader
 
                 await Game.ExecuteLoadScript();
 
-                RebuildButton.Enabled = true;
-                LoadButton.Enabled = true;
-                RunGameButton.Enabled = true;
-                LoadButton.Text = "Load All Mods";
-
                 MessageBox.Show("Load operation completed successfully!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                RebuildButton.Enabled = true;
+                LoadButton.Enabled = true;
+                RunGameButton.Enabled = true;
+                LoadButton.Text = "Load All Mods";
             }
         }
 
