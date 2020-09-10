@@ -73,11 +73,9 @@ namespace ModLoader.Core
             }
             catch (Exception)
             {
-                await PackBuilder
-                    .FromDirectory(GamePath)
+                await new PackBuilder(GamePath, "_base_")
                     .WithBitmap(new Image<Rgba32>(100, 100))
                     .WithNote("Base Game (DO NOT DELETE!)")
-                    .WithName("_base_")
                     .BuildAsync()
                     .ContinueWith(t =>
                     {

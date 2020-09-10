@@ -45,14 +45,13 @@ namespace ModMaker
         {
             try
             {
-                await PackBuilder
-                    .FromDirectory(Directory.Exists(FolderDialog.SelectedPath) ? FolderDialog.SelectedPath :
-                        throw new Exception("The user has failed to select a vaild directory."))
+                await new PackBuilder(
+                        Directory.Exists(FolderDialog.SelectedPath) ? FolderDialog.SelectedPath :
+                        throw new Exception("The user has failed to select a vaild directory."),
+                        !string.IsNullOrEmpty(NameEntry.Text) &&
+                        !NameEntry.Text.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ?
+                         NameEntry.Text : throw new Exception("The user has failed to enter a valid pack name. Pack names must be a valid file-name on the host system and cannot be empty."))
                     .WithBitmap(Image ?? throw new Exception("The user has failed to select a valid image file."))
-                    .WithName(
-                        !string.IsNullOrEmpty(NameEntry.Text) && 
-                        !NameEntry.Text.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ? 
-                        NameEntry.Text : throw new Exception("The user has failed to enter a valid pack name. Pack names must be a valid file-name on the host system and cannot be empty."))
                     .WithNote(NoteEntry.Text)
                     .BuildAsync();
 

@@ -23,5 +23,12 @@ namespace ModMaker
             new PackForm().ShowDialog();
             Show();
         }
+
+        private void PatchButton_Click(object sender, EventArgs e)
+        {
+            Hide();
+            new PatchForm().ShowDialog();
+            Show();
+        }
     }
 }

@@ -27,11 +27,9 @@ namespace ModLoader
 
                 foreach (var dir in dirs)
                 {
-                    await PackBuilder
-                        .FromDirectory(dir)
+                    await new PackBuilder(dir, Path.GetFileName(dir))
                         .WithBitmap(new Image<Rgba32>(100, 100))
                         .WithNote("Your mod pack (under construction)")
-                        .WithName(Path.GetFileName(dir))
                         .BuildAsync();
                 }
 

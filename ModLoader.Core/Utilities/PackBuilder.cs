@@ -11,33 +11,30 @@ namespace ModLoader.Core.Utilities
     public class PackBuilder
     {
         private string Path { get; }
+        private string Name { get; }
 
         private Image Image { get; set; }
         private string Note { get; set; }
 
-        private string Name { get; set; }
-
-        private PackBuilder(string path)
+        public PackBuilder(string path, string name)
         {
             Path = path;
+            Name = name;
         }
 
         public PackBuilder WithBitmap(Image image)
         {
+            if (Image != null)
+                throw new InvalidOperationException("This value has already been specified");
             Image = image;
             return this;
         }
 
         public PackBuilder WithNote(string note)
         {
+            if (Note != null)
+                throw new InvalidOperationException("This value has already been specified");
             Note = note;
-            return this;
-        }
-
-
-        public PackBuilder WithName(string name)
-        {
-            Name = name;
             return this;
         }
 
@@ -74,11 +71,6 @@ namespace ModLoader.Core.Utilities
                 using (var entryStream = archive.CreateEntry("_pack.json").Open())
                     await graph.WriteToStreamAsync(entryStream);
             }
-        }
-
-        public static PackBuilder FromDirectory(string path)
-        {
-            return new PackBuilder(path);
         }
     }
 }
