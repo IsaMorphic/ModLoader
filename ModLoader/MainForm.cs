@@ -224,7 +224,14 @@ namespace ModLoader
             RunGameButton.Enabled = false;
             RunGameButton.Text = "Game is running...";
 
-            await Game.RunGameAsync();
+            try
+            {
+                await Game.RunGameAsync();
+            }
+            catch (Exception) 
+            {
+                MessageBox.Show("Could not auto-launch game, make sure there is only one .exe file in the game directory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             RebuildButton.Enabled = true;
             LoadButton.Enabled = true;
