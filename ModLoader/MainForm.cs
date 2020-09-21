@@ -103,6 +103,11 @@ namespace ModLoader
         {
             Hide();
             new LoaderForm(this).ShowDialog();
+            if (Game == null)
+            {
+                Application.Exit();
+                return;
+            }
             Show();
 
             RefreshPackList();
@@ -228,7 +233,7 @@ namespace ModLoader
             {
                 await Game.RunGameAsync();
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 MessageBox.Show("Could not auto-launch game, make sure there is only one .exe file in the game directory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }

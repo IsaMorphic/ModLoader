@@ -1,16 +1,13 @@
-Pack list should be CheckedListBox (done)
-all CheckedListBoxes should have CheckOnClick enabled (done)
+Mod maker:
+Make diff creator/editor (maybe... since text files are easier to create so it might not be necessary)
 
 Bugs:
-"Launch Game" button should automatically locate the game exe and launch it.
-Exception occurs when you attempt to load all mods after disabling a mod that adds a file that isn't in the base game
-
-Mod maker:
-Make simple pack builder (done)
-Make diff creator/editor (maybe, since text files are easier to create so it might not be necessary)
-Make patch creator/editor (maybe create it automatically based off comparing original against modified)
+strange inconsistiency in diff (see ..\..\Polly's Mods) <- fixed
 
 questions from Polly:
 Is there a way to automatically build the file system? <- yes there should be, create a system wide game manager that allows you to quick launch the tool for active game installations and to add new games and install the tool into them.
 And maybe a bar at the top with an option to open the mods folder and another to import? (as in it opens up a file window for you to search for a file and you select the mod and it puts it into the mods folder and reloads?)
 ^ do this as well
+is there a way to replace the lines based on what text it has?
+^ There should be, yes, add replacement "locator" statement to diff modules: "= acceleration" to find a line starting with "acceleration"
+^^ this has been done

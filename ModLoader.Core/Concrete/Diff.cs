@@ -85,9 +85,9 @@ namespace ModLoader.Core
                     }
                 }
 
-                foreach (var hunk in group.Members.Select(m => m.Resolve()))
+                foreach (var hunk in group.Members.Select(m => m.Resolve()).OrderBy(m => m.Offset))
                 {
-                    int index = indicies.IndexOf(hunk.Offset);
+                    int index = indicies.LastIndexOf(hunk.Offset);
                     foreach (var line in hunk.Lines)
                     {
                         switch (line.Op)
@@ -121,6 +121,21 @@ namespace ModLoader.Core
 
         public Diff(Pack parent, string name, Guid id) : base(parent, name, id, new DiffLoader())
         {
+            Module baseModule = Root.BasePack.Members
+                .Select(m => m.Resolve())
+                .Single(m => m.Name == Name);
+
+            List<string> baseText = new List<string>();
+
+            using (var stream = baseModule.GetDataStream())
+            using (var reader = new StreamReader(stream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    baseText.Add(reader.ReadLine());
+                }
+            }
+
             using (var data = GetDataStream())
             using (var reader = new StreamReader(data))
             {
@@ -128,14 +143,43 @@ namespace ModLoader.Core
 
                 while (!reader.EndOfStream)
                 {
-                    if (!line.StartsWith(": ") || !int.TryParse(line.Remove(0, 2), out int offset))
-                        throw new FormatException("Bad hunk format! Check your syntax or contact pack developer to resolve the issue.");
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        line = reader.ReadLine();
+                        continue;
+                    }
+
+                    bool validIdxLine = int.TryParse(line.Remove(0, 2), out int offset) && line.StartsWith(": ");
+                    bool validSearchLine = !string.IsNullOrWhiteSpace(line.Remove(0, 2)) && line.StartsWith("= ");
+
+                    if (!validIdxLine)
+                    {
+                        if (validSearchLine)
+                        {
+                            var str = line.Remove(0, 2);
+                            try
+                            {
+                                offset = baseText
+                                    .Select((s, i) => (s, i))
+                                    .Where(x => x.s.StartsWith(str))
+                                    .First().i;
+                            }
+                            catch (InvalidOperationException)
+                            {
+                                throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax and spelling, or contact pack developer to resolve the issue.");
+                            }
+                        }
+                        else
+                        {
+                            throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax and spelling, or contact pack developer to resolve the issue.");
+                        }
+                    }
 
                     List<Line> lines = new List<Line>();
 
                     line = reader.ReadLine();
 
-                    while (!line.StartsWith(": "))
+                    while (!line.StartsWith(": ") && !line.StartsWith("= ") && !string.IsNullOrWhiteSpace(line))
                     {
                         if (line.StartsWith("+ "))
                         {
@@ -151,7 +195,7 @@ namespace ModLoader.Core
                         }
                         else
                         {
-                            throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax or contact pack developer to resolve the issue.");
+                            throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax and spelling, or contact pack developer to resolve the issue.");
                         }
 
                         if (reader.EndOfStream)
