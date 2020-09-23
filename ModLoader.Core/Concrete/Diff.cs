@@ -88,6 +88,8 @@ namespace ModLoader.Core
                 foreach (var hunk in group.Members.Select(m => m.Resolve()).OrderBy(m => m.Offset))
                 {
                     int index = indicies.LastIndexOf(hunk.Offset);
+                    if (index < -1)
+                        throw new InvalidOperationException($"Diff load failed! Line offset \"{hunk.Offset}\" is out of the file's bounds.\nCheck your line numbers and try again, or contact pack developer to resolve the issue.\nOffending module: \"{group}\"");
                     foreach (var line in hunk.Lines)
                     {
                         switch (line.Op)
@@ -166,12 +168,12 @@ namespace ModLoader.Core
                             }
                             catch (InvalidOperationException)
                             {
-                                throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax and spelling, or contact pack developer to resolve the issue.");
+                                throw new FormatException($"Diff parse failed! Could not find \"{str}\" in _base_ version of module.\nOffending module: \"{this}\"\nOffending line: \"{line}\"");
                             }
                         }
                         else
                         {
-                            throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax and spelling, or contact pack developer to resolve the issue.");
+                            throw new FormatException($"Diff parse failed! Invalid hunk header. Expecting a line starting with: \": <line number>\" or \"= <search string>\".\nOffending module: \"{this}\"\nOffending line: \"{line}\"");
                         }
                     }
 
@@ -179,7 +181,7 @@ namespace ModLoader.Core
 
                     line = reader.ReadLine();
 
-                    while (!line.StartsWith(": ") && !line.StartsWith("= ") && !string.IsNullOrWhiteSpace(line))
+                    while (!line.StartsWith(": ") && !line.StartsWith("= "))
                     {
                         if (line.StartsWith("+ "))
                         {
@@ -193,9 +195,9 @@ namespace ModLoader.Core
                         {
                             lines.Add(new Line("", Operation.Remove));
                         }
-                        else
+                        else if (!string.IsNullOrWhiteSpace(line))
                         {
-                            throw new FormatException("Diff parse failed! Bad hunk format. Check your syntax and spelling, or contact pack developer to resolve the issue.");
+                            throw new FormatException($"Diff parse failed! Expected line starting with \"+\" or \"-\".\nOffending module: \"{this}\"\nOffending line: \"{line}\"");
                         }
 
                         if (reader.EndOfStream)
@@ -213,7 +215,7 @@ namespace ModLoader.Core
                     if (conflictors.Any())
                     {
                         var conflict = new Conflict<Hunk>(hunk.ToString(), hunk, new HashSet<Hunk>(conflictors));
-                        throw new ConflictException<Hunk>("Diff parse failed! Diff cannot have conflicting hunks. Contact the developer of this pack to resolve the issue.", conflict);
+                        throw new ConflictException<Hunk>($"Diff parse failed! Diff cannot have conflicting hunks. Check all your headers or contact pack developer to resolve the issue.\nOffending module: \"{this}\"", conflict);
                     }
                     else
                     {

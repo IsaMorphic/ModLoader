@@ -42,7 +42,7 @@ namespace ModLoader.Core.Abstract
             }
             catch (InvalidOperationException)
             {
-                throw new ConflictException<T>("Execution halted because a mergable instigated a conflict.\nPlease resolve the conflict before trying again.", this);
+                throw new ConflictException<T>($"Execution halted because mergable with name: \"{Name}\" instigated a conflict.\nPlease resolve the conflict before trying again.", this);
             }
         }
 
