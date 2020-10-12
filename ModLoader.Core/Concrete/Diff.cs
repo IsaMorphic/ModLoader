@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
-    using Exceptions;
 
     public enum Operation
     {
         Remove,
         Add,
+        Append,
     }
 
     public class Line
@@ -31,34 +31,45 @@ namespace ModLoader.Core
     public class Hunk : Xunk<Hunk>
     {
         public List<Line> Lines { get; }
+
         public override long Offset { get; }
+        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Remove ? c - 1 : c + 1);
 
-        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Add ? c + 1 : c - 1);
+        public HashSet<Exception> Errors { get; }
 
-        public Hunk(Diff parent, List<Line> lines, int offset) : base(parent)
+        public Hunk(Diff parent, List<Line> lines, int offset, HashSet<Exception> errors) : base(parent)
         {
             Lines = lines;
             Offset = offset;
+
+            Errors = errors;
         }
 
         public override Hunk ResolveSelf() => this;
 
         public override string[] GetDisplayText()
         {
-            List<string> lines = new List<string>();
-            lines.Add($"Starting at line {Offset + 1}:");
-
-            foreach (var line in Lines)
+            if (Errors.Any())
             {
-                lines.Add($"{(line.Op == Operation.Add ? "+" : "-")} {line.Text}");
+                return Errors.SelectMany(err => (err.Message + '\n').Split('\n')).ToArray();
             }
+            else
+            {
+                List<string> lines = new List<string>();
+                lines.Add($"Starting at line {Offset + 1}:");
 
-            return lines.ToArray();
+                foreach (var line in Lines)
+                {
+                    lines.Add($"{(line.Op == Operation.Add ? "+" : (line.Op == Operation.Remove ? "-" : ">"))} {line.Text}");
+                }
+
+                return lines.ToArray();
+            }
         }
 
         public override string ToString()
         {
-            return $"HUNK;[offset:{Offset},length:{Length}]";
+            return (Errors.Any() ? "[ERROR] " : "") + $"HUNK;[offset:{Offset},length:{Length}]";
         }
     }
 
@@ -85,11 +96,15 @@ namespace ModLoader.Core
                     }
                 }
 
-                foreach (var hunk in group.Members.Select(m => m.Resolve()).OrderBy(m => m.Offset))
+                foreach (var hunk in group.Members
+                    .Select(m => m.Resolve())
+                    .Where(m => m != null)
+                    .OrderBy(m => m.Offset))
                 {
+                    if (hunk.Errors.Any())
+                        throw new InvalidOperationException($"Cannot load diff because one or more hunks is in an error state.\nOffending module: {group}");
+
                     int index = indicies.LastIndexOf(hunk.Offset);
-                    if (index < -1)
-                        throw new InvalidOperationException($"Diff load failed! Line offset \"{hunk.Offset}\" is out of the file's bounds.\nCheck your line numbers and try again, or contact pack developer to resolve the issue.\nOffending module: \"{group}\"");
                     foreach (var line in hunk.Lines)
                     {
                         switch (line.Op)
@@ -103,6 +118,10 @@ namespace ModLoader.Core
                                 lines.Insert(index, line.Text);
                                 indicies.Insert(index, index);
                                 index++;
+                                break;
+
+                            case Operation.Append:
+                                lines[index] += line.Text;
                                 break;
                         }
                     }
@@ -151,6 +170,8 @@ namespace ModLoader.Core
                         continue;
                     }
 
+                    HashSet<Exception> errors = new HashSet<Exception>();
+
                     bool validIdxLine = int.TryParse(line.Remove(0, 2), out int offset) && line.StartsWith(": ");
                     bool validSearchLine = !string.IsNullOrWhiteSpace(line.Remove(0, 2)) && line.StartsWith("= ");
 
@@ -168,13 +189,18 @@ namespace ModLoader.Core
                             }
                             catch (InvalidOperationException)
                             {
-                                throw new FormatException($"Diff parse failed! Could not find \"{str}\" in _base_ version of module.\nOffending module: \"{this}\"\nOffending line: \"{line}\"");
+                                errors.Add(new FormatException($"Could not find \"{str}\" in _base_ version of module.\nOffending line: \"{line}\""));
+                                offset = -1;
                             }
                         }
                         else
                         {
-                            throw new FormatException($"Diff parse failed! Invalid hunk header. Expecting a line starting with: \": <line number>\" or \"= <search string>\".\nOffending module: \"{this}\"\nOffending line: \"{line}\"");
+                            errors.Add(new FormatException($"Invalid hunk header. Expecting a line starting with: \": <line number>\" or \"= <search string>\".\nOffending line: \"{line}\""));
                         }
+                    }
+                    else if (offset < 0 || offset > baseText.Count - 1)
+                    {
+                        errors.Add(new FormatException($"Line offset \"{offset}\" is out of the file's bounds.\nOffending line: \"{line}\""));
                     }
 
                     List<Line> lines = new List<Line>();
@@ -195,9 +221,18 @@ namespace ModLoader.Core
                         {
                             lines.Add(new Line("", Operation.Remove));
                         }
+                        else if (line.StartsWith("| "))
+                        {
+                            lines.Add(new Line("", Operation.Remove));
+                            lines.Add(new Line(line.Remove(0, 2), Operation.Add));
+                        }
+                        else if (line.StartsWith("> "))
+                        {
+                            lines.Add(new Line(line.Remove(0, 2), Operation.Append));
+                        }
                         else if (!string.IsNullOrWhiteSpace(line))
                         {
-                            throw new FormatException($"Diff parse failed! Expected line starting with \"+\" or \"-\".\nOffending module: \"{this}\"\nOffending line: \"{line}\"");
+                            errors.Add(new FormatException($"Expected line starting with \"+\", \"-\", \"|\", or \">\".\nOffending line: \"{line}\""));
                         }
 
                         if (reader.EndOfStream)
@@ -206,21 +241,8 @@ namespace ModLoader.Core
                         line = reader.ReadLine();
                     }
 
-                    var hunk = new Hunk(this, lines, offset);
-
-                    var conflictors = Members
-                            .Select(h => h.Resolve())
-                            .Where(h => h.CanMergeWith(hunk));
-
-                    if (conflictors.Any())
-                    {
-                        var conflict = new Conflict<Hunk>(hunk.ToString(), hunk, new HashSet<Hunk>(conflictors));
-                        throw new ConflictException<Hunk>($"Diff parse failed! Diff cannot have conflicting hunks. Check all your headers or contact pack developer to resolve the issue.\nOffending module: \"{this}\"", conflict);
-                    }
-                    else
-                    {
-                        Members.Add(hunk);
-                    }
+                    var hunk = new Hunk(this, lines, offset, errors);
+                    Members.Add(hunk);
                 }
             }
         }
@@ -228,6 +250,12 @@ namespace ModLoader.Core
         public override Stream GetDataStream()
         {
             return Parent.Archive.GetEntry($"{Name}.diff").Open();
+        }
+
+        public override string ToString()
+        {
+            bool hasErrors = Members.SelectMany(m => m.Resolve()?.Errors ?? new HashSet<Exception>()).Any();
+            return (hasErrors ? "[ERROR] " : "") + base.ToString();
         }
     }
 }

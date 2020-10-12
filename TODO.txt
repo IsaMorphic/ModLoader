@@ -1,13 +1,16 @@
 Mod maker:
 Make diff creator/editor (maybe... since text files are easier to create so it might not be necessary)
 
-Bugs:
-strange inconsistiency in diff (see ..\..\Polly's Mods) <- fixed
+Questions from Polly:
 
-questions from Polly:
-Is there a way to automatically build the file system? <- yes there should be, create a system wide game manager that allows you to quick launch the tool for active game installations and to add new games and install the tool into them.
-And maybe a bar at the top with an option to open the mods folder and another to import? (as in it opens up a file window for you to search for a file and you select the mod and it puts it into the mods folder and reloads?)
+Is there a way to automatically build the file system? <- yes there should be,
+create a system wide game manager that allows you to quick launch the tool for
+active game installations and to add new games and install the tool into them.
+
+And maybe a bar at the top with an option to open the mods folder and
+another to import? (as in it opens up a file window for you to search
+for a file and you select the mod and it puts it into the mods
+folder and reloads?)
 ^ do this as well
-is there a way to replace the lines based on what text it has?
-^ There should be, yes, add replacement "locator" statement to diff modules: "= acceleration" to find a line starting with "acceleration"
-^^ this has been done
+
+See .\Polly's Notes\ for more

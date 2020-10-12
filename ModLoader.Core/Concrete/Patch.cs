@@ -80,19 +80,7 @@ namespace ModLoader.Core
 
                         var chunk = new Chunk(this, offset, bytes);
 
-                        var conflictors = Members
-                            .Select(c => c.Resolve())
-                            .Where(c => c.CanMergeWith(chunk));
-
-                        if (conflictors.Any())
-                        {
-                            var conflict = new Conflict<Chunk>(chunk.ToString(), chunk, new HashSet<Chunk>(conflictors));
-                            throw new ConflictException<Chunk>($"Patch parse failed! Patch cannot have conflicting chunks. Try using the ModMaker tool to create your patches or contact the pack developer to resolve the issue.\nOffending module: \"{this}\"", conflict);
-                        }
-                        else
-                        {
-                            Members.Add(chunk);
-                        }
+                        Members.Add(chunk);
                     }
                 }
             }

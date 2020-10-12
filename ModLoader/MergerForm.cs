@@ -158,6 +158,10 @@ namespace ModLoader
                 {
                     RefreshChangeList();
                 }
+                if (listBox != ModuleList)
+                {
+                    RefreshModuleList();
+                }
             }
         }
     }

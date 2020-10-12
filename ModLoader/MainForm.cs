@@ -156,6 +156,9 @@ namespace ModLoader
                         merger = new XunkMerger<Hunk>(null, null, null, new HashSet<XunkGroup<Hunk>>
                     { ChangeList.SelectedItem as XunkGroup<Hunk> });
                     new MergerForm<Hunk>(merger).ShowDialog();
+
+                    RefreshModuleList();
+                    RefreshChangeList();
                 }
                 else if (ChangeList.SelectedItem is XunkGroup<Chunk>)
                 {
