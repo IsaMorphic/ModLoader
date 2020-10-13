@@ -47,6 +47,13 @@
             this.ConflictList = new System.Windows.Forms.CheckedListBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ModuleList = new System.Windows.Forms.CheckedListBox();
+            this.MenuBar = new System.Windows.Forms.MenuStrip();
+            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OpenModsButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImportModButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.BuildPackButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.BuildPatchButton = new System.Windows.Forms.ToolStripMenuItem();
             this.ModuleGroup.SuspendLayout();
             this.PackGroup.SuspendLayout();
             this.NoteGroup.SuspendLayout();
@@ -55,6 +62,7 @@
             this.groupBox1.SuspendLayout();
             this.ChangeGroup.SuspendLayout();
             this.groupBox2.SuspendLayout();
+            this.MenuBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // ChangeList
@@ -63,19 +71,19 @@
             this.ChangeList.HorizontalScrollbar = true;
             this.ChangeList.IntegralHeight = false;
             this.ChangeList.ItemHeight = 16;
-            this.ChangeList.Location = new System.Drawing.Point(8, 23);
+            this.ChangeList.Location = new System.Drawing.Point(8, 22);
             this.ChangeList.Margin = new System.Windows.Forms.Padding(5);
             this.ChangeList.Name = "ChangeList";
-            this.ChangeList.Size = new System.Drawing.Size(286, 395);
+            this.ChangeList.Size = new System.Drawing.Size(286, 381);
             this.ChangeList.TabIndex = 1;
             this.ChangeList.SelectedIndexChanged += new System.EventHandler(this.ChangeList_SelectedIndexChanged);
             // 
             // ModuleGroup
             // 
             this.ModuleGroup.Controls.Add(this.ChangeList);
-            this.ModuleGroup.Location = new System.Drawing.Point(12, 13);
+            this.ModuleGroup.Location = new System.Drawing.Point(12, 28);
             this.ModuleGroup.Name = "ModuleGroup";
-            this.ModuleGroup.Size = new System.Drawing.Size(302, 424);
+            this.ModuleGroup.Size = new System.Drawing.Size(302, 409);
             this.ModuleGroup.TabIndex = 3;
             this.ModuleGroup.TabStop = false;
             this.ModuleGroup.Text = "Changes";
@@ -85,9 +93,9 @@
             this.PackGroup.Controls.Add(this.NoteGroup);
             this.PackGroup.Controls.Add(this.PackList);
             this.PackGroup.Controls.Add(this.PackImage);
-            this.PackGroup.Location = new System.Drawing.Point(320, 13);
+            this.PackGroup.Location = new System.Drawing.Point(320, 28);
             this.PackGroup.Name = "PackGroup";
-            this.PackGroup.Size = new System.Drawing.Size(643, 424);
+            this.PackGroup.Size = new System.Drawing.Size(643, 409);
             this.PackGroup.TabIndex = 4;
             this.PackGroup.TabStop = false;
             this.PackGroup.Text = "Mod Packs";
@@ -97,7 +105,7 @@
             this.NoteGroup.Controls.Add(this.PackNotes);
             this.NoteGroup.Location = new System.Drawing.Point(353, 257);
             this.NoteGroup.Name = "NoteGroup";
-            this.NoteGroup.Size = new System.Drawing.Size(276, 161);
+            this.NoteGroup.Size = new System.Drawing.Size(276, 146);
             this.NoteGroup.TabIndex = 3;
             this.NoteGroup.TabStop = false;
             this.NoteGroup.Text = "Notes";
@@ -109,7 +117,7 @@
             this.PackNotes.Multiline = true;
             this.PackNotes.Name = "PackNotes";
             this.PackNotes.ReadOnly = true;
-            this.PackNotes.Size = new System.Drawing.Size(263, 134);
+            this.PackNotes.Size = new System.Drawing.Size(263, 119);
             this.PackNotes.TabIndex = 0;
             // 
             // PackList
@@ -120,7 +128,7 @@
             this.PackList.Location = new System.Drawing.Point(8, 23);
             this.PackList.Margin = new System.Windows.Forms.Padding(5);
             this.PackList.Name = "PackList";
-            this.PackList.Size = new System.Drawing.Size(337, 395);
+            this.PackList.Size = new System.Drawing.Size(337, 380);
             this.PackList.TabIndex = 1;
             this.PackList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PackList_ItemCheck);
             this.PackList.SelectedIndexChanged += new System.EventHandler(this.PackList_SelectedIndexChanged);
@@ -154,7 +162,7 @@
             this.EnabledCheckBox.Enabled = false;
             this.EnabledCheckBox.Location = new System.Drawing.Point(6, 21);
             this.EnabledCheckBox.Name = "EnabledCheckBox";
-            this.EnabledCheckBox.Size = new System.Drawing.Size(82, 21);
+            this.EnabledCheckBox.Size = new System.Drawing.Size(92, 27);
             this.EnabledCheckBox.TabIndex = 2;
             this.EnabledCheckBox.Text = "Enabled";
             this.EnabledCheckBox.UseVisualStyleBackColor = true;
@@ -263,6 +271,66 @@
             this.ModuleList.TabIndex = 1;
             this.ModuleList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.ModuleList_ItemCheck);
             // 
+            // MenuBar
+            // 
+            this.MenuBar.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuBar.ImageScalingSize = new System.Drawing.Size(36, 36);
+            this.MenuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.fileToolStripMenuItem,
+            this.buildToolStripMenuItem});
+            this.MenuBar.Location = new System.Drawing.Point(0, 0);
+            this.MenuBar.Name = "MenuBar";
+            this.MenuBar.Size = new System.Drawing.Size(970, 47);
+            this.MenuBar.TabIndex = 7;
+            this.MenuBar.Text = "MenuBar";
+            // 
+            // fileToolStripMenuItem
+            // 
+            this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OpenModsButton,
+            this.ImportModButton});
+            this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(80, 43);
+            this.fileToolStripMenuItem.Text = "File";
+            // 
+            // OpenModsButton
+            // 
+            this.OpenModsButton.Name = "OpenModsButton";
+            this.OpenModsButton.Size = new System.Drawing.Size(410, 48);
+            this.OpenModsButton.Text = "Open Mod Directory";
+            this.OpenModsButton.Click += new System.EventHandler(this.OpenModsButton_Click);
+            // 
+            // ImportModButton
+            // 
+            this.ImportModButton.Name = "ImportModButton";
+            this.ImportModButton.Size = new System.Drawing.Size(410, 48);
+            this.ImportModButton.Text = "Import Mod";
+            // 
+            // buildToolStripMenuItem
+            // 
+            this.buildToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.BuildPackButton,
+            this.BuildPatchButton});
+            this.buildToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(99, 41);
+            this.buildToolStripMenuItem.Text = "Build";
+            // 
+            // BuildPackButton
+            // 
+            this.BuildPackButton.Name = "BuildPackButton";
+            this.BuildPackButton.Size = new System.Drawing.Size(403, 48);
+            this.BuildPackButton.Text = "Pack";
+            this.BuildPackButton.Click += new System.EventHandler(this.BuildPackButton_Click);
+            // 
+            // BuildPatchButton
+            // 
+            this.BuildPatchButton.Name = "BuildPatchButton";
+            this.BuildPatchButton.Size = new System.Drawing.Size(403, 48);
+            this.BuildPatchButton.Text = "Patch";
+            this.BuildPatchButton.Click += new System.EventHandler(this.BuildPatchButton_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -274,7 +342,9 @@
             this.Controls.Add(this.PropGroup);
             this.Controls.Add(this.PackGroup);
             this.Controls.Add(this.ModuleGroup);
+            this.Controls.Add(this.MenuBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MainMenuStrip = this.MenuBar;
             this.Margin = new System.Windows.Forms.Padding(5);
             this.MaximizeBox = false;
             this.Name = "MainForm";
@@ -290,7 +360,10 @@
             this.groupBox1.ResumeLayout(false);
             this.ChangeGroup.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
+            this.MenuBar.ResumeLayout(false);
+            this.MenuBar.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -315,6 +388,13 @@
         private System.Windows.Forms.CheckedListBox ConflictList;
         private System.Windows.Forms.CheckedListBox ModuleList;
         private System.Windows.Forms.Button RebuildButton;
+        private System.Windows.Forms.MenuStrip MenuBar;
+        private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem OpenModsButton;
+        private System.Windows.Forms.ToolStripMenuItem ImportModButton;
+        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem BuildPackButton;
+        private System.Windows.Forms.ToolStripMenuItem BuildPatchButton;
     }
 }
 

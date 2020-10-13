@@ -1,4 +1,4 @@
-﻿namespace ModMaker
+﻿namespace ModLoader
 {
     partial class PatchForm
     {
@@ -137,7 +137,7 @@
             this.MaximizeBox = false;
             this.Name = "PatchForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pack Builder";
+            this.Text = "Patch Builder";
             this.ResumeLayout(false);
 
         }

@@ -2,6 +2,7 @@
 using ModLoader.Core.Abstract;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -259,6 +260,21 @@ namespace ModLoader
         private void RebuildButton_Click(object sender, EventArgs e)
         {
             Application.Restart();
+        }
+
+        private void OpenModsButton_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", Game.ModPath);
+        }
+
+        private void BuildPackButton_Click(object sender, EventArgs e)
+        {
+            new PackForm().ShowDialog();
+        }
+
+        private void BuildPatchButton_Click(object sender, EventArgs e)
+        {
+            new PatchForm().ShowDialog();
         }
     }
 }

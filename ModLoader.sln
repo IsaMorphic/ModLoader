@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModLoader", "ModLoader\ModL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ModLoader.Core", "ModLoader.Core\ModLoader.Core.csproj", "{B3DA0E2F-E399-4B5A-AE3E-E73339F59979}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModMaker", "ModMaker\ModMaker.csproj", "{21794001-2306-4C48-B93C-56F4C9346FD2}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{B3DA0E2F-E399-4B5A-AE3E-E73339F59979}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B3DA0E2F-E399-4B5A-AE3E-E73339F59979}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B3DA0E2F-E399-4B5A-AE3E-E73339F59979}.Release|Any CPU.Build.0 = Release|Any CPU
-		{21794001-2306-4C48-B93C-56F4C9346FD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{21794001-2306-4C48-B93C-56F4C9346FD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{21794001-2306-4C48-B93C-56F4C9346FD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{21794001-2306-4C48-B93C-56F4C9346FD2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,4 @@
-﻿namespace ModMaker
+﻿namespace ModLoader
 {
     partial class PackForm
     {
