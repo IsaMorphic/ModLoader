@@ -21,34 +21,38 @@ namespace ModLoader.Core
         public string BasePath { get; }
 
         public string ModPath { get; }
-        public string GamePath { get; }
+        public string GamePath { get; private set; }
 
         public string GraphPath { get; }
         public string ConfigPath { get; }
         public string ScriptPath { get; }
 
-        public IEnumerable<Pack> Packs { get; }
+        public string Name { get; }
 
-        public Pack BasePack { get; private set; }
+        public GameManager Parent { get; }
 
         public Graph Graph { get; private set; }
-
         public Config Config { get; private set; }
 
-        public GroupMerger<Module> Merger { get; }
+        public IEnumerable<Pack> Packs { get; }
+        public Pack BasePack { get; private set; }
 
+        public GroupMerger<Module> Merger { get; }
         public IResolvable<IGroup<Module>> Modules { get; set; }
 
-        public Game(string basePath)
+        public Game(GameManager parent, string name)
         {
-            BasePath = basePath;
+            Parent = parent;
+
+            Name = name;
+
+            BasePath = Path.Combine(Parent.BasePath, Name);
 
             ModPath = Path.Combine(BasePath, "Mods");
-            GamePath = Path.Combine(BasePath, "Game");
 
-            GraphPath = Path.Combine(GamePath, "_pack.json");
-            ConfigPath = Path.Combine(GamePath, "_config.json");
-            ScriptPath = Path.Combine(GamePath, "_script.bat");
+            GraphPath = Path.Combine(BasePath, "_pack.json");
+            ConfigPath = Path.Combine(BasePath, "_config.json");
+            ScriptPath = Path.Combine(BasePath, "_script.bat");
 
             Merger = new GroupMerger<Module>();
 
@@ -63,38 +67,33 @@ namespace ModLoader.Core
             };
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(string gamePath)
         {
-            BasePack = new Pack(this, "_base_");
+            Directory.CreateDirectory(BasePath);
 
-            try
-            {
-                await BasePack.InitializeAsync();
-            }
-            catch (Exception)
-            {
-                await new PackBuilder(GamePath, "_base_")
+            GamePath = gamePath;
+
+            Config = new Config(GamePath);
+            await SaveConfigAsync();
+
+            await new PackBuilder(GamePath, ModPath, "_base_")
                     .WithBitmap(new Image<Rgba32>(100, 100))
                     .WithNote("Base Game (DO NOT DELETE!)")
-                    .BuildAsync()
-                    .ContinueWith(t =>
-                    {
-                        File.Move(
-                            Path.Combine(BasePath, "_base_.zip"),
-                            Path.Combine(ModPath, "_base_.zip")
-                            );
-                    });
+                    .BuildAsync();
 
-                await BasePack.InitializeAsync();
+            BasePack = new Pack(this, "_base_");
+            await BasePack.InitializeAsync();
 
-                using (var stream = File.Create(GraphPath))
-                    await BasePack.Graph.WriteToStreamAsync(stream);
+            using (var stream = File.Create(GraphPath))
+                await BasePack.Graph.WriteToStreamAsync(stream);
 
-                Config = new Config();
-                await SaveConfigAsync();
+            File.WriteAllText(ScriptPath, "echo Nothing to do!");
+        }
 
-                File.WriteAllText(ScriptPath, "echo Nothing to do!");
-            }
+        public async Task LoadAsync()
+        {
+            BasePack = new Pack(this, "_base_");
+            await BasePack.InitializeAsync();
 
             await LoadGraphAsync();
 
@@ -112,10 +111,23 @@ namespace ModLoader.Core
             await LoadConfigAsync();
         }
 
+        public async Task UnloadAsync()
+        {
+            await BasePack.UnloadAsync();
+
+            foreach (var pack in Packs)
+            {
+                await pack.UnloadAsync();
+            }
+            Merger.Mergers.Clear();
+        }
+
         public async Task LoadConfigAsync()
         {
             using (var stream = File.OpenRead(ConfigPath))
                 Config = await Config.LoadFromStreamAsync(stream);
+
+            GamePath = Config.GamePath;
 
             foreach (var packConfig in Config.Packs)
             {
@@ -229,7 +241,13 @@ namespace ModLoader.Core
 
         public async Task ExecuteLoadScript()
         {
-            var proc = Process.Start(ScriptPath);
+            var startInfo = new ProcessStartInfo(ScriptPath);
+
+            startInfo.WorkingDirectory = BasePath;
+            startInfo.Environment["GAME_PATH"] = GamePath;
+            startInfo.UseShellExecute = false;
+
+            var proc = Process.Start(startInfo);
             await Task.Run(proc.WaitForExit);
 
             if (proc.ExitCode != 0) throw new ScriptExecutionException($"_script.bat halted with exit code: {proc.ExitCode}", proc.ExitCode);
@@ -286,6 +304,11 @@ namespace ModLoader.Core
                 var path = Path.Combine(GamePath, module.Name);
                 await Task.Run(() => File.Delete(path));
             }
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

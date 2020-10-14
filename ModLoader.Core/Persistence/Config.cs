@@ -1,5 +1,4 @@
-﻿using ModLoader.Core.Abstract;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -47,17 +46,19 @@ namespace ModLoader.Core.Persistence
             public bool Enabled { get; set; }
         }
 
-        public string LaunchPath { get; set; }
+        public string GamePath { get; }
 
         public Dictionary<string, Pack> Packs { get; }
 
-        public Config()
+        internal Config(string gamePath)
         {
+            GamePath = gamePath;
             Packs = new Dictionary<string, Pack>();
         }
 
-        public Config(Dictionary<string, Pack> packs)
+        public Config(string gamePath, Dictionary<string, Pack> packs)
         {
+            GamePath = gamePath;
             Packs = packs;
         }
 

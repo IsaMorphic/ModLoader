@@ -10,21 +10,21 @@ namespace ModLoader
 {
     public partial class LoaderForm : Form
     {
-        private MainForm Form { get; }
+        private Game Game { get; }
 
-        public LoaderForm(MainForm form)
+        public Exception Error { get; private set; }
+
+        public LoaderForm(Game game)
         {
-            Form = form;
             InitializeComponent();
+            Game = game;
         }
 
         private async void FormLoad(object sender, EventArgs e)
         {
             try
             {
-                var mods = new Game(Environment.CurrentDirectory);
-                var dirs = Directory.GetDirectories(mods.ModPath);
-
+                var dirs = Directory.GetDirectories(Game.ModPath);
                 foreach (var dir in dirs)
                 {
                     await new PackBuilder(dir, Path.GetFileName(dir))
@@ -33,13 +33,12 @@ namespace ModLoader
                         .BuildAsync();
                 }
 
-                await mods.InitializeAsync();
-
-                Form.Game = mods;
+                await Game.LoadAsync();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Error = ex;
             }
             finally
             {

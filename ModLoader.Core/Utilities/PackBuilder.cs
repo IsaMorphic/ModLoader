@@ -10,15 +10,27 @@ namespace ModLoader.Core.Utilities
 {
     public class PackBuilder
     {
-        private string Path { get; }
+        private string InputDir { get; }
+        private string OutputDir { get; }
+
         private string Name { get; }
 
         private Image Image { get; set; }
         private string Note { get; set; }
 
-        public PackBuilder(string path, string name)
+        public PackBuilder(string inputDir, string outputDir, string name)
         {
-            Path = path;
+            InputDir = inputDir;
+            OutputDir = outputDir;
+
+            Name = name;
+        }
+
+        public PackBuilder(string inputDir, string name)
+        {
+            InputDir = inputDir;
+            OutputDir = Path.GetDirectoryName(InputDir);
+
             Name = name;
         }
 
@@ -42,14 +54,14 @@ namespace ModLoader.Core.Utilities
         {
             Graph graph = new Graph();
 
-            var path = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), $"{Name}.zip");
+            Directory.CreateDirectory(OutputDir);
 
-            using (var archiveStream = File.Create(path))
+            using (var archiveStream = File.Create(Path.Combine(OutputDir, $"{Name}.zip")))
             using (var archive = new ZipArchive(archiveStream, ZipArchiveMode.Create))
             {
-                foreach (var file in Directory.EnumerateFiles(Path, "*.*", SearchOption.AllDirectories))
+                foreach (var file in Directory.EnumerateFiles(InputDir, "*.*", SearchOption.AllDirectories))
                 {
-                    var name = file.Replace(Path, "").Trim('\\').ToLowerInvariant();
+                    var name = file.Replace(InputDir, "").Trim('\\').ToLowerInvariant();
                     var entry = archive.CreateEntry(name);
 
                     using (var fileStream = File.OpenRead(file))

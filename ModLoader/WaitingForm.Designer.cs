@@ -1,6 +1,6 @@
 ﻿namespace ModLoader
 {
-    partial class LoaderForm
+    partial class WaitingForm
     {
         /// <summary>
         /// Required designer variable.
@@ -38,10 +38,10 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(429, 192);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Loading Game...";
+            this.label1.Text = "Waiting...";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
-            // LoaderForm
+            // WaitingForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -49,10 +49,9 @@
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Margin = new System.Windows.Forms.Padding(5);
-            this.Name = "LoaderForm";
+            this.Name = "WaitingForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Loading...";
-            this.Load += new System.EventHandler(this.FormLoad);
+            this.Text = "Waiting...";
             this.ResumeLayout(false);
 
         }

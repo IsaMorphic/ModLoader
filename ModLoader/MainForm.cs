@@ -15,11 +15,12 @@ namespace ModLoader
     {
         private bool Refreshing { get; set; }
 
-        public Game Game { get; set; }
+        private Game Game { get; }
 
-        public MainForm()
+        public MainForm(Game game)
         {
             InitializeComponent();
+            Game = game;
         }
 
         private void RefreshChangeList()
@@ -103,10 +104,11 @@ namespace ModLoader
         private void MainForm_Load(object sender, EventArgs e)
         {
             Hide();
-            new LoaderForm(this).ShowDialog();
-            if (Game == null)
+            var loader = new LoaderForm(Game);
+            loader.ShowDialog();
+            if (loader.Error != null)
             {
-                Application.Exit();
+                Close();
                 return;
             }
             Show();
@@ -199,7 +201,6 @@ namespace ModLoader
         {
             try
             {
-                RebuildButton.Enabled = false;
                 LoadButton.Enabled = false;
                 RunGameButton.Enabled = false;
                 LoadButton.Text = "Loading mods...";
@@ -219,7 +220,6 @@ namespace ModLoader
             }
             finally
             {
-                RebuildButton.Enabled = true;
                 LoadButton.Enabled = true;
                 RunGameButton.Enabled = true;
                 LoadButton.Text = "Load All Mods";
@@ -228,7 +228,6 @@ namespace ModLoader
 
         private async void RunGameButton_Click(object sender, EventArgs e)
         {
-            RebuildButton.Enabled = false;
             LoadButton.Enabled = false;
             RunGameButton.Enabled = false;
             RunGameButton.Text = "Game is running...";
@@ -242,7 +241,6 @@ namespace ModLoader
                 MessageBox.Show("Could not auto-launch game, make sure there is only one .exe file in the game directory", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            RebuildButton.Enabled = true;
             LoadButton.Enabled = true;
             RunGameButton.Enabled = true;
             RunGameButton.Text = "Launch Game";
@@ -275,6 +273,11 @@ namespace ModLoader
         private void BuildPatchButton_Click(object sender, EventArgs e)
         {
             new PatchForm().ShowDialog();
+        }
+
+        private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            await Game.UnloadAsync();
         }
     }
 }

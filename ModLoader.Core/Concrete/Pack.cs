@@ -23,7 +23,7 @@ namespace ModLoader.Core
         public string Name { get; }
 
         public IResolvable<Pack> Fallback { get; set; }
-        
+
         public bool Enabled { get; set; }
 
         public HashSet<IResolvable<Module>> Members { get; }
@@ -69,6 +69,11 @@ namespace ModLoader.Core
 
                 Members.Add(module);
             }
+        }
+
+        public Task UnloadAsync()
+        {
+            return Task.Run(Archive.Dispose);
         }
 
         public Pack ResolveSelf() => this;

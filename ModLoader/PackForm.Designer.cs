@@ -43,7 +43,7 @@
             // 
             // Step1Label
             // 
-            this.Step1Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Step1Label.Font = new System.Drawing.Font("Lucida Console", 11F);
             this.Step1Label.Location = new System.Drawing.Point(7, 5);
             this.Step1Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step1Label.Name = "Step1Label";
@@ -56,7 +56,7 @@
             // 
             this.FolderBrowseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.FolderBrowseButton.Location = new System.Drawing.Point(7, 30);
-            this.FolderBrowseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.FolderBrowseButton.Margin = new System.Windows.Forms.Padding(2);
             this.FolderBrowseButton.Name = "FolderBrowseButton";
             this.FolderBrowseButton.Size = new System.Drawing.Size(331, 43);
             this.FolderBrowseButton.TabIndex = 2;
@@ -68,7 +68,7 @@
             // 
             this.ImageBrowseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ImageBrowseButton.Location = new System.Drawing.Point(7, 128);
-            this.ImageBrowseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.ImageBrowseButton.Margin = new System.Windows.Forms.Padding(2);
             this.ImageBrowseButton.Name = "ImageBrowseButton";
             this.ImageBrowseButton.Size = new System.Drawing.Size(331, 43);
             this.ImageBrowseButton.TabIndex = 3;
@@ -78,7 +78,7 @@
             // 
             // Step2Label
             // 
-            this.Step2Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Step2Label.Font = new System.Drawing.Font("Lucida Console", 11F);
             this.Step2Label.Location = new System.Drawing.Point(7, 99);
             this.Step2Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step2Label.Name = "Step2Label";
@@ -91,7 +91,7 @@
             // 
             this.NoteEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NoteEntry.Location = new System.Drawing.Point(7, 290);
-            this.NoteEntry.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.NoteEntry.Margin = new System.Windows.Forms.Padding(2);
             this.NoteEntry.Multiline = true;
             this.NoteEntry.Name = "NoteEntry";
             this.NoteEntry.Size = new System.Drawing.Size(332, 63);
@@ -99,7 +99,7 @@
             // 
             // Step4Label
             // 
-            this.Step4Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Step4Label.Font = new System.Drawing.Font("Lucida Console", 11F);
             this.Step4Label.Location = new System.Drawing.Point(7, 260);
             this.Step4Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step4Label.Name = "Step4Label";
@@ -110,9 +110,9 @@
             // 
             // BuildButton
             // 
-            this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.BuildButton.Location = new System.Drawing.Point(7, 382);
-            this.BuildButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.BuildButton.Margin = new System.Windows.Forms.Padding(2);
             this.BuildButton.Name = "BuildButton";
             this.BuildButton.Size = new System.Drawing.Size(331, 43);
             this.BuildButton.TabIndex = 7;
@@ -122,7 +122,7 @@
             // 
             // Step33Label
             // 
-            this.Step33Label.Font = new System.Drawing.Font("Lucida Console", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Step33Label.Font = new System.Drawing.Font("Lucida Console", 11F);
             this.Step33Label.Location = new System.Drawing.Point(7, 192);
             this.Step33Label.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.Step33Label.Name = "Step33Label";
@@ -135,9 +135,9 @@
             // 
             this.NameEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.NameEntry.Location = new System.Drawing.Point(7, 222);
-            this.NameEntry.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.NameEntry.Margin = new System.Windows.Forms.Padding(2);
             this.NameEntry.Name = "NameEntry";
-            this.NameEntry.Size = new System.Drawing.Size(332, 26);
+            this.NameEntry.Size = new System.Drawing.Size(332, 41);
             this.NameEntry.TabIndex = 9;
             // 
             // PackForm
@@ -155,7 +155,7 @@
             this.Controls.Add(this.FolderBrowseButton);
             this.Controls.Add(this.Step1Label);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.MaximizeBox = false;
             this.Name = "PackForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

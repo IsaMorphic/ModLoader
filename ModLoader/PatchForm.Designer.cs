@@ -52,7 +52,7 @@
             // 
             // OriginalButton
             // 
-            this.OriginalButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.OriginalButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.OriginalButton.Location = new System.Drawing.Point(7, 30);
             this.OriginalButton.Margin = new System.Windows.Forms.Padding(2);
             this.OriginalButton.Name = "OriginalButton";
@@ -64,7 +64,7 @@
             // 
             // ModdedButton
             // 
-            this.ModdedButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.ModdedButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.ModdedButton.Location = new System.Drawing.Point(7, 128);
             this.ModdedButton.Margin = new System.Windows.Forms.Padding(2);
             this.ModdedButton.Name = "ModdedButton";
@@ -87,7 +87,7 @@
             // 
             // BuildButton
             // 
-            this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.BuildButton.Location = new System.Drawing.Point(7, 317);
             this.BuildButton.Margin = new System.Windows.Forms.Padding(2);
             this.BuildButton.Name = "BuildButton";
@@ -110,7 +110,7 @@
             // 
             // SaveButton
             // 
-            this.SaveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SaveButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
             this.SaveButton.Location = new System.Drawing.Point(7, 232);
             this.SaveButton.Margin = new System.Windows.Forms.Padding(2);
             this.SaveButton.Name = "SaveButton";
