@@ -1,5 +1,4 @@
 ﻿using ModLoader.Core.Utilities;
-using SixLabors.ImageSharp;
 using System;
 using System.IO;
 using System.Linq;
@@ -9,7 +8,7 @@ namespace ModLoader
 {
     public partial class PackForm : Form
     {
-        private Image Image { get; set; }
+        private Stream ImageStream { get; set; }
 
         public PackForm()
         {
@@ -26,13 +25,13 @@ namespace ModLoader
             }
         }
 
-        private async void ImageBrowseButton_Click(object sender, EventArgs e)
+        private void ImageBrowseButton_Click(object sender, EventArgs e)
         {
             ImageDialog.ShowDialog();
 
             try
             {
-                Image = await Image.LoadAsync(ImageDialog.FileName);
+                ImageStream = File.OpenRead(ImageDialog.FileName);
             }
             catch (Exception)
             {
@@ -50,7 +49,7 @@ namespace ModLoader
                         !string.IsNullOrEmpty(NameEntry.Text) &&
                         !NameEntry.Text.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ?
                          NameEntry.Text : throw new Exception("The user has failed to enter a valid pack name. Pack names must be a valid file-name on the host system and cannot be empty."))
-                    .WithBitmap(Image ?? throw new Exception("The user has failed to select a valid image file."))
+                    .WithImageStream(ImageStream ?? throw new Exception("The user has failed to select a valid image file."))
                     .WithNote(NoteEntry.Text)
                     .BuildAsync();
 

@@ -85,6 +85,10 @@
             this.Step2Label.Text = "Step 2: Select Modified File";
             this.Step2Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // FileDialog
+            // 
+            this.FileDialog.Filter = "All Files|*.*";
+            // 
             // BuildButton
             // 
             this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);

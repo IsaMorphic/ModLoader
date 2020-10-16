@@ -47,6 +47,7 @@
             this.GameList.Name = "GameList";
             this.GameList.Size = new System.Drawing.Size(641, 251);
             this.GameList.TabIndex = 1;
+            this.GameList.SelectedIndexChanged += new System.EventHandler(this.GameList_SelectedIndexChanged);
             // 
             // ModuleGroup
             // 
@@ -60,7 +61,8 @@
             // 
             // LoadGameButton
             // 
-            this.LoadGameButton.Location = new System.Drawing.Point(12, 301);
+            this.LoadGameButton.Enabled = false;
+            this.LoadGameButton.Location = new System.Drawing.Point(241, 301);
             this.LoadGameButton.Name = "LoadGameButton";
             this.LoadGameButton.Size = new System.Drawing.Size(208, 47);
             this.LoadGameButton.TabIndex = 4;
@@ -70,7 +72,7 @@
             // 
             // AddGameButton
             // 
-            this.AddGameButton.Location = new System.Drawing.Point(226, 301);
+            this.AddGameButton.Location = new System.Drawing.Point(12, 301);
             this.AddGameButton.Name = "AddGameButton";
             this.AddGameButton.Size = new System.Drawing.Size(223, 47);
             this.AddGameButton.TabIndex = 5;
@@ -80,12 +82,14 @@
             // 
             // RemoveGameButton
             // 
+            this.RemoveGameButton.Enabled = false;
             this.RemoveGameButton.Location = new System.Drawing.Point(455, 301);
             this.RemoveGameButton.Name = "RemoveGameButton";
             this.RemoveGameButton.Size = new System.Drawing.Size(214, 47);
             this.RemoveGameButton.TabIndex = 6;
             this.RemoveGameButton.Text = "Remove Game (Careful!)";
             this.RemoveGameButton.UseVisualStyleBackColor = true;
+            this.RemoveGameButton.Click += new System.EventHandler(this.RemoveGameButton_Click);
             // 
             // ManagerForm
             // 

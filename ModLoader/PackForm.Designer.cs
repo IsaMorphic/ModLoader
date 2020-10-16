@@ -108,6 +108,10 @@
             this.Step4Label.Text = "Step 4: Describe your Mod";
             this.Step4Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // ImageDialog
+            // 
+            this.ImageDialog.Filter = "PNG Image Files|*.png";
+            // 
             // BuildButton
             // 
             this.BuildButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);

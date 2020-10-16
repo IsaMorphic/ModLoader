@@ -1,5 +1,6 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Abstract;
+using ModLoader.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -101,16 +103,43 @@ namespace ModLoader
             Refreshing = false;
         }
 
-        private void MainForm_Load(object sender, EventArgs e)
+        private async Task RebuildPacksAsync()
+        {
+            var dirs = Directory.GetDirectories(Game.ModPath);
+
+            var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("ModLoader.Resources.UnderDevPack.png");
+            foreach (var dir in dirs)
+            {
+                await new PackBuilder(dir, Path.GetFileName(dir))
+                    .WithImageStream(stream)
+                    .WithNote("This is a generated test pack. Once you're ready to ship your mod, go to Build->Pack and follow the steps!")
+                    .BuildAsync();
+            }
+
+        }
+
+        private async void MainForm_Load(object sender, EventArgs e)
         {
             Hide();
-            var loader = new LoaderForm(Game);
-            loader.ShowDialog();
-            if (loader.Error != null)
+
+            var waiter = new WaitingForm("Loading game...");
+            waiter.Show();
+
+            try
             {
+                await RebuildPacksAsync();
+
+                await Game.ReloadAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 Close();
                 return;
             }
+
+            waiter.Hide();
+
             Show();
 
             RefreshPackList();
@@ -134,11 +163,22 @@ namespace ModLoader
 
             RefreshModuleList();
 
-            using (var stream = pack.Archive.GetEntry("_pack.png").Open())
-                PackImage.Image = Bitmap.FromStream(stream);
+            if (pack.Enabled)
+            {
+                PackImage.Image?.Dispose();
 
-            using (var stream = pack.Archive.GetEntry("_pack.txt").Open())
-                PackNotes.Text = new StreamReader(stream).ReadToEnd();
+                using (var stream = pack.Archive.GetEntry("_pack.png").Open())
+                    PackImage.Image = Image.FromStream(stream);
+
+                using (var stream = pack.Archive.GetEntry("_pack.txt").Open())
+                    PackNotes.Text = new StreamReader(stream).ReadToEnd();
+            }
+            else
+            {
+                using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("ModLoader.Resources.UnloadedPack.png"))
+                    PackImage.Image = Image.FromStream(stream);
+                PackNotes.Text = "This pack is unloaded. Re-enable it to see more details!";
+            }
         }
 
         private void ChangeList_SelectedIndexChanged(object sender, EventArgs e)
@@ -179,7 +219,14 @@ namespace ModLoader
             var pack = PackList.SelectedItem as Pack;
             if (pack == null) return;
 
-            pack.Enabled = e.NewValue == CheckState.Checked;
+            try
+            {
+                pack.Enabled = e.NewValue == CheckState.Checked;
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("An unexpected error occured while toggling this pack. Please verify that the pack file still exists.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
 
             RefreshChangeList();
             RefreshModuleList();
@@ -255,9 +302,31 @@ namespace ModLoader
             RefreshChangeList();
         }
 
-        private void RebuildButton_Click(object sender, EventArgs e)
+        private async void RebuildButton_Click(object sender, EventArgs e)
         {
-            Application.Restart();
+            Hide();
+
+            var waiter = new WaitingForm("Reloading game...");
+            waiter.Show();
+
+            try
+            {
+                await Game.ReloadAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Close();
+                return;
+            }
+
+            waiter.Hide();
+
+            Show();
+
+            RefreshPackList();
+            RefreshModuleList();
+            RefreshChangeList();
         }
 
         private void OpenModsButton_Click(object sender, EventArgs e)
@@ -275,9 +344,20 @@ namespace ModLoader
             new PatchForm().ShowDialog();
         }
 
-        private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private async void ImportModButton_Click(object sender, EventArgs e)
         {
-            await Game.UnloadAsync();
+            if (ImportFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                string fileName = Path.GetFileName(ImportFileDialog.FileName);
+                string destPath = Path.Combine(Game.ModPath, fileName);
+
+                await Task.Run(() => File.Move(ImportFileDialog.FileName, destPath));
+
+                await Game.ReloadAsync();
+
+                RefreshPackList();
+                RefreshChangeList();
+            }
         }
     }
 }

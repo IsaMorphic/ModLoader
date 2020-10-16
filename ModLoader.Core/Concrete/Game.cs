@@ -77,7 +77,7 @@ namespace ModLoader.Core
             await SaveConfigAsync();
 
             await new PackBuilder(GamePath, ModPath, "_base_")
-                    .WithBitmap(new Image<Rgba32>(100, 100))
+                    .WithImageStream(Stream.Null)
                     .WithNote("Base Game (DO NOT DELETE!)")
                     .BuildAsync();
 
@@ -90,8 +90,21 @@ namespace ModLoader.Core
             File.WriteAllText(ScriptPath, "echo Nothing to do!");
         }
 
-        public async Task LoadAsync()
+        public async Task ReloadAsync()
         {
+            if (BasePack != null)
+            {
+                BasePack.Enabled = false;
+                BasePack = null;
+            }
+
+            foreach (var pack in Packs)
+            {
+                pack.Unload();
+            }
+
+            Merger.Mergers.Clear();
+
             BasePack = new Pack(this, "_base_");
             await BasePack.InitializeAsync();
 
@@ -103,23 +116,16 @@ namespace ModLoader.Core
                 if (packName == "_base_") continue;
 
                 var pack = new Pack(this, packName);
-                await pack.InitializeAsync();
 
                 Merger.Mergers.Add(pack);
             }
 
-            await LoadConfigAsync();
-        }
-
-        public async Task UnloadAsync()
-        {
-            await BasePack.UnloadAsync();
-
             foreach (var pack in Packs)
             {
-                await pack.UnloadAsync();
+                await pack.InitializeAsync();
             }
-            Merger.Mergers.Clear();
+
+            await LoadConfigAsync();
         }
 
         public async Task LoadConfigAsync()

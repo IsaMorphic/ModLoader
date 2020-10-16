@@ -27,7 +27,7 @@ namespace ModLoader
 
             if(!File.Exists(FileDialog.FileName))
             {
-                MessageBox.Show("The file you have selected does not exist. Please select a valid folder.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("The file you have selected does not exist. Please select a valid file.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
 
             FilePaths[sender] = FileDialog.FileName;

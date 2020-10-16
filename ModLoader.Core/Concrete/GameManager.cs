@@ -13,7 +13,7 @@ namespace ModLoader.Core
 
         public GameManager()
         {
-            var dir = Environment.GetEnvironmentVariable("MODLOADER_PATH") ?? 
+            var dir = Environment.GetEnvironmentVariable("MODLOADER_PATH") ??
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ModLoader");
             BasePath = Path.Combine(dir, "Games");
             Games = new HashSet<Game>();
@@ -37,6 +37,13 @@ namespace ModLoader.Core
             var game = new Game(this, name);
             await game.InitializeAsync(gamePath);
             Games.Add(game);
+        }
+
+        public Task RemoveGameAsync(Game game)
+        {
+            Games.Remove(game);
+            var dir = Path.Combine(BasePath, game.Name);
+            return Task.Run(() => Directory.Delete(dir, true));
         }
     }
 }

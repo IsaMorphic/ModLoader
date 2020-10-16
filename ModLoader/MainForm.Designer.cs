@@ -40,6 +40,7 @@
             this.FallbackLabel = new System.Windows.Forms.Label();
             this.FallbackSelect = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.RebuildButton = new System.Windows.Forms.Button();
             this.RunGameButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
             this.ChangeGroup = new System.Windows.Forms.GroupBox();
@@ -53,6 +54,7 @@
             this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.BuildPackButton = new System.Windows.Forms.ToolStripMenuItem();
             this.BuildPatchButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.ImportFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.ModuleGroup.SuspendLayout();
             this.PackGroup.SuspendLayout();
             this.NoteGroup.SuspendLayout();
@@ -186,6 +188,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.RebuildButton);
             this.groupBox1.Controls.Add(this.RunGameButton);
             this.groupBox1.Controls.Add(this.LoadButton);
             this.groupBox1.Location = new System.Drawing.Point(673, 443);
@@ -195,11 +198,21 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Actions";
             // 
+            // RebuildButton
+            // 
+            this.RebuildButton.Location = new System.Drawing.Point(7, 21);
+            this.RebuildButton.Name = "RebuildButton";
+            this.RebuildButton.Size = new System.Drawing.Size(277, 35);
+            this.RebuildButton.TabIndex = 2;
+            this.RebuildButton.Text = "Rebuild Packs / Reload";
+            this.RebuildButton.UseVisualStyleBackColor = true;
+            this.RebuildButton.Click += new System.EventHandler(this.RebuildButton_Click);
+            // 
             // RunGameButton
             // 
-            this.RunGameButton.Location = new System.Drawing.Point(7, 82);
+            this.RunGameButton.Location = new System.Drawing.Point(7, 102);
             this.RunGameButton.Name = "RunGameButton";
-            this.RunGameButton.Size = new System.Drawing.Size(277, 54);
+            this.RunGameButton.Size = new System.Drawing.Size(277, 34);
             this.RunGameButton.TabIndex = 1;
             this.RunGameButton.Text = "Launch Game";
             this.RunGameButton.UseVisualStyleBackColor = true;
@@ -207,9 +220,9 @@
             // 
             // LoadButton
             // 
-            this.LoadButton.Location = new System.Drawing.Point(6, 22);
+            this.LoadButton.Location = new System.Drawing.Point(7, 61);
             this.LoadButton.Name = "LoadButton";
-            this.LoadButton.Size = new System.Drawing.Size(277, 54);
+            this.LoadButton.Size = new System.Drawing.Size(277, 35);
             this.LoadButton.TabIndex = 0;
             this.LoadButton.Text = "Load All Mods";
             this.LoadButton.UseVisualStyleBackColor = true;
@@ -262,7 +275,6 @@
             // MenuBar
             // 
             this.MenuBar.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.MenuBar.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.MenuBar.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.MenuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
@@ -295,6 +307,7 @@
             this.ImportModButton.Name = "ImportModButton";
             this.ImportModButton.Size = new System.Drawing.Size(410, 48);
             this.ImportModButton.Text = "Import Mod";
+            this.ImportModButton.Click += new System.EventHandler(this.ImportModButton_Click);
             // 
             // buildToolStripMenuItem
             // 
@@ -320,6 +333,11 @@
             this.BuildPatchButton.Text = "Patch";
             this.BuildPatchButton.Click += new System.EventHandler(this.BuildPatchButton_Click);
             // 
+            // ImportFileDialog
+            // 
+            this.ImportFileDialog.DefaultExt = "zip";
+            this.ImportFileDialog.Filter = "ModLoader Pack Files|*.zip";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
@@ -337,8 +355,8 @@
             this.Margin = new System.Windows.Forms.Padding(5);
             this.MaximizeBox = false;
             this.Name = "MainForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ModLoader";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ModuleGroup.ResumeLayout(false);
             this.PackGroup.ResumeLayout(false);
@@ -384,6 +402,8 @@
         private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem BuildPackButton;
         private System.Windows.Forms.ToolStripMenuItem BuildPatchButton;
+        private System.Windows.Forms.OpenFileDialog ImportFileDialog;
+        private System.Windows.Forms.Button RebuildButton;
     }
 }
 

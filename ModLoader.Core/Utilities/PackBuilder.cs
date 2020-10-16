@@ -15,7 +15,7 @@ namespace ModLoader.Core.Utilities
 
         private string Name { get; }
 
-        private Image Image { get; set; }
+        private Stream ImageStream { get; set; }
         private string Note { get; set; }
 
         public PackBuilder(string inputDir, string outputDir, string name)
@@ -34,11 +34,11 @@ namespace ModLoader.Core.Utilities
             Name = name;
         }
 
-        public PackBuilder WithBitmap(Image image)
+        public PackBuilder WithImageStream(Stream imageStream)
         {
-            if (Image != null)
+            if (ImageStream != null)
                 throw new InvalidOperationException("This value has already been specified");
-            Image = image;
+            ImageStream = imageStream;
             return this;
         }
 
@@ -74,7 +74,10 @@ namespace ModLoader.Core.Utilities
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())
-                    await Image.SaveAsPngAsync(entryStream);
+                {
+                    ImageStream.Seek(0, SeekOrigin.Begin);
+                    await ImageStream.CopyToAsync(entryStream);
+                }
 
                 using (var entryStream = archive.CreateEntry("_pack.txt").Open())
                 using (var writer = new StreamWriter(entryStream))

@@ -24,7 +24,24 @@ namespace ModLoader.Core
 
         public IResolvable<Pack> Fallback { get; set; }
 
-        public bool Enabled { get; set; }
+        private bool _initialized { get; set; }
+
+        private bool _enabled;
+        public bool Enabled
+        {
+            get => _enabled;
+            set
+            {
+                if (_initialized && _enabled != value)
+                {
+                    if (value)
+                        Reload();
+                    else
+                        Unload();
+                }
+                _enabled = value;
+            }
+        }
 
         public HashSet<IResolvable<Module>> Members { get; }
 
@@ -69,11 +86,19 @@ namespace ModLoader.Core
 
                 Members.Add(module);
             }
+
+            _initialized = true;
         }
 
-        public Task UnloadAsync()
+        public void Unload()
         {
-            return Task.Run(Archive.Dispose);
+            Archive?.Dispose();
+        }
+
+        public void Reload()
+        {
+            var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
+            Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
         }
 
         public Pack ResolveSelf() => this;
