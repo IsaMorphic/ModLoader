@@ -75,6 +75,40 @@ namespace ModLoader.Core
 
     public class Diff : XunkGroup<Hunk>
     {
+        public static class DiffCache
+        {
+            public static Dictionary<(Game, string), List<string>> Cache { get; } = new Dictionary<(Game, string), List<string>>();
+
+            public static async Task<List<string>> GetCachedText(Game game, string moduleName)
+            {
+                if (Cache.ContainsKey((game, moduleName)))
+                {
+                    return Cache[(game, moduleName)];
+                }
+                else
+                {
+                    Module baseModule = game.BasePack.Members
+                        .Select(m => m.Resolve())
+                        .Single(m => m.Name == moduleName);
+
+                    List<string> baseText = new List<string>();
+
+                    using (var stream = baseModule.GetDataStream())
+                    using (var reader = new StreamReader(stream))
+                    {
+                        while (!reader.EndOfStream)
+                        {
+                            baseText.Add(await reader.ReadLineAsync());
+                        }
+                    }
+
+                    Cache.Add((game, moduleName), baseText);
+
+                    return baseText;
+                }
+            }
+        }
+
         public class DiffLoader : IXunkGroupLoader<Hunk>
         {
             public async Task LoadAsync(XunkGroup<Hunk> group, CancellationToken token)
@@ -142,31 +176,22 @@ namespace ModLoader.Core
 
         public Diff(Pack parent, string name, Guid id) : base(parent, name, id, new DiffLoader())
         {
-            Module baseModule = Root.BasePack.Members
-                .Select(m => m.Resolve())
-                .Single(m => m.Name == Name);
+        }
 
-            List<string> baseText = new List<string>();
-
-            using (var stream = baseModule.GetDataStream())
-            using (var reader = new StreamReader(stream))
-            {
-                while (!reader.EndOfStream)
-                {
-                    baseText.Add(reader.ReadLine());
-                }
-            }
+        public async Task InitializeAsync()
+        {
+            List<string> baseText = await DiffCache.GetCachedText(Root, Name);
 
             using (var data = GetDataStream())
             using (var reader = new StreamReader(data))
             {
-                string line = reader.ReadLine();
+                string line = await reader.ReadLineAsync();
 
                 while (!reader.EndOfStream)
                 {
                     if (string.IsNullOrWhiteSpace(line))
                     {
-                        line = reader.ReadLine();
+                        line = await reader.ReadLineAsync();
                         continue;
                     }
 
@@ -205,7 +230,7 @@ namespace ModLoader.Core
 
                     List<Line> lines = new List<Line>();
 
-                    line = reader.ReadLine();
+                    line = await reader.ReadLineAsync();
 
                     while (!line.StartsWith(": ") && !line.StartsWith("= "))
                     {
@@ -238,7 +263,7 @@ namespace ModLoader.Core
                         if (reader.EndOfStream)
                             break;
 
-                        line = reader.ReadLine();
+                        line = await reader.ReadLineAsync();
                     }
 
                     var hunk = new Hunk(this, lines, offset, errors);

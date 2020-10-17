@@ -68,23 +68,30 @@ namespace ModLoader.Core
 
         public Patch(Pack parent, string name, Guid id) : base(parent, name, id, new PatchLoader())
         {
-            try
+        }
+
+        public Task InitializeAsync()
+        {
+            return Task.Run(() =>
             {
-                using (var data = GetDataStream())
-                using (var reader = new BinaryReader(data))
+                try
                 {
-                    while (true)
+                    using (var data = GetDataStream())
+                    using (var reader = new BinaryReader(data))
                     {
-                        long offset = reader.ReadInt64();
-                        byte[] bytes = reader.ReadBytes(reader.ReadInt32());
+                        while (true)
+                        {
+                            long offset = reader.ReadInt64();
+                            byte[] bytes = reader.ReadBytes(reader.ReadInt32());
 
-                        var chunk = new Chunk(this, offset, bytes);
+                            var chunk = new Chunk(this, offset, bytes);
 
-                        Members.Add(chunk);
+                            Members.Add(chunk);
+                        }
                     }
                 }
-            }
-            catch (EndOfStreamException) { }
+                catch (EndOfStreamException) { }
+            });
         }
 
         public override Stream GetDataStream()

@@ -76,9 +76,17 @@ namespace ModLoader.Core
 
                 Module module;
                 if (name.EndsWith(".diff"))
-                    module = new Diff(this, name.Replace(".diff", ""), id);
+                {
+                    var diff = new Diff(this, name.Replace(".diff", ""), id);
+                    await diff.InitializeAsync();
+                    module = diff;
+                }
                 else if (name.EndsWith(".patch"))
-                    module = new Patch(this, name.Replace(".patch", ""), id);
+                {
+                    var patch = new Patch(this, name.Replace(".patch", ""), id);
+                    await patch.InitializeAsync();
+                    module = patch;
+                }
                 else if (name.EndsWith(".burn"))
                     module = new Burn(this, name.Replace(".burn", ""), id);
                 else
