@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ModLoader.Core.Concrete
+namespace ModLoader.Core
 {
     public class Burn : Module
     {

@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
-    using ModLoader.Core.Concrete;
     using Persistence;
 
     public class Pack : IGroup<Module>, ILoadable<Pack>

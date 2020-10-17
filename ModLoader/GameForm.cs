@@ -1,6 +1,4 @@
-﻿using ModLoader.Core.Utilities;
-using SixLabors.ImageSharp;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
