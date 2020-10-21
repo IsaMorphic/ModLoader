@@ -261,7 +261,10 @@ namespace ModLoader.Core
         {
             var exePath = Directory.EnumerateFiles(GamePath, "*.exe").Single();
 
-            var proc = Process.Start(exePath);
+            var startInfo = new ProcessStartInfo(exePath) 
+            { WorkingDirectory = GamePath };
+
+            var proc = Process.Start(startInfo);
             return Task.Run(proc.WaitForExit);
         }
 
