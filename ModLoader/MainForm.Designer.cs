@@ -49,6 +49,7 @@
             this.ModuleList = new System.Windows.Forms.CheckedListBox();
             this.MenuBar = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.OpenGameButton = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenModsButton = new System.Windows.Forms.ToolStripMenuItem();
             this.ImportModButton = new System.Windows.Forms.ToolStripMenuItem();
             this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -275,6 +276,7 @@
             // MenuBar
             // 
             this.MenuBar.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.MenuBar.GripMargin = new System.Windows.Forms.Padding(2, 2, 0, 2);
             this.MenuBar.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.MenuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
@@ -288,6 +290,7 @@
             // fileToolStripMenuItem
             // 
             this.fileToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.OpenGameButton,
             this.OpenModsButton,
             this.ImportModButton});
             this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F);
@@ -295,17 +298,24 @@
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(80, 41);
             this.fileToolStripMenuItem.Text = "File";
             // 
+            // OpenGameButton
+            // 
+            this.OpenGameButton.Name = "OpenGameButton";
+            this.OpenGameButton.Size = new System.Drawing.Size(424, 48);
+            this.OpenGameButton.Text = "Open Game Directory";
+            this.OpenGameButton.Click += new System.EventHandler(this.OpenGameButton_Click);
+            // 
             // OpenModsButton
             // 
             this.OpenModsButton.Name = "OpenModsButton";
-            this.OpenModsButton.Size = new System.Drawing.Size(410, 48);
+            this.OpenModsButton.Size = new System.Drawing.Size(424, 48);
             this.OpenModsButton.Text = "Open Mod Directory";
             this.OpenModsButton.Click += new System.EventHandler(this.OpenModsButton_Click);
             // 
             // ImportModButton
             // 
             this.ImportModButton.Name = "ImportModButton";
-            this.ImportModButton.Size = new System.Drawing.Size(410, 48);
+            this.ImportModButton.Size = new System.Drawing.Size(424, 48);
             this.ImportModButton.Text = "Import Mod";
             this.ImportModButton.Click += new System.EventHandler(this.ImportModButton_Click);
             // 
@@ -357,6 +367,7 @@
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ModLoader";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ModuleGroup.ResumeLayout(false);
             this.PackGroup.ResumeLayout(false);
@@ -404,6 +415,7 @@
         private System.Windows.Forms.ToolStripMenuItem BuildPatchButton;
         private System.Windows.Forms.OpenFileDialog ImportFileDialog;
         private System.Windows.Forms.Button RebuildButton;
+        private System.Windows.Forms.ToolStripMenuItem OpenGameButton;
     }
 }
 

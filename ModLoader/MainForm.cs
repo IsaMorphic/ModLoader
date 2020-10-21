@@ -1,6 +1,5 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Abstract;
-using ModLoader.Core.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -103,21 +102,6 @@ namespace ModLoader
             Refreshing = false;
         }
 
-        private async Task RebuildPacksAsync()
-        {
-            var dirs = Directory.GetDirectories(Game.ModPath);
-
-            var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("ModLoader.Resources.UnderDevPack.png");
-            foreach (var dir in dirs)
-            {
-                await new PackBuilder(dir, Path.GetFileName(dir))
-                    .WithImageStream(stream)
-                    .WithNote("This is a generated test pack. Once you're ready to ship your mod, go to Build->Pack and follow the steps!")
-                    .BuildAsync();
-            }
-
-        }
-
         private async void MainForm_Load(object sender, EventArgs e)
         {
             Hide();
@@ -127,8 +111,6 @@ namespace ModLoader
 
             try
             {
-                await RebuildPacksAsync();
-
                 await Game.ReloadAsync();
             }
             catch (Exception ex)
@@ -137,8 +119,10 @@ namespace ModLoader
                 Close();
                 return;
             }
-
-            waiter.Hide();
+            finally
+            {
+                waiter.Hide();
+            }
 
             Show();
 
@@ -329,6 +313,11 @@ namespace ModLoader
             RefreshChangeList();
         }
 
+        private void OpenGameButton_Click(object sender, EventArgs e)
+        {
+            Process.Start("explorer.exe", Game.GamePath);
+        }
+
         private void OpenModsButton_Click(object sender, EventArgs e)
         {
             Process.Start("explorer.exe", Game.ModPath);
@@ -358,6 +347,11 @@ namespace ModLoader
                 RefreshPackList();
                 RefreshChangeList();
             }
+        }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Game.Unload();
         }
     }
 }

@@ -16,6 +16,9 @@ namespace ModLoader.Core
 
     public class Game
     {
+        public static Stream DefaultPackImageStream { get; set; }
+        public static string DefaultPackNote { get; set; }
+
         public string BasePath { get; }
 
         public string ModPath { get; }
@@ -88,7 +91,7 @@ namespace ModLoader.Core
             File.WriteAllText(ScriptPath, "echo Nothing to do!");
         }
 
-        public async Task ReloadAsync()
+        public void Unload()
         {
             if (BasePack != null)
             {
@@ -102,6 +105,26 @@ namespace ModLoader.Core
             }
 
             Merger.Mergers.Clear();
+        }
+
+        public async Task RebuildTestPacksAsync()
+        {
+            var dirs = Directory.GetDirectories(ModPath);
+
+            foreach (var dir in dirs)
+            {
+                await new PackBuilder(dir, Path.GetFileName(dir))
+                    .WithImageStream(DefaultPackImageStream)
+                    .WithNote(DefaultPackNote)
+                    .BuildAsync();
+            }
+        }
+
+        public async Task ReloadAsync()
+        {
+            Unload();
+
+            await RebuildTestPacksAsync();
 
             BasePack = new Pack(this, "_base_");
             await BasePack.InitializeAsync();
@@ -261,7 +284,7 @@ namespace ModLoader.Core
         {
             var exePath = Directory.EnumerateFiles(GamePath, "*.exe").Single();
 
-            var startInfo = new ProcessStartInfo(exePath) 
+            var startInfo = new ProcessStartInfo(exePath)
             { WorkingDirectory = GamePath };
 
             var proc = Process.Start(startInfo);
