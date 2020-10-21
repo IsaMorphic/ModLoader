@@ -104,7 +104,7 @@ namespace ModLoader
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
-            Hide();
+            BeginInvoke((Action)Hide);
 
             var waiter = new WaitingForm("Loading game...");
             waiter.Show();
