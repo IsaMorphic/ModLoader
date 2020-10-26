@@ -56,6 +56,7 @@
             this.BuildPackButton = new System.Windows.Forms.ToolStripMenuItem();
             this.BuildPatchButton = new System.Windows.Forms.ToolStripMenuItem();
             this.ImportFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.AboutButton = new System.Windows.Forms.ToolStripMenuItem();
             this.ModuleGroup.SuspendLayout();
             this.PackGroup.SuspendLayout();
             this.NoteGroup.SuspendLayout();
@@ -280,10 +281,11 @@
             this.MenuBar.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.MenuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.buildToolStripMenuItem});
+            this.buildToolStripMenuItem,
+            this.AboutButton});
             this.MenuBar.Location = new System.Drawing.Point(0, 0);
             this.MenuBar.Name = "MenuBar";
-            this.MenuBar.Size = new System.Drawing.Size(970, 45);
+            this.MenuBar.Size = new System.Drawing.Size(970, 47);
             this.MenuBar.TabIndex = 7;
             this.MenuBar.Text = "MenuBar";
             // 
@@ -295,7 +297,7 @@
             this.ImportModButton});
             this.fileToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(80, 41);
+            this.fileToolStripMenuItem.Size = new System.Drawing.Size(80, 43);
             this.fileToolStripMenuItem.Text = "File";
             // 
             // OpenGameButton
@@ -326,7 +328,7 @@
             this.BuildPatchButton});
             this.buildToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
-            this.buildToolStripMenuItem.Size = new System.Drawing.Size(99, 41);
+            this.buildToolStripMenuItem.Size = new System.Drawing.Size(99, 43);
             this.buildToolStripMenuItem.Text = "Build";
             // 
             // BuildPackButton
@@ -347,6 +349,13 @@
             // 
             this.ImportFileDialog.DefaultExt = "zip";
             this.ImportFileDialog.Filter = "ModLoader Pack Files|*.zip";
+            // 
+            // AboutButton
+            // 
+            this.AboutButton.Name = "AboutButton";
+            this.AboutButton.Size = new System.Drawing.Size(112, 43);
+            this.AboutButton.Text = "About";
+            this.AboutButton.Click += new System.EventHandler(this.AboutButton_Click);
             // 
             // MainForm
             // 
@@ -416,6 +425,7 @@
         private System.Windows.Forms.OpenFileDialog ImportFileDialog;
         private System.Windows.Forms.Button RebuildButton;
         private System.Windows.Forms.ToolStripMenuItem OpenGameButton;
+        private System.Windows.Forms.ToolStripMenuItem AboutButton;
     }
 }
 

@@ -106,7 +106,7 @@ namespace ModLoader
         {
             BeginInvoke((Action)Hide);
 
-            var waiter = new WaitingForm("Loading game...");
+            var waiter = new WaitingForm();
             waiter.Show();
 
             try
@@ -290,7 +290,7 @@ namespace ModLoader
         {
             Hide();
 
-            var waiter = new WaitingForm("Reloading game...");
+            var waiter = new WaitingForm();
             waiter.Show();
 
             try
@@ -352,6 +352,11 @@ namespace ModLoader
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             Game.Unload();
+        }
+
+        private void AboutButton_Click(object sender, EventArgs e)
+        {
+            new AboutForm().ShowDialog();
         }
     }
 }

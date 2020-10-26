@@ -39,7 +39,7 @@ namespace ModLoader
             if (dialog.GameName != null && dialog.GamePath != null)
             {
                 Hide();
-                var waiter = new WaitingForm("Initializing game.\nThis may take a while...");
+                var waiter = new WaitingForm();
                 waiter.Show();
                 await GameManager.AddGameAsync(dialog.GameName, dialog.GamePath);
                 GameList.Items.Clear();
@@ -75,7 +75,7 @@ namespace ModLoader
             {
                 Hide();
 
-                var waiter = new WaitingForm($"Deleting all of {game}'s mods, configuration data and scripts.\nThis may take a while...");
+                var waiter = new WaitingForm();
                 waiter.Show();
 
                 await GameManager.RemoveGameAsync(game);

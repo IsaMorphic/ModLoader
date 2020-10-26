@@ -8,12 +8,12 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using Exceptions;
 
     public enum Operation
     {
         Remove,
         Add,
-        Append,
     }
 
     public class Line
@@ -33,7 +33,7 @@ namespace ModLoader.Core
         public List<Line> Lines { get; }
 
         public override long Offset { get; }
-        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Remove ? c - 1 : c + 1);
+        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Remove ? c + 1 : c);
 
         public HashSet<Exception> Errors { get; }
 
@@ -144,18 +144,20 @@ namespace ModLoader.Core
                         switch (line.Op)
                         {
                             case Operation.Remove:
-                                lines.RemoveAt(index);
-                                indicies.RemoveAt(index);
+                                try
+                                {
+                                    lines.RemoveAt(index);
+                                    indicies.RemoveAt(index);
+                                }
+                                catch (ArgumentOutOfRangeException)
+                                {
+                                    throw new ArgumentOutOfRangeException($"An error occured while loading diff module.\nThe most likely cause is that the user created a diff that removes more lines than there are in the base file.\nOffending module: {group}");
+                                }
                                 break;
-
                             case Operation.Add:
                                 lines.Insert(index, line.Text);
                                 indicies.Insert(index, index);
                                 index++;
-                                break;
-
-                            case Operation.Append:
-                                lines[index] += line.Text;
                                 break;
                         }
                     }
@@ -253,7 +255,13 @@ namespace ModLoader.Core
                         }
                         else if (line.StartsWith("> "))
                         {
-                            lines.Add(new Line(line.Remove(0, 2), Operation.Append));
+                            if (lines.Any())
+                                errors.Add(new FormatException($"If a hunk has a \">\" line present, it must be the only line in the hunk. Bogus? Maybe. Ask Yoda and Polly, but do so at your own risk...\nOffending line: \"{line}\""));
+                            else
+                            {
+                                lines.Add(new Line("", Operation.Remove));
+                                lines.Add(new Line(baseText[offset] + line.Remove(0, 2), Operation.Add));
+                            }
                         }
                         else if (!string.IsNullOrWhiteSpace(line))
                         {
@@ -267,6 +275,11 @@ namespace ModLoader.Core
                     }
 
                     var hunk = new Hunk(this, lines, offset, errors);
+
+                    if (Members.Select(h => h.Resolve())
+                        .Any(h => h.CanMergeWith(hunk) || hunk.CanMergeWith(h)))
+                        hunk.Errors.Add(new ConflictException<Hunk>("This hunk conflicts with a hunk in this diff that was parsed prior."));
+
                     Members.Add(hunk);
                 }
             }

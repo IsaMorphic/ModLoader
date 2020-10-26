@@ -106,7 +106,7 @@
             this.MaximizeBox = false;
             this.Name = "GameForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Pack Builder";
+            this.Text = "Add Game";
             this.ResumeLayout(false);
             this.PerformLayout();
 

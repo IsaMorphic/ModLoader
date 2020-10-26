@@ -4,10 +4,9 @@ namespace ModLoader
 {
     public partial class WaitingForm : Form
     {
-        public WaitingForm(string message)
+        public WaitingForm()
         {
             InitializeComponent();
-            label1.Text = message;
         }
     }
 }
