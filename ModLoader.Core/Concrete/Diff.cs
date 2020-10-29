@@ -33,7 +33,7 @@ namespace ModLoader.Core
         public List<Line> Lines { get; }
 
         public override long Offset { get; }
-        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Remove ? c + 1 : c);
+        public override long Length => Math.Min(0, Lines.Aggregate(-1, (c, l) => l.Op == Operation.Remove ? c + 1 : c));
 
         public HashSet<Exception> Errors { get; }
 
@@ -89,7 +89,9 @@ namespace ModLoader.Core
                 {
                     Module baseModule = game.BasePack.Members
                         .Select(m => m.Resolve())
-                        .Single(m => m.Name == moduleName);
+                        .SingleOrDefault(m => m.Name == moduleName);
+
+                    if (baseModule == null) throw new InvalidOperationException("An attempt was made to initialize a diff module for which a base version does not exist.");
 
                     List<string> baseText = new List<string>();
 

@@ -296,15 +296,15 @@ namespace ModLoader
             try
             {
                 await Game.ReloadAsync();
+                waiter.Hide();
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                waiter.Hide();
                 Close();
                 return;
             }
-
-            waiter.Hide();
 
             Show();
 

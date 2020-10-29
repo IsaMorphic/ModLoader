@@ -120,6 +120,7 @@
             this.PackNotes.Multiline = true;
             this.PackNotes.Name = "PackNotes";
             this.PackNotes.ReadOnly = true;
+            this.PackNotes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.PackNotes.Size = new System.Drawing.Size(263, 119);
             this.PackNotes.TabIndex = 0;
             // 
