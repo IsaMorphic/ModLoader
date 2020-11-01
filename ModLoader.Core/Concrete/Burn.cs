@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,8 +20,7 @@ namespace ModLoader.Core
             }
             catch (InvalidOperationException) { }
 
-            var path = Path.Combine(Root.GamePath, Name);
-            await Task.Run(() => File.Delete(path));
+            await Root.Files.RemoveFileAsync(Name);
 
             Root.Graph.Table[Name] = new HashSet<Guid> { Id };
         }

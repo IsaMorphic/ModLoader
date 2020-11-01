@@ -9,6 +9,7 @@ namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
+    using System.ComponentModel.Design.Serialization;
 
     public enum Operation
     {
@@ -91,7 +92,7 @@ namespace ModLoader.Core
                         .Select(m => m.Resolve())
                         .SingleOrDefault(m => m.Name == moduleName);
 
-                    if (baseModule == null) throw new InvalidOperationException("An attempt was made to initialize a diff module for which a base version does not exist.");
+                    if (baseModule == null) throw new InvalidOperationException($"An attempt was made to initialize a diff module for which a base version does not exist.\nOffending module: {moduleName}");
 
                     List<string> baseText = new List<string>();
 
@@ -120,61 +121,68 @@ namespace ModLoader.Core
                 List<long> indicies = new List<long>();
                 List<string> lines = new List<string>();
 
-                var path = Path.Combine(group.Root.GamePath, group.Name);
-                using (var stream = File.OpenRead(path))
-                using (var reader = new StreamReader(stream))
+                var file = await group.Root.Files.StageFileAsync(group.Name);
+
+                try
                 {
-                    int index = 0;
+                    var reader = new StreamReader(file.Stream);
+                    int i = 0;
                     while (!reader.EndOfStream)
                     {
                         lines.Add(await reader.ReadLineAsync());
-                        indicies.Add(index++);
+                        indicies.Add(i++);
                     }
-                }
 
-                foreach (var hunk in group.Members
-                    .Select(m => m.Resolve())
-                    .Where(m => m != null)
-                    .OrderBy(m => m.Offset))
-                {
-                    if (hunk.Errors.Any())
-                        throw new InvalidOperationException($"Cannot load diff because one or more hunks is in an error state.\nOffending module: {group}");
-
-                    int index = indicies.LastIndexOf(hunk.Offset);
-                    foreach (var line in hunk.Lines)
+                    foreach (var hunk in group.Members
+                        .Select(m => m.Resolve())
+                        .Where(m => m != null)
+                        .OrderBy(m => m.Offset))
                     {
-                        switch (line.Op)
+                        if (hunk.Errors.Any())
+                            throw new InvalidOperationException($"Cannot load diff because one or more hunks is in an error state.\nOffending module: {group}");
+
+                        int index = indicies.LastIndexOf(hunk.Offset);
+                        foreach (var line in hunk.Lines)
                         {
-                            case Operation.Remove:
-                                try
-                                {
-                                    lines.RemoveAt(index);
-                                    indicies.RemoveAt(index);
-                                }
-                                catch (ArgumentOutOfRangeException)
-                                {
-                                    throw new ArgumentOutOfRangeException($"An error occured while loading diff module.\nThe most likely cause is that the user created a diff that removes more lines than there are in the base file.\nOffending module: {group}");
-                                }
-                                break;
-                            case Operation.Add:
-                                lines.Insert(index, line.Text);
-                                indicies.Insert(index, index);
-                                index++;
-                                break;
+                            switch (line.Op)
+                            {
+                                case Operation.Remove:
+                                    try
+                                    {
+                                        lines.RemoveAt(index);
+                                        indicies.RemoveAt(index);
+                                    }
+                                    catch (ArgumentOutOfRangeException)
+                                    {
+                                        throw new ArgumentOutOfRangeException($"An error occured while loading diff module.\nThe most likely cause is that the user created a diff that removes more lines than there are in the base file.\nOffending module: {group}");
+                                    }
+                                    break;
+                                case Operation.Add:
+                                    lines.Insert(index, line.Text);
+                                    indicies.Insert(index, index);
+                                    index++;
+                                    break;
+                            }
                         }
                     }
-                }
 
-                using (var stream = File.Create(path))
-                using (var writer = new StreamWriter(stream))
-                {
+                    file.Stream.Seek(0, SeekOrigin.Begin);
+
+                    var writer = new StreamWriter(file.Stream);
                     foreach (var line in lines)
                     {
                         await writer.WriteLineAsync(line);
                     }
-                }
 
-                group.Root.Graph.Table[group.Name].Add(group.Id);
+                    await group.Root.Files.CommitFileAsync(file);
+
+                    group.Root.Graph.Table[group.Name].Add(group.Id);
+                }
+                catch (Exception ex)
+                {
+                    await group.Root.Files.UnstageFileAsync(file);
+                    throw ex;
+                }
             }
         }
 

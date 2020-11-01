@@ -22,6 +22,7 @@ namespace ModLoader.Core
         public string BasePath { get; }
 
         public string ModPath { get; }
+        public string TempPath { get; }
         public string GamePath { get; private set; }
 
         public string GraphPath { get; }
@@ -41,6 +42,8 @@ namespace ModLoader.Core
         public GroupMerger<Module> Merger { get; }
         public IResolvable<IGroup<Module>> Modules { get; set; }
 
+        public IFileSystem Files { get; private set; }
+
         public Game(GameManager parent, string name)
         {
             Parent = parent;
@@ -50,6 +53,7 @@ namespace ModLoader.Core
             BasePath = Path.Combine(Parent.BasePath, Name);
 
             ModPath = Path.Combine(BasePath, "Mods");
+            TempPath = Path.Combine(BasePath, "_tmp");
 
             GraphPath = Path.Combine(BasePath, "_pack.json");
             ConfigPath = Path.Combine(BasePath, "_config.json");
@@ -91,8 +95,11 @@ namespace ModLoader.Core
             File.WriteAllText(ScriptPath, "echo Nothing to do!");
         }
 
-        public void Unload()
+        public async Task Unload()
         {
+            if (Files != null)
+                await Files.UnmountAsync();
+
             if (BasePack != null)
             {
                 BasePack.Enabled = false;
@@ -122,7 +129,7 @@ namespace ModLoader.Core
 
         public async Task ReloadAsync()
         {
-            Unload();
+            await Unload();
 
             await RebuildTestPacksAsync();
 
@@ -147,6 +154,22 @@ namespace ModLoader.Core
             }
 
             await LoadConfigAsync();
+
+            if (Config.Extras != null && Config.Extras.ContainsKey("FileHandler"))
+            {
+                switch (Config.Extras["FileHandler"])
+                {
+                    case "FTP":
+                        Files = new FTPFileSystem(Config.Extras["HostName"], Config.Extras["UserName"], Config.Extras["Password"], GamePath, TempPath);
+                        break;
+                }
+            }
+            else
+            {
+                Files = new LocalFileSystem(GamePath, TempPath);
+            }
+
+            await Files.MountAsync();
         }
 
         public async Task LoadConfigAsync()
@@ -331,8 +354,7 @@ namespace ModLoader.Core
 
             foreach (var module in toRemove)
             {
-                var path = Path.Combine(GamePath, module.Name);
-                await Task.Run(() => File.Delete(path));
+                await Files.RemoveFileAsync(module.Name);
             }
         }
 

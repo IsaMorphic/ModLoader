@@ -75,17 +75,23 @@ namespace ModLoader.Core
             }
             catch (InvalidOperationException) { }
 
-            var path = Path.Combine(Root.GamePath, Name);
-
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-            using (var data = GetDataStream())
-            using (var stream = File.Create(path))
+            var file = await Root.Files.StageFileAsync(Name);
+            try
             {
-                await data.CopyToAsync(stream);
-            }
+                using (var data = GetDataStream())
+                {
+                    await data.CopyToAsync(file.Stream);
+                }
 
-            Root.Graph.Table[Name] = new HashSet<Guid> { Id };
+                await Root.Files.CommitFileAsync(file);
+
+                Root.Graph.Table[Name] = new HashSet<Guid> { Id };
+            }
+            catch (Exception ex)
+            {
+                await Root.Files.UnstageFileAsync(file);
+                throw ex;
+            }
         }
 
         public override string ToString()

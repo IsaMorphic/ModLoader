@@ -52,17 +52,26 @@ namespace ModLoader.Core
             {
                 if (group.Root.Graph.Table[group.Name].Contains(group.Id)) return;
 
-                var path = Path.Combine(group.Root.GamePath, group.Name);
-                using (var stream = File.OpenWrite(path))
+                var file = await group.Root.Files.StageFileAsync(group.Name);
+                try
                 {
                     foreach (var chunk in group.Members.Select(m => m.Resolve()))
                     {
-                        stream.Seek(chunk.Offset, SeekOrigin.Begin);
-                        await stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
+                        if (chunk.Offset > file.Stream.Length)
+                            throw new InvalidOperationException($"An attempt was made by a patch module to modify data outside of the base module's bounds.\nOffending module: {group.Name}");
+                        file.Stream.Seek(chunk.Offset, SeekOrigin.Begin);
+                        await file.Stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
                     }
-                }
 
-                group.Root.Graph.Table[group.Name].Add(group.Id);
+                    await group.Root.Files.CommitFileAsync(file);
+
+                    group.Root.Graph.Table[group.Name].Add(group.Id);
+                }
+                catch (Exception ex)
+                {
+                    await group.Root.Files.UnstageFileAsync(file);
+                    throw ex;
+                }
             }
         }
 
