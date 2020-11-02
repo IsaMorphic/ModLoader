@@ -22,10 +22,10 @@ namespace ModLoader.Core
             return Task.CompletedTask;
         }
 
-        public async Task<StagedFile> StageFileAsync(string path)
+        public async Task<StagedFile> StageFileAsync(string path, bool createNew = false)
         {
             string localFile = Path.Combine(LocalDir, path);
-            if (File.Exists(localFile))
+            if (File.Exists(localFile) && !createNew)
             {
                 string tempFile = Path.Combine(TempDir, path);
                 string tempDir = Path.GetDirectoryName(tempFile);
@@ -60,6 +60,7 @@ namespace ModLoader.Core
 
         public Task CommitFileAsync(StagedFile file)
         {
+            file.Stream.Flush();
             file.Stream.Dispose();
 
             string tempFile = Path.Combine(TempDir, file.Path);

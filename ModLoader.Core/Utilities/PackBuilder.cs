@@ -1,6 +1,5 @@
 ﻿using ModLoader.Core.Persistence;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
@@ -69,7 +68,7 @@ namespace ModLoader.Core.Utilities
                         await fileStream.CopyToAsync(entryStream);
                     }
 
-                    graph.Table.Add(name, new HashSet<Guid> { Guid.NewGuid() });
+                    graph.Table.Add(name, Guid.NewGuid());
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())

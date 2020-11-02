@@ -279,8 +279,21 @@ namespace ModLoader.Core
 
         public async Task LoadGraphAsync()
         {
-            using (var stream = File.OpenRead(GraphPath))
-                Graph = await Graph.LoadFromStreamAsync(stream);
+            try
+            {
+                using (var stream = File.OpenRead(GraphPath))
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream);
+                }
+            }
+            catch
+            {
+                using (var stream = File.OpenRead(GraphPath))
+                {
+                    Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
+                }
+            }
+
         }
 
         public async Task SaveGraphAsync()
@@ -324,27 +337,24 @@ namespace ModLoader.Core
 
         public async Task ReloadBaseModulesAsync(CancellationToken token)
         {
-            var modules = Packs
+            var @base = BasePack.Members
+                .Select(m => m.ResolveSelf());
+
+            var active = Modules.Resolve().Members
+                .Select(m => m.ResolveSelf());
+
+            var inactive = Packs
                 .SelectMany(m => m.Members)
                 .Select(m => m.ResolveSelf())
-                .Where(m => m.Resolve() == null)
-                .Concat(Modules.Resolve().Members
-                    .Select(m => m.Resolve())
-                    .Where(m => m.Id == Guid.Empty));
+                .Where(m => !active.Any(n => n.Name == m.Name));
 
-            var toLoad = modules
-                .Select(m => BasePack.Members
-                    .Select(b => b.Resolve())
-                    .Where(b => b != null)
-                    .SingleOrDefault(b => b.Name == m.Name))
+            var toLoad = inactive
+                .Select(m => @base.SingleOrDefault(n => n.Name == m.Name))
                 .Where(m => m != null)
                 .Distinct();
 
-            var toRemove = modules
-                .Where(m => !BasePack.Members
-                    .Select(b => b.Resolve())
-                    .Where(b => b != null)
-                    .Any(b => b.Name == m.Name))
+            var toRemove = inactive
+                .Where(m => !@base.Any(b => b.Name == m.Name) && Graph.Table.ContainsKey(m.Name))
                 .Distinct();
 
             foreach (var module in toLoad)
@@ -354,6 +364,7 @@ namespace ModLoader.Core
 
             foreach (var module in toRemove)
             {
+                Graph.Table.Remove(module.Name);
                 await Files.RemoveFileAsync(module.Name);
             }
         }

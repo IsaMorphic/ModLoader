@@ -1,11 +1,12 @@
 ﻿using FluentFTP;
+using System;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
 {
     using Abstract;
-    using System.Linq;
 
     public class FTPFileSystem : IFileSystem
     {
@@ -30,10 +31,21 @@ namespace ModLoader.Core
             TempDir = tempDir;
         }
 
-        private async Task<bool> FileExistsAsync(string path)
+        private async Task<(bool exists, string realName)> CheckFileAsync(string path)
         {
             var names = await Client.GetNameListingAsync();
-            return FtpExtensions.FileExistsInNameListing(names.Select(n => n.ToLowerInvariant()).ToArray(), path.ToLowerInvariant());
+            var lower = names
+                .Select(n => n.ToLowerInvariant())
+                .ToArray();
+
+            var p = path.ToLowerInvariant();
+
+            var i = Array.IndexOf(lower, p);
+
+            if (i < 0)
+                return (false, null);
+            else
+                return (true, names[i]);
         }
 
         public async Task MountAsync()
@@ -44,7 +56,7 @@ namespace ModLoader.Core
             await Client.AutoConnectAsync();
         }
 
-        public async Task<StagedFile> StageFileAsync(string path)
+        public async Task<StagedFile> StageFileAsync(string path, bool createNew = false)
         {
             string tempFile = Path.Combine(TempDir, path);
             string localFilePath = LocalDir.CombineLocalPath(path).GetFtpPath();
@@ -53,9 +65,11 @@ namespace ModLoader.Core
             string localDir = localFilePath.GetFtpDirectoryName();
             await Client.SetWorkingDirectoryAsync(localDir);
 
-            if (await FileExistsAsync(localFileName))
+            var check = await CheckFileAsync(localFileName);
+
+            if (check.exists && !createNew)
             {
-                await Client.DownloadFileAsync(tempFile, localFileName, FtpLocalExists.Overwrite);
+                await Client.DownloadFileAsync(tempFile, check.realName, FtpLocalExists.Overwrite);
 
                 var stream = File.Open(tempFile, FileMode.Open, FileAccess.ReadWrite);
                 var file = new StagedFile(path, stream);
@@ -78,36 +92,44 @@ namespace ModLoader.Core
         public Task UnstageFileAsync(StagedFile file)
         {
             file.Stream.Dispose();
+
             return Task.Run(() => File.Delete(Path.Combine(TempDir, file.Path)));
         }
 
         public async Task CommitFileAsync(StagedFile file)
         {
+            file.Stream.Flush();
             file.Stream.Dispose();
 
             string tempFile = Path.Combine(TempDir, file.Path);
 
-            string localFilePath = LocalDir.CombineLocalPath(file.Path);
+            string localFilePath = LocalDir.CombineLocalPath(file.Path).GetFtpPath();
 
             string localFileDir = localFilePath.GetFtpDirectoryName();
             string localFileName = localFilePath.GetFtpFileName();
 
+            var check = await CheckFileAsync(localFileName);
+
             await Client.SetWorkingDirectoryAsync(localFileDir);
 
-            await Client.UploadFileAsync(tempFile, localFileName, FtpRemoteExists.Overwrite, true);
+            await Client.UploadFileAsync(tempFile, check.realName, FtpRemoteExists.Overwrite, true);
+
+            await Task.Run(() => File.Delete(Path.Combine(TempDir, file.Path)));
         }
 
         public async Task RemoveFileAsync(string path)
         {
-            string localFilePath = LocalDir.CombineLocalPath(path).GetFtpFileName();
+            string localFilePath = LocalDir.CombineLocalPath(path).GetFtpPath();
 
             string localFileDir = localFilePath.GetFtpDirectoryName();
             string localFileName = localFilePath.GetFtpFileName();
 
             await Client.SetWorkingDirectoryAsync(localFileDir);
 
-            if (await FileExistsAsync(localFileName))
-                await Client.DeleteFileAsync(localFileName);
+            var check = await CheckFileAsync(localFileName);
+
+            if (check.exists)
+                await Client.DeleteFileAsync(check.realName);
         }
 
         public async Task UnmountAsync()

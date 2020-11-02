@@ -2,26 +2,20 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core.Persistence
 {
-    public class Graph
+    public class GraphCompat
     {
-        public Dictionary<string, Guid> Table { get; }
+        public Dictionary<string, HashSet<Guid>> Table { get; }
 
-        public Graph()
+        public GraphCompat()
         {
-            Table = new Dictionary<string, Guid>();
+            Table = new Dictionary<string, HashSet<Guid>>();
         }
 
-        public Graph(GraphCompat compat)
-        {
-            Table = compat.Table.ToDictionary(k => k.Key, v => v.Value.First());
-        }
-
-        public Graph(Dictionary<string, Guid> table)
+        public GraphCompat(Dictionary<string, HashSet<Guid>> table)
         {
             Table = table;
         }
@@ -32,10 +26,10 @@ namespace ModLoader.Core.Persistence
                 await writer.WriteAsync(JsonConvert.SerializeObject(this));
         }
 
-        public static async Task<Graph> LoadFromStreamAsync(Stream stream)
+        public static async Task<GraphCompat> LoadFromStreamAsync(Stream stream)
         {
             using (var reader = new StreamReader(stream))
-                return JsonConvert.DeserializeObject<Graph>(await reader.ReadToEndAsync());
+                return JsonConvert.DeserializeObject<GraphCompat>(await reader.ReadToEndAsync());
         }
     }
 }

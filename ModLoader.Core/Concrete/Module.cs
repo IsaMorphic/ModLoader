@@ -66,14 +66,10 @@ namespace ModLoader.Core
         {
             if (!Root.Graph.Table.ContainsKey(Name))
             {
-                Root.Graph.Table.Add(Name, new HashSet<Guid>());
+                Root.Graph.Table.Add(Name, Guid.Empty);
             }
 
-            try
-            {
-                if (Root.Graph.Table[Name].Single() == Id) return;
-            }
-            catch (InvalidOperationException) { }
+            if (Root.Graph.Table[Name] == Id) return;
 
             var file = await Root.Files.StageFileAsync(Name);
             try
@@ -85,7 +81,7 @@ namespace ModLoader.Core
 
                 await Root.Files.CommitFileAsync(file);
 
-                Root.Graph.Table[Name] = new HashSet<Guid> { Id };
+                Root.Graph.Table[Name] = Id;
             }
             catch (Exception ex)
             {

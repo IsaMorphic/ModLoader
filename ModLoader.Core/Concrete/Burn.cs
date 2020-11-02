@@ -14,15 +14,11 @@ namespace ModLoader.Core
 
         public override async Task LoadSelfAsync(CancellationToken token)
         {
-            try
-            {
-                if (Root.Graph.Table[Name].Single() == Id) return;
-            }
-            catch (InvalidOperationException) { }
+            if (Root.Graph.Table[Name] == Id) return;
 
             await Root.Files.RemoveFileAsync(Name);
 
-            Root.Graph.Table[Name] = new HashSet<Guid> { Id };
+            Root.Graph.Table[Name] = Id;
         }
 
         public override string ToString()

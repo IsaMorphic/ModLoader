@@ -66,12 +66,25 @@ namespace ModLoader.Core
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
 
-            Graph = await Graph.LoadFromStreamAsync(Archive.GetEntry("_pack.json").Open());
+            try
+            {
+                using (var stream = Archive.GetEntry("_pack.json").Open())
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream);
+                }
+            }
+            catch
+            {
+                using (var stream = Archive.GetEntry("_pack.json").Open())
+                {
+                    Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
+                }
+            }
 
             foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().EndsWith("/")))
             {
                 string name = entry.FullName.ToLowerInvariant();
-                Guid id = Graph.Table[name].Single();
+                Guid id = Graph.Table[name];
 
                 Module module;
                 if (name.EndsWith(".diff"))

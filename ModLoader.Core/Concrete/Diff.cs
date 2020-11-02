@@ -116,73 +116,56 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Hunk> group, CancellationToken token)
             {
-                if (group.Root.Graph.Table[group.Name].Contains(group.Id)) return;
+                if (group.Root.Graph.Table[group.Name] == group.Id) return;
 
-                List<long> indicies = new List<long>();
-                List<string> lines = new List<string>();
+                List<string> lines = (await DiffCache.GetCachedText(group.Root, group.Name)).ToList();
+                List<long> indicies = Enumerable.Range(0, lines.Count).Select(n => (long)n).ToList();
 
-                var file = await group.Root.Files.StageFileAsync(group.Name);
-
-                try
+                foreach (var hunk in group.Members
+                    .Select(m => m.Resolve())
+                    .Where(m => m != null)
+                    .OrderBy(m => m.Offset))
                 {
-                    var reader = new StreamReader(file.Stream);
-                    int i = 0;
-                    while (!reader.EndOfStream)
-                    {
-                        lines.Add(await reader.ReadLineAsync());
-                        indicies.Add(i++);
-                    }
+                    if (hunk.Errors.Any())
+                        throw new InvalidOperationException($"Cannot load diff because one or more hunks is in an error state.\nOffending module: {group}");
 
-                    foreach (var hunk in group.Members
-                        .Select(m => m.Resolve())
-                        .Where(m => m != null)
-                        .OrderBy(m => m.Offset))
+                    int index = indicies.LastIndexOf(hunk.Offset);
+                    foreach (var line in hunk.Lines)
                     {
-                        if (hunk.Errors.Any())
-                            throw new InvalidOperationException($"Cannot load diff because one or more hunks is in an error state.\nOffending module: {group}");
-
-                        int index = indicies.LastIndexOf(hunk.Offset);
-                        foreach (var line in hunk.Lines)
+                        switch (line.Op)
                         {
-                            switch (line.Op)
-                            {
-                                case Operation.Remove:
-                                    try
-                                    {
-                                        lines.RemoveAt(index);
-                                        indicies.RemoveAt(index);
-                                    }
-                                    catch (ArgumentOutOfRangeException)
-                                    {
-                                        throw new ArgumentOutOfRangeException($"An error occured while loading diff module.\nThe most likely cause is that the user created a diff that removes more lines than there are in the base file.\nOffending module: {group}");
-                                    }
-                                    break;
-                                case Operation.Add:
-                                    lines.Insert(index, line.Text);
-                                    indicies.Insert(index, index);
-                                    index++;
-                                    break;
-                            }
+                            case Operation.Remove:
+                                try
+                                {
+                                    lines.RemoveAt(index);
+                                    indicies.RemoveAt(index);
+                                }
+                                catch (ArgumentOutOfRangeException)
+                                {
+                                    throw new ArgumentOutOfRangeException($"An error occured while loading diff module.\nThe most likely cause is that the user created a diff that removes more lines than there are in the base file.\nOffending module: {group}");
+                                }
+                                break;
+                            case Operation.Add:
+                                lines.Insert(index, line.Text);
+                                indicies.Insert(index, index);
+                                index++;
+                                break;
                         }
                     }
-
-                    file.Stream.Seek(0, SeekOrigin.Begin);
-
-                    var writer = new StreamWriter(file.Stream);
-                    foreach (var line in lines)
-                    {
-                        await writer.WriteLineAsync(line);
-                    }
-
-                    await group.Root.Files.CommitFileAsync(file);
-
-                    group.Root.Graph.Table[group.Name].Add(group.Id);
                 }
-                catch (Exception ex)
+
+                var file = await group.Root.Files.StageFileAsync(group.Name, true);
+                var writer = new StreamWriter(file.Stream);
+                foreach (var line in lines)
                 {
-                    await group.Root.Files.UnstageFileAsync(file);
-                    throw ex;
+                    await writer.WriteLineAsync(line);
                 }
+
+                await writer.FlushAsync();
+
+                await group.Root.Files.CommitFileAsync(file);
+
+                group.Root.Graph.Table[group.Name] = group.Id;
             }
         }
 

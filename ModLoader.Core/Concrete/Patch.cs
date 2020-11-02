@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
-    using Exceptions;
 
     public class Chunk : Xunk<Chunk>
     {
@@ -50,7 +49,7 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Chunk> group, CancellationToken token)
             {
-                if (group.Root.Graph.Table[group.Name].Contains(group.Id)) return;
+                if (group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 var file = await group.Root.Files.StageFileAsync(group.Name);
                 try
@@ -65,7 +64,7 @@ namespace ModLoader.Core
 
                     await group.Root.Files.CommitFileAsync(file);
 
-                    group.Root.Graph.Table[group.Name].Add(group.Id);
+                    group.Root.Graph.Table[group.Name] = group.Id;
                 }
                 catch (Exception ex)
                 {
