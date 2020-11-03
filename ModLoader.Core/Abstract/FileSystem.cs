@@ -6,7 +6,7 @@ namespace ModLoader.Core.Abstract
     {
         Task MountAsync();
 
-        Task<StagedFile> StageFileAsync(string path, bool createNew = false);
+        Task<StagedFile> StageFileAsync(string path);
         Task UnstageFileAsync(StagedFile file); 
 
         Task CommitFileAsync(StagedFile file);

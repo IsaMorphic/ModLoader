@@ -9,7 +9,6 @@ namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
-    using System.ComponentModel.Design.Serialization;
 
     public enum Operation
     {
@@ -34,7 +33,7 @@ namespace ModLoader.Core
         public List<Line> Lines { get; }
 
         public override long Offset { get; }
-        public override long Length => Math.Min(0, Lines.Aggregate(-1, (c, l) => l.Op == Operation.Remove ? c + 1 : c));
+        public override long Length => Math.Max(0, Lines.Aggregate(-1, (c, l) => l.Op == Operation.Remove ? c + 1 : c));
 
         public HashSet<Exception> Errors { get; }
 
@@ -154,7 +153,7 @@ namespace ModLoader.Core
                     }
                 }
 
-                var file = await group.Root.Files.StageFileAsync(group.Name, true);
+                var file = await group.Root.Files.StageFileAsync(group.Name);
                 var writer = new StreamWriter(file.Stream);
                 foreach (var line in lines)
                 {

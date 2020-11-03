@@ -52,6 +52,13 @@ namespace ModLoader.Core
                 if (group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 var file = await group.Root.Files.StageFileAsync(group.Name);
+
+                var @base = group.Root.BasePack.Members
+                    .Select(m => m.Resolve())
+                    .Single(m => m.Name == group.Name);
+
+                await @base.GetDataStream().CopyToAsync(file.Stream);
+
                 try
                 {
                     foreach (var chunk in group.Members.Select(m => m.Resolve()))

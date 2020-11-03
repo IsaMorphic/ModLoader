@@ -56,37 +56,17 @@ namespace ModLoader.Core
             await Client.AutoConnectAsync();
         }
 
-        public async Task<StagedFile> StageFileAsync(string path, bool createNew = false)
+        public Task<StagedFile> StageFileAsync(string path)
         {
             string tempFile = Path.Combine(TempDir, path);
-            string localFilePath = LocalDir.CombineLocalPath(path).GetFtpPath();
-            string localFileName = localFilePath.GetFtpFileName();
+            string tempDir = Path.GetDirectoryName(tempFile);
 
-            string localDir = localFilePath.GetFtpDirectoryName();
-            await Client.SetWorkingDirectoryAsync(localDir);
+            Directory.CreateDirectory(tempDir);
 
-            var check = await CheckFileAsync(localFileName);
+            var stream = File.Open(tempFile, FileMode.Create, FileAccess.ReadWrite);
+            var file = new StagedFile(path, stream);
 
-            if (check.exists && !createNew)
-            {
-                await Client.DownloadFileAsync(tempFile, check.realName, FtpLocalExists.Overwrite);
-
-                var stream = File.Open(tempFile, FileMode.Open, FileAccess.ReadWrite);
-                var file = new StagedFile(path, stream);
-
-                return file;
-            }
-            else
-            {
-                string tempDir = Path.GetDirectoryName(tempFile);
-
-                Directory.CreateDirectory(tempDir);
-
-                var stream = File.Open(tempFile, FileMode.Create, FileAccess.ReadWrite);
-                var file = new StagedFile(path, stream);
-
-                return file;
-            }
+            return Task.FromResult(file);
         }
 
         public Task UnstageFileAsync(StagedFile file)
@@ -112,7 +92,7 @@ namespace ModLoader.Core
 
             await Client.SetWorkingDirectoryAsync(localFileDir);
 
-            await Client.UploadFileAsync(tempFile, check.realName, FtpRemoteExists.Overwrite, true);
+            await Client.UploadFileAsync(tempFile, check.realName ?? localFileName, FtpRemoteExists.Overwrite, true);
 
             await Task.Run(() => File.Delete(Path.Combine(TempDir, file.Path)));
         }

@@ -22,34 +22,17 @@ namespace ModLoader.Core
             return Task.CompletedTask;
         }
 
-        public async Task<StagedFile> StageFileAsync(string path, bool createNew = false)
+        public Task<StagedFile> StageFileAsync(string path)
         {
-            string localFile = Path.Combine(LocalDir, path);
-            if (File.Exists(localFile) && !createNew)
-            {
-                string tempFile = Path.Combine(TempDir, path);
-                string tempDir = Path.GetDirectoryName(tempFile);
+            string tempFile = Path.Combine(TempDir, path);
+            string tempDir = Path.GetDirectoryName(tempFile);
 
-                Directory.CreateDirectory(tempDir);
-                await Task.Run(() => File.Copy(localFile, tempFile, true));
+            Directory.CreateDirectory(tempDir);
 
-                var stream = File.Open(tempFile, FileMode.Open, FileAccess.ReadWrite);
-                var file = new StagedFile(path, stream);
+            var stream = File.Open(tempFile, FileMode.Create, FileAccess.ReadWrite);
+            var file = new StagedFile(path, stream);
 
-                return file;
-            }
-            else
-            {
-                string tempFile = Path.Combine(TempDir, path);
-                string tempDir = Path.GetDirectoryName(tempFile);
-
-                Directory.CreateDirectory(tempDir);
-
-                var stream = File.Open(tempFile, FileMode.Create, FileAccess.ReadWrite);
-                var file = new StagedFile(path, stream);
-
-                return file;
-            }
+            return Task.FromResult(file);
         }
 
         public Task UnstageFileAsync(StagedFile file)
