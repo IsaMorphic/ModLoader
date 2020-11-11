@@ -102,6 +102,7 @@ namespace ModLoader.Core
                         {
                             baseText.Add(await reader.ReadLineAsync());
                         }
+                        baseText.Add("");
                     }
 
                     Cache.Add((game, moduleName), baseText);
@@ -145,9 +146,17 @@ namespace ModLoader.Core
                                 }
                                 break;
                             case Operation.Add:
-                                lines.Insert(index, line.Text);
-                                indicies.Insert(index, index);
-                                index++;
+                                if (index >= lines.Count - 1)
+                                {
+                                    lines.Add(line.Text);
+                                    indicies.Add(index);
+                                }
+                                else
+                                {
+                                    lines.Insert(index, line.Text);
+                                    indicies.Insert(index, index);
+                                    index++;
+                                }
                                 break;
                         }
                     }

@@ -81,30 +81,50 @@ namespace ModLoader.Core
                 }
             }
 
-            foreach (var entry in Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().EndsWith("/")))
+            HashSet<string> burnDirs = new HashSet<string>();
+
+            var entries = Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().EndsWith("/"));
+            foreach (var entry in entries)
             {
                 string name = entry.FullName.ToLowerInvariant();
                 Guid id = Graph.Table[name];
 
-                Module module;
                 if (name.EndsWith(".diff"))
                 {
                     var diff = new Diff(this, name.Replace(".diff", ""), id);
                     await diff.InitializeAsync();
-                    module = diff;
+                    Members.Add(diff);
                 }
                 else if (name.EndsWith(".patch"))
                 {
                     var patch = new Patch(this, name.Replace(".patch", ""), id);
                     await patch.InitializeAsync();
-                    module = patch;
+                    Members.Add(patch);
+                }
+                else if (Path.GetFileName(name) == ".burn")
+                {
+                    var dir = Path.GetDirectoryName(name);
+                    burnDirs.Add(dir);
                 }
                 else if (name.EndsWith(".burn"))
-                    module = new Burn(this, name.Replace(".burn", ""), id);
+                {
+                    var burn = new Burn(this, name.Replace(".burn", ""), id);
+                    Members.Add(burn);
+                }
                 else
-                    module = new Module(this, name, id);
+                {
+                    var module = new Module(this, name, id);
+                    Members.Add(module);
+                }
+            }
 
-                Members.Add(module);
+            foreach (var dir in burnDirs)
+            {
+                var toBurn = Parent.BasePack.Members
+                        .Select(m => m.Resolve().Name)
+                        .Where(n => n.StartsWith(dir) && !Members.Any(m => m.Resolve().Name == n))
+                        .Select(n => new Burn(this, n, Guid.NewGuid()));
+                Members.UnionWith(toBurn);
             }
 
             _initialized = true;

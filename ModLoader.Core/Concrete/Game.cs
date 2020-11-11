@@ -95,7 +95,7 @@ namespace ModLoader.Core
             File.WriteAllText(ScriptPath, "echo Nothing to do!");
         }
 
-        public async Task Unload()
+        public async Task UnloadAsync()
         {
             if (Files != null)
                 await Files.UnmountAsync();
@@ -129,7 +129,7 @@ namespace ModLoader.Core
 
         public async Task ReloadAsync()
         {
-            await Unload();
+            await UnloadAsync();
 
             await RebuildTestPacksAsync();
 
