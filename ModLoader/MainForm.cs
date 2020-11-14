@@ -1,5 +1,6 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Abstract;
+using ModLoader.Properties;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -106,6 +107,20 @@ namespace ModLoader
         {
             BeginInvoke((Action)Hide);
 
+            Width = (int)(Settings.Default.LoaderAppWidth * Screen.PrimaryScreen.Bounds.Width);
+            Height = (int)(Settings.Default.LoaderAppHeight * Screen.PrimaryScreen.Bounds.Height);
+
+            Top = Screen.PrimaryScreen.Bounds.Y + Screen.PrimaryScreen.Bounds.Height / 2 - Height / 2;
+            Left = Screen.PrimaryScreen.Bounds.X + Screen.PrimaryScreen.Bounds.Width / 2 - Width / 2;
+
+            MainPane.SplitterDistance = (int)(Settings.Default.LoaderMainPanelSplit * MainPane.Height);
+            TopPane.SplitterDistance = (int)(Settings.Default.LoaderTopPanelSplit * TopPane.Width);
+            BottomPane.SplitterDistance = (int)(Settings.Default.LoaderBottomPanelSplit * BottomPane.Width);
+            PacksPane.SplitterDistance = (int)(Settings.Default.LoaderPacksPanelSplit * PacksPane.Width);
+            DetailsPane.SplitterDistance = (int)(Settings.Default.LoaderDetailsPanelSplit * DetailsPane.Height);
+            OtherPane.SplitterDistance = (int)(Settings.Default.LoaderOtherPanelSplit * OtherPane.Height);
+            PropActionPane.SplitterDistance = (int)(Settings.Default.LoaderPropActionPanelSplit * PropActionPane.Width);
+
             var waiter = new WaitingForm();
             waiter.Show();
 
@@ -141,8 +156,6 @@ namespace ModLoader
             PropGroup.Enabled = true;
 
             var pack = PackList.SelectedItem as Pack;
-
-            EnabledCheckBox.Checked = pack.Enabled;
             FallbackSelect.SelectedItem = pack.Fallback;
 
             RefreshModuleList();
@@ -349,9 +362,22 @@ namespace ModLoader
             }
         }
 
-        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Game.Unload();
+            Settings.Default.LoaderAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
+            Settings.Default.LoaderAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+
+            Settings.Default.LoaderMainPanelSplit = (double)MainPane.SplitterDistance / MainPane.Height;
+            Settings.Default.LoaderTopPanelSplit = (double)TopPane.SplitterDistance / TopPane.Width;
+            Settings.Default.LoaderBottomPanelSplit = (double)BottomPane.SplitterDistance / BottomPane.Width;
+            Settings.Default.LoaderPacksPanelSplit = (double)PacksPane.SplitterDistance / PacksPane.Width;
+            Settings.Default.LoaderDetailsPanelSplit = (double)DetailsPane.SplitterDistance / DetailsPane.Height;
+            Settings.Default.LoaderOtherPanelSplit = (double)OtherPane.SplitterDistance / OtherPane.Height;
+            Settings.Default.LoaderPropActionPanelSplit = (double)PropActionPane.SplitterDistance / PropActionPane.Width;
+
+            Settings.Default.Save();
+
+            await Game.UnloadAsync();
         }
 
         private void AboutButton_Click(object sender, EventArgs e)

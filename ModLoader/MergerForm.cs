@@ -1,5 +1,6 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Abstract;
+using ModLoader.Properties;
 using System;
 using System.Linq;
 using System.Windows.Forms;
@@ -23,6 +24,17 @@ namespace ModLoader
         {
             RefreshModuleList();
             RefreshChangeList();
+
+            Width = (int)(Settings.Default.MergerAppWidth * Screen.PrimaryScreen.Bounds.Width);
+            Height = (int)(Settings.Default.MergerAppHeight * Screen.PrimaryScreen.Bounds.Height);
+
+            Top = Screen.PrimaryScreen.Bounds.Y + Screen.PrimaryScreen.Bounds.Height / 2 - Height / 2;
+            Left = Screen.PrimaryScreen.Bounds.X + Screen.PrimaryScreen.Bounds.Width / 2 - Width / 2;
+
+            MainPane.SplitterDistance = (int)(Settings.Default.MergerMainPanelSplit * MainPane.Width);
+            LeftPane.SplitterDistance = (int)(Settings.Default.MergerLeftPanelSplit * LeftPane.Height);
+            TopPane.SplitterDistance = (int)(Settings.Default.MergerTopPanelSplit * TopPane.Width);
+            BottomPane.SplitterDistance = (int)(Settings.Default.MergerBottomPanelSplit * BottomPane.Width);
         }
 
         private void RefreshModuleList()
@@ -163,6 +175,19 @@ namespace ModLoader
                     RefreshModuleList();
                 }
             }
+        }
+
+        private void MergerForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Settings.Default.MergerAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
+            Settings.Default.MergerAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+
+            Settings.Default.MergerMainPanelSplit = (double)MainPane.SplitterDistance / MainPane.Width;
+            Settings.Default.MergerTopPanelSplit = (double)TopPane.SplitterDistance / TopPane.Width;
+            Settings.Default.MergerBottomPanelSplit = (double)BottomPane.SplitterDistance / BottomPane.Width;
+            Settings.Default.MergerLeftPanelSplit = (double)LeftPane.SplitterDistance / LeftPane.Height;
+
+            Settings.Default.Save();
         }
     }
 }

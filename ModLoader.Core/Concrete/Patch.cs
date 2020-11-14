@@ -87,6 +87,8 @@ namespace ModLoader.Core
 
         public Task InitializeAsync()
         {
+            if(!Root.BasePack.Members.Any(m => m.Resolve().Name == Name))
+                throw new InvalidOperationException($"An attempt was made to initialize a patch module for which a base version does not exist.\nOffending module: {Name}");
             return Task.Run(() =>
             {
                 try
