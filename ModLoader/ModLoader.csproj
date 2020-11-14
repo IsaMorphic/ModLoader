@@ -4,6 +4,10 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWindowsForms>true</UseWindowsForms>
+    <Authors>Yodadude2003</Authors>
+    <Company>Chosen Few Software</Company>
+    <PackageId>ModLoader</PackageId>
+    <Version>1.9</Version>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\*" />
