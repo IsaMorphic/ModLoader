@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ModLoader.Core.Filters
 {
@@ -9,10 +8,14 @@ namespace ModLoader.Core.Filters
         where TIn : class
         where TOut : class
     {
+        public CastFilter(IPotential<IGroup<TIn>> input) : base(input)
+        {
+        }
+
         public override IGroup<TOut> Apply(IGroup<TIn> group)
         {
             var filtered = group.Members.Cast<TOut>();
-            return new Group<TOut>(new HashSet<TOut>(filtered));
+            return new Group<TOut>(filtered);
         }
     }
 }

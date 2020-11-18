@@ -5,7 +5,7 @@ namespace ModLoader.Core.Exceptions
     using Abstract;
 
     public class ConflictException<T> : Exception
-        where T : class, IResolvable<T>
+        where T : class
     {
         public Conflict<T> Conflict { get; }
 

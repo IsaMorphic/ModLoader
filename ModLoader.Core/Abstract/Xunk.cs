@@ -29,10 +29,9 @@ namespace ModLoader.Core.Abstract
             return Offset >= xunk.Offset && xunk.Offset + xunk.Length >= Offset;
         }
 
-        public IResolvable<T> MergeWith(HashSet<IResolvable<T>> others)
+        public IPotential<T> MergeWith(HashSet<IResolvable<T>> others)
         {
-            var resolved = others.Select(o => o.ResolveSelf());
-            return new Conflict<T>(ToString(), ResolveSelf(), new HashSet<T>(resolved));
+            return new Conflict<T>(ToString(), ResolveSelf(), others);
         }
 
         public abstract T ResolveSelf();

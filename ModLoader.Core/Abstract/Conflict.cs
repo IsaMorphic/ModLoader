@@ -6,19 +6,17 @@ namespace ModLoader.Core.Abstract
 {
     using Exceptions;
 
-    public class Conflict<T> : IResolvable<T>
-        where T : class, IResolvable<T>
+    public class Conflict<T> : IPotential<T>
+        where T : class
     {
-        public IResolvable<T> Fallback => null;
-        public bool Enabled => true;
 
         public string Name { get; }
 
-        public T Instigator { get; }
+        public IResolvable<T> Instigator { get; }
 
-        public HashSet<T> Conflictors { get; }
+        public HashSet<IResolvable<T>> Conflictors { get; }
 
-        public Conflict(string name, T instigator, HashSet<T> conflictors)
+        public Conflict(string name, IResolvable<T> instigator, HashSet<IResolvable<T>> conflictors)
         {
             Name = name;
 
@@ -26,7 +24,7 @@ namespace ModLoader.Core.Abstract
             Conflictors = conflictors;
         }
 
-        public Conflict(string name, T instigator) : this(name, instigator, new HashSet<T>())
+        public Conflict(string name, IResolvable<T> instigator) : this(name, instigator, new HashSet<IResolvable<T>>())
         {
         }
 
@@ -35,7 +33,7 @@ namespace ModLoader.Core.Abstract
             try
             {
                 return Conflictors
-                    .Union(new HashSet<T> { Instigator })
+                    .Union(new HashSet<IResolvable<T>> { Instigator })
                     .Select(m => m.Resolve())
                     .Where(m => m != null)
                     .Single();

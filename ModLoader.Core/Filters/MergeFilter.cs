@@ -5,9 +5,13 @@ namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class MergeFilter<T> : GroupFilter<IMergeable<T>, IResolvable<T>>
+    public class MergeFilter<T> : GroupFilter<IMergeable<T>, IPotential<T>>
         where T : class
     {
+        public MergeFilter(IPotential<IGroup<IMergeable<T>>> input) : base(input)
+        {
+        }
+
         class MergingUnit
         {
             public IMergeable<T> Unit { get; }
@@ -20,7 +24,7 @@ namespace ModLoader.Core.Filters
             }
         }
 
-        public override IGroup<IResolvable<T>> Apply(IGroup<IMergeable<T>> group)
+        public override IGroup<IPotential<T>> Apply(IGroup<IMergeable<T>> group)
         {
             HashSet<MergingUnit> units =
                 new HashSet<MergingUnit>(group.Members
@@ -39,8 +43,8 @@ namespace ModLoader.Core.Filters
                 }
             }
 
-            HashSet<IResolvable<T>> merged =
-                new HashSet<IResolvable<T>>(units
+            HashSet<IPotential<T>> merged =
+                new HashSet<IPotential<T>>(units
                 .Where(u => !u.Mergers.Any())
                 .Select(u => u.Unit)
                 );
@@ -61,7 +65,7 @@ namespace ModLoader.Core.Filters
                 }
             }
 
-            return new Group<IResolvable<T>>(new HashSet<IResolvable<T>>(merged));
+            return new Group<IPotential<T>>(merged);
         }
     }
 }

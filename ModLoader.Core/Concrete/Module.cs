@@ -52,10 +52,9 @@ namespace ModLoader.Core
             return Name == (other as Module).Name;
         }
 
-        public virtual IResolvable<Module> MergeWith(HashSet<IResolvable<Module>> others)
+        public virtual IPotential<Module> MergeWith(HashSet<IResolvable<Module>> others)
         {
-            var resolved = others.Select(o => o.ResolveSelf());
-            return new Conflict<Module>(Name, this, new HashSet<Module>(resolved));
+            return new Conflict<Module>(Name, this, others);
         }
 
         public virtual Stream GetDataStream()

@@ -11,7 +11,7 @@ namespace ModLoader.Core
     using Abstract;
     using Persistence;
 
-    public class Pack : IGroup<IResolvable<Module>>, ILoadable<Pack>
+    public class Pack : IGroup<Module>, ILoadable<Pack>
     {
         public Game Parent { get; }
 
@@ -42,24 +42,19 @@ namespace ModLoader.Core
             }
         }
 
-        public HashSet<IResolvable<Module>> Members { get; }
+        public HashSet<Module> Members { get; }
 
-        public Pack(string name, HashSet<IResolvable<Module>> modules)
+        IEnumerable<Module> IGroup<Module>.Members => Members;
+
+        public Pack(Game parent, string name)
         {
             Name = name;
-            Members = modules;
+            Parent = parent;
+
+            Members = new HashSet<Module>();
 
             Enabled = true;
-        }
-
-        public Pack(Game parent, string name) : this(name, new HashSet<IResolvable<Module>>())
-        {
-            Parent = parent;
             Fallback = Parent.BasePack;
-        }
-
-        public Pack() : this(null, new HashSet<IResolvable<Module>>())
-        {
         }
 
         public async Task InitializeAsync()

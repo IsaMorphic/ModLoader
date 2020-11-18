@@ -40,7 +40,7 @@ namespace ModLoader.Core
         public Pack BasePack { get; private set; }
 
         public GroupMerger<Module> Merger { get; }
-        public IResolvable<IGroup<IResolvable<Module>>> Modules { get; set; }
+        public IPotential<IGroup<IPotential<Module>>> Modules { get; set; }
 
         public IFileSystem Files { get; private set; }
 
@@ -63,31 +63,19 @@ namespace ModLoader.Core
 
             Packs = Merger.Mergers.Cast<Pack>();
 
-            Modules = new MergeFilter<Module>
-            {
-                Input = new CastFilter<Module, IMergeable<Module>>
-                {
-                    Input = new ResolveFilter<Module>
-                    {
-                        Input = new PriorityFilter<Module>
-                        {
-                            Input = new MergeFilter<IResolvable<Module>>
-                            {
-                                Input = new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>
-                                {
-                                    Input = new FallbackFilter<IResolvable<Module>>
-                                    {
-                                        Input = new PrioritizeFilter<Module>
-                                        {
-                                            Input = Merger
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+            Modules = new MergeFilter<Module>(
+                    new ResolveFilter<Module>(
+                        new PriorityFilter<Module>(
+                            new MergeFilter<IResolvable<Module>>(
+                                new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>(
+                                    new FallbackFilter<IResolvable<Module>>(
+                                        new PrioritizeFilter<Module>(Merger)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    );
         }
 
         public async Task InitializeAsync(string gamePath)
@@ -347,7 +335,7 @@ namespace ModLoader.Core
 
         public async Task LoadModulesAsync(CancellationToken token)
         {
-            foreach (var module in Modules.Resolve().Members.Select(m => m.Resolve()))
+            foreach (var module in Modules.ResolveSelf().Members.Select(m => m.ResolveSelf()))
             {
                 await module.LoadAsync(token);
             }
@@ -358,7 +346,7 @@ namespace ModLoader.Core
             var @base = BasePack.Members
                 .Select(m => m.ResolveSelf());
 
-            var active = Modules.Resolve().Members
+            var active = Modules.ResolveSelf().Members
                 .Select(m => m.ResolveSelf());
 
             var inactive = Packs

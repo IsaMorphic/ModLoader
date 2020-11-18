@@ -3,31 +3,27 @@ using System.Linq;
 
 namespace ModLoader.Core.Abstract
 {
-    public class GroupMerger<T> : IResolvable<IGroup<IResolvable<T>>>
+    public class GroupMerger<T> : IPotential<IGroup<T>>
         where T : class
     {
-        public HashSet<IGroup<IResolvable<T>>> Mergers { get; }
+        public HashSet<IGroup<T>> Mergers { get; }
 
-        public IResolvable<IGroup<IResolvable<T>>> Fallback { get; set; }
-        public bool Enabled { get; set; }
-
-        public GroupMerger(HashSet<IGroup<IResolvable<T>>> mergers)
+        public GroupMerger(HashSet<IGroup<T>> mergers)
         {
             Mergers = mergers;
-            Enabled = true;
         }
 
         public GroupMerger()
         {
-            Mergers = new HashSet<IGroup<IResolvable<T>>>();
-            Enabled = true;
+            Mergers = new HashSet<IGroup<T>>();
         }
 
-        public IGroup<IResolvable<T>> ResolveSelf()
+        public IGroup<T> ResolveSelf()
         {
-            return new Group<IResolvable<T>>(
-                new HashSet<IResolvable<T>>(Mergers
-                .SelectMany(m => m.Members)));
+            return new Group<T>(
+                new HashSet<T>(Mergers
+                .SelectMany(m => m.Members)
+                ));
         }
     }
 }

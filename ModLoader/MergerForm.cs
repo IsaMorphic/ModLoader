@@ -84,7 +84,7 @@ namespace ModLoader
         {
             Refreshing = true;
 
-            var members = Merger.Resolver.Resolve().Members.ToArray();
+            var members = Merger.Resolver.ResolveSelf().Members.ToArray();
 
             ChangeList.Items.Clear();
             ChangeList.Items.AddRange(members);

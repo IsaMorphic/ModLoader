@@ -61,7 +61,7 @@ namespace ModLoader.Core
 
                 try
                 {
-                    foreach (var chunk in group.Members.Select(m => m.Resolve()))
+                    foreach (var chunk in group.Members.Select(m => m.ResolveSelf()))
                     {
                         if (chunk.Offset > file.Stream.Length)
                             throw new InvalidOperationException($"An attempt was made by a patch module to modify data outside of the base module's bounds.\nOffending module: {group.Name}");

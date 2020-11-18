@@ -122,7 +122,7 @@ namespace ModLoader.Core
                 List<long> indicies = Enumerable.Range(0, lines.Count).Select(n => (long)n).ToList();
 
                 foreach (var hunk in group.Members
-                    .Select(m => m.Resolve())
+                    .Select(m => m is IResolvable<Hunk> ? m.ResolveSelf() : m.ResolveSelf())
                     .Where(m => m != null)
                     .OrderBy(m => m.Offset))
                 {
@@ -277,7 +277,7 @@ namespace ModLoader.Core
 
                     var hunk = new Hunk(this, lines, offset, errors);
 
-                    if (Members.Select(h => h.Resolve())
+                    if (Members.Select(h => h.ResolveSelf())
                         .Any(h => h.CanMergeWith(hunk) || hunk.CanMergeWith(h)))
                         hunk.Errors.Add(new ConflictException<Hunk>("This hunk conflicts with a hunk in this diff that was parsed prior."));
 
@@ -293,7 +293,7 @@ namespace ModLoader.Core
 
         public override string ToString()
         {
-            bool hasErrors = Members.SelectMany(m => m.Resolve()?.Errors ?? new HashSet<Exception>()).Any();
+            bool hasErrors = Members.SelectMany(m => m.ResolveSelf()?.Errors ?? new HashSet<Exception>()).Any();
             return (hasErrors ? "[ERROR] " : "") + base.ToString();
         }
     }

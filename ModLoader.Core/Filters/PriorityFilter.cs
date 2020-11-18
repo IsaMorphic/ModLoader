@@ -5,15 +5,18 @@ namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class PriorityFilter<T> : GroupFilter<IResolvable<IResolvable<T>>, IResolvable<T>>
+    public class PriorityFilter<T> : GroupFilter<IPotential<IResolvable<T>>, IResolvable<T>>
         where T : class
     {
-        public override IGroup<IResolvable<T>> Apply(IGroup<IResolvable<IResolvable<T>>> group)
+        public PriorityFilter(IPotential<IGroup<IPotential<IResolvable<T>>>> input) : base(input)
+        {
+        }
+
+        public override IGroup<IResolvable<T>> Apply(IGroup<IPotential<IResolvable<T>>> group)
         {
             var filtered = group.Members
                 .Cast<PrioritizedConflict<T>>()
-                .OrderBy(m => m.Priority)
-                .First().Members;
+                .SelectMany(m => m.Members);
 
             return new Group<IResolvable<T>>(filtered);
         }

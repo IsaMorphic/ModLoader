@@ -8,11 +8,15 @@ namespace ModLoader.Core.Filters
     public class FallbackFilter<T> : GroupFilter<IResolvable<T>, IResolvable<T>>
         where T : class
     {
+        public FallbackFilter(IPotential<IGroup<IResolvable<T>>> input) : base(input)
+        {
+        }
+
         public override IGroup<IResolvable<T>> Apply(IGroup<IResolvable<T>> group)
         {
             var filtered = group.Members
                 .SelectMany(m => m.ResolveFull());
-            return new Group<IResolvable<T>>(new HashSet<IResolvable<T>>(filtered));
+            return new Group<IResolvable<T>>(filtered);
         }
     }
 }

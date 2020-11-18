@@ -2,13 +2,11 @@
 
 namespace ModLoader.Core.Abstract
 {
-    public interface IResolvable<T>
+    public interface IResolvable<out T> : IPotential<T>
         where T : class
     {
         IResolvable<T> Fallback { get; }
         bool Enabled { get; }
-
-        T ResolveSelf();
     }
 
     public static class ResolvableExtensions

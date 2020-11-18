@@ -31,7 +31,7 @@ namespace ModLoader
             var item = ChangeList.SelectedItem;
 
             ChangeList.Items.Clear();
-            ChangeList.Items.AddRange(Game.Modules.Resolve().Members.ToArray());
+            ChangeList.Items.AddRange(Game.Modules.ResolveSelf().Members.ToArray());
 
             ChangeList.SelectedItem = item;
 

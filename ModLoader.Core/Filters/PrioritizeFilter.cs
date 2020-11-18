@@ -1,17 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class PrioritizeFilter<T> : GroupFilter<IResolvable<T>, IResolvable<IResolvable<T>>>
+    public class PrioritizeFilter<T> : GroupFilter<IMergeable<T>, Prioritized<T>>
         where T : class
     {
-        public override IGroup<IResolvable<IResolvable<T>>> Apply(IGroup<IResolvable<T>> group)
+        public PrioritizeFilter(IPotential<IGroup<IMergeable<T>>> input) : base(input)
+        {
+        }
+
+        public override IGroup<Prioritized<T>> Apply(IGroup<IMergeable<T>> group)
         {
             var filtered = group.Members.Select(m => new Prioritized<T>(m, 0));
-            return new Group<IResolvable<IResolvable<T>>>(new HashSet<IResolvable<IResolvable<T>>>(filtered));
+            return new Group<Prioritized<T>>(filtered);
         }
     }
 }

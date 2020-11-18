@@ -1,22 +1,19 @@
 ﻿namespace ModLoader.Core.Abstract
 {
-    public abstract class GroupFilter<TIn, TOut> : IResolvable<IGroup<TOut>>
+    public abstract class GroupFilter<TIn, TOut> : IPotential<IGroup<TOut>>
         where TIn : class
         where TOut : class
     {
-        public IResolvable<IGroup<TOut>> Fallback { get; set; }
-        public bool Enabled { get; set; }
+        public IPotential<IGroup<TIn>> Input { get; }
 
-        public IResolvable<IGroup<TIn>> Input { get; set; }
-
-        public GroupFilter()
+        public GroupFilter(IPotential<IGroup<TIn>> input)
         {
-            Enabled = true;
+            Input = input;
         }
 
         public IGroup<TOut> ResolveSelf()
         {
-            return Apply(Input.Resolve());
+            return Apply(Input.ResolveSelf());
         }
 
         public abstract IGroup<TOut> Apply(IGroup<TIn> group);

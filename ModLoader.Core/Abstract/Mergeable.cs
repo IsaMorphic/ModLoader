@@ -6,6 +6,6 @@ namespace ModLoader.Core.Abstract
         where T : class
     {
         bool CanMergeWith(IResolvable<T> other);
-        IResolvable<T> MergeWith(HashSet<IResolvable<T>> others);
+        IPotential<T> MergeWith(HashSet<IResolvable<T>> others);
     }
 }
