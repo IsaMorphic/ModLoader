@@ -11,18 +11,21 @@ namespace ModLoader.Core.Abstract
     {
         public HashSet<XunkGroup<T>> Mergers { get; }
 
-        public IResolvable<IGroup<T>> Resolver { get; }
+        public IResolvable<IGroup<IResolvable<T>>> Resolver { get; }
 
         public XunkMerger(Pack parent, string name, IXunkGroupLoader<T> loader, HashSet<XunkGroup<T>> mergers) : base(parent, name, Guid.Empty, loader)
         {
             Mergers = mergers;
 
-            var groups = new HashSet<IGroup<T>>(
-                Mergers.Cast<IGroup<T>>());
+            var groups = new HashSet<IGroup<IResolvable<T>>>(
+                Mergers.Cast<IGroup<IResolvable<T>>>());
 
             Resolver = new MergeFilter<T>()
             {
-                Fallback = new GroupMerger<T>(groups)
+                Input = new CastFilter<IResolvable<T>, IMergeable<T>>
+                {
+                    Input = new GroupMerger<T>(groups)
+                }
             };
         }
 

@@ -26,17 +26,26 @@ namespace ModLoader.Core.Abstract
         }
 
         public static List<IResolvable<T>> ResolveFull<T>(this IResolvable<T> unit)
-            where T : class, IResolvable<T>
+            where T : class
         {
-            return unit.ResolveFull(new List<IResolvable<T>>());
+            var list = new List<IResolvable<T>>();
+            if (unit.Enabled) list.Add(unit);
+            return unit.ResolveFull(list);
         }
 
         public static List<IResolvable<T>> ResolveFull<T>(this IResolvable<T> unit, List<IResolvable<T>> list)
-            where T : class, IResolvable<T>
+            where T : class
         {
-            var next = unit.ResolveAsIfDisabled();
-            list.Add(next);
-            return unit.Fallback?.ResolveFull(list) ?? list;
+            var next = unit.Fallback;
+            if (next?.Enabled ?? false)
+            {
+                list.Add(next);
+                return next.ResolveFull(list);
+            }
+            else
+            {
+                return list;
+            }
         }
     }
 }

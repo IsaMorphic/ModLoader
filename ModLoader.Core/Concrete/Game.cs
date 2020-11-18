@@ -40,7 +40,7 @@ namespace ModLoader.Core
         public Pack BasePack { get; private set; }
 
         public GroupMerger<Module> Merger { get; }
-        public IResolvable<IGroup<Module>> Modules { get; set; }
+        public IResolvable<IGroup<IResolvable<Module>>> Modules { get; set; }
 
         public IFileSystem Files { get; private set; }
 
@@ -65,9 +65,27 @@ namespace ModLoader.Core
 
             Modules = new MergeFilter<Module>
             {
-                Fallback = new FallbackFilter<Module>
+                Input = new CastFilter<Module, IMergeable<Module>>
                 {
-                    Fallback = Merger
+                    Input = new ResolveFilter<Module>
+                    {
+                        Input = new PriorityFilter<Module>
+                        {
+                            Input = new MergeFilter<IResolvable<Module>>
+                            {
+                                Input = new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>
+                                {
+                                    Input = new FallbackFilter<IResolvable<Module>>
+                                    {
+                                        Input = new PrioritizeFilter<Module>
+                                        {
+                                            Input = Merger
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             };
         }
@@ -188,7 +206,7 @@ namespace ModLoader.Core
                 var fallback = Packs.SingleOrDefault(p => p.Name == packConfig.Value.Fallback);
 
                 pack.Enabled = packConfig.Value.Enabled;
-                pack.Fallback = fallback;
+                pack.Fallback = fallback ?? BasePack;
 
                 foreach (var moduleConfig in packConfig.Value.Modules)
                 {

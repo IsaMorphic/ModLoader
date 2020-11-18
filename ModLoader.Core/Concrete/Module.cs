@@ -47,14 +47,15 @@ namespace ModLoader.Core
 
         public virtual Module ResolveSelf() => this;
 
-        public virtual bool CanMergeWith(Module other)
+        public virtual bool CanMergeWith(IResolvable<Module> other)
         {
-            return Name == other.Name;
+            return Name == (other as Module).Name;
         }
 
-        public virtual IResolvable<Module> MergeWith(HashSet<Module> others)
+        public virtual IResolvable<Module> MergeWith(HashSet<IResolvable<Module>> others)
         {
-            return new Conflict<Module>(Name, this, others);
+            var resolved = others.Select(o => o.ResolveSelf());
+            return new Conflict<Module>(Name, this, new HashSet<Module>(resolved));
         }
 
         public virtual Stream GetDataStream()

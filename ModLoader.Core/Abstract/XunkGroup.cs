@@ -12,7 +12,7 @@ namespace ModLoader.Core.Abstract
         Task LoadAsync(XunkGroup<T> group, CancellationToken token);
     }
 
-    public class XunkGroup<T> : Module, IGroup<T>
+    public class XunkGroup<T> : Module, IGroup<IResolvable<T>>
         where T : Xunk<T>
     {
         public IXunkGroupLoader<T> Loader { get; }
@@ -31,7 +31,7 @@ namespace ModLoader.Core.Abstract
             Members = xunks;
         }
 
-        public override IResolvable<Module> MergeWith(HashSet<Module> others)
+        public override IResolvable<Module> MergeWith(HashSet<IResolvable<Module>> others)
         {
             if (others.All(m => m is XunkGroup<T>))
             {

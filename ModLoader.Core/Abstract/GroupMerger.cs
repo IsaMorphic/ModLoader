@@ -3,15 +3,15 @@ using System.Linq;
 
 namespace ModLoader.Core.Abstract
 {
-    public class GroupMerger<T> : IResolvable<IGroup<T>>
-        where T : class, IResolvable<T>
+    public class GroupMerger<T> : IResolvable<IGroup<IResolvable<T>>>
+        where T : class
     {
-        public HashSet<IGroup<T>> Mergers { get; }
+        public HashSet<IGroup<IResolvable<T>>> Mergers { get; }
 
-        public IResolvable<IGroup<T>> Fallback { get; set; }
+        public IResolvable<IGroup<IResolvable<T>>> Fallback { get; set; }
         public bool Enabled { get; set; }
 
-        public GroupMerger(HashSet<IGroup<T>> mergers)
+        public GroupMerger(HashSet<IGroup<IResolvable<T>>> mergers)
         {
             Mergers = mergers;
             Enabled = true;
@@ -19,18 +19,15 @@ namespace ModLoader.Core.Abstract
 
         public GroupMerger()
         {
-            Mergers = new HashSet<IGroup<T>>();
+            Mergers = new HashSet<IGroup<IResolvable<T>>>();
             Enabled = true;
         }
 
-        public IGroup<T> ResolveSelf()
+        public IGroup<IResolvable<T>> ResolveSelf()
         {
-            return new Group<T>(
+            return new Group<IResolvable<T>>(
                 new HashSet<IResolvable<T>>(Mergers
-                .SelectMany(m => m.Members)
-                .Select(m => m.Resolve())
-                .Where(m => m != null)
-                .Distinct()));
+                .SelectMany(m => m.Members)));
         }
     }
 }
