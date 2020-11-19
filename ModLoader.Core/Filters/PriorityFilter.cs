@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ModLoader.Core.Filters
 {
@@ -15,8 +14,13 @@ namespace ModLoader.Core.Filters
         public override IGroup<IResolvable<T>> Apply(IGroup<IPotential<IResolvable<T>>> group)
         {
             var filtered = group.Members
+                .Where(m => m is PrioritizedConflict<T>)
                 .Cast<PrioritizedConflict<T>>()
-                .SelectMany(m => m.Members);
+                .SelectMany(m => m.Members)
+                .Concat(group.Members
+                    .Where(m => !(m is PrioritizedConflict<T>))
+                    .Select(m => m.ResolveSelf())
+                    );
 
             return new Group<IResolvable<T>>(filtered);
         }

@@ -6,23 +6,23 @@ namespace ModLoader.Core.Abstract
     public class GroupMerger<T> : IPotential<IGroup<T>>
         where T : class
     {
-        public HashSet<IGroup<T>> Mergers { get; }
+        public HashSet<IPotential<IGroup<T>>> Mergers { get; }
 
-        public GroupMerger(HashSet<IGroup<T>> mergers)
+        public GroupMerger(HashSet<IPotential<IGroup<T>>> mergers)
         {
             Mergers = mergers;
         }
 
         public GroupMerger()
         {
-            Mergers = new HashSet<IGroup<T>>();
+            Mergers = new HashSet<IPotential<IGroup<T>>>();
         }
 
         public IGroup<T> ResolveSelf()
         {
             return new Group<T>(
                 new HashSet<T>(Mergers
-                .SelectMany(m => m.Members)
+                .SelectMany(m => m.ResolveSelf().Members)
                 ));
         }
     }

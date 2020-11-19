@@ -47,17 +47,13 @@ namespace ModLoader.Core
     {
         public class PatchLoader : IXunkLoader<Chunk>
         {
-            public async Task LoadAsync(XunkGroup<Chunk> group, CancellationToken token)
+            public async Task LoadAsync(XunkGroup<Chunk> group)
             {
                 if (group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 var file = await group.Root.Files.StageFileAsync(group.Name);
 
-                var @base = group.Root.BasePack.Members
-                    .Select(m => m.Resolve())
-                    .Single(m => m.Name == group.Name);
-
-                await @base.GetDataStream().CopyToAsync(file.Stream);
+                await group.Base.GetDataStream().CopyToAsync(file.Stream);
 
                 try
                 {

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -32,7 +31,7 @@ namespace ModLoader.Core
 
         public bool Enabled { get; set; }
 
-        bool IResolvable<Module>.Enabled => Enabled && (Parent as IResolvable<Pack>).Enabled;
+        bool IResolvable<Module>.Enabled => Enabled && ((Parent as IResolvable<Pack>)?.Enabled ?? true);
 
         public Module(Pack parent, string name, Guid id)
         {
@@ -62,7 +61,7 @@ namespace ModLoader.Core
             return Parent.Archive.GetEntry(Name).Open();
         }
 
-        public virtual async Task LoadSelfAsync(CancellationToken token)
+        public virtual async Task LoadSelfAsync()
         {
             if (!Root.Graph.Table.ContainsKey(Name))
             {

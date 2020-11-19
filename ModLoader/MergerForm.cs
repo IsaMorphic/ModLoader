@@ -48,8 +48,7 @@ namespace ModLoader
 
             for (int i = 0; i < ModuleList.Items.Count; i++)
             {
-                var state = (ModuleList.Items[i] as Module).Enabled;
-                ModuleList.SetItemChecked(i, state);
+                ModuleList.SetItemCheckState(i, CheckState.Indeterminate);
             }
 
             Refreshing = false;

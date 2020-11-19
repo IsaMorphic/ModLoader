@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -75,51 +74,28 @@ namespace ModLoader.Core
 
     public class Diff : XunkGroup<Hunk>
     {
-        public static class DiffCache
-        {
-            public static Dictionary<(Game, string), List<string>> Cache { get; } = new Dictionary<(Game, string), List<string>>();
-
-            public static async Task<List<string>> GetCachedText(Game game, string moduleName)
-            {
-                if (Cache.ContainsKey((game, moduleName)))
-                {
-                    return Cache[(game, moduleName)];
-                }
-                else
-                {
-                    Module baseModule = game.BasePack.Members
-                        .Select(m => m.Resolve())
-                        .SingleOrDefault(m => m.Name == moduleName);
-
-                    if (baseModule == null) throw new InvalidOperationException($"An attempt was made to initialize a diff module for which a base version does not exist.\nOffending module: {moduleName}");
-
-                    List<string> baseText = new List<string>();
-
-                    using (var stream = baseModule.GetDataStream())
-                    using (var reader = new StreamReader(stream))
-                    {
-                        while (!reader.EndOfStream)
-                        {
-                            baseText.Add(await reader.ReadLineAsync());
-                        }
-                        baseText.Add("");
-                    }
-
-                    Cache.Add((game, moduleName), baseText);
-
-                    return baseText;
-                }
-            }
-        }
-
         public class DiffLoader : IXunkLoader<Hunk>
         {
-            public async Task LoadAsync(XunkGroup<Hunk> group, CancellationToken token)
+            public async Task LoadAsync(XunkGroup<Hunk> group)
             {
                 if (group.Root.Graph.Table[group.Name] == group.Id) return;
 
-                List<string> lines = (await DiffCache.GetCachedText(group.Root, group.Name)).ToList();
-                List<long> indicies = Enumerable.Range(0, lines.Count).Select(n => (long)n).ToList();
+                List<string> lines = new List<string>();
+                List<long> indicies = new List<long>();
+
+                int i = 0;
+
+                using (var stream = group.Base.GetDataStream())
+                using (var reader = new StreamReader(stream))
+                {
+                    while (!reader.EndOfStream)
+                    {
+                        lines.Add(await reader.ReadLineAsync());
+                        indicies.Add(i++);
+                    }
+                    lines.Add("");
+                    indicies.Add(i++);
+                }
 
                 foreach (var hunk in group.Xunks
                     .Select(m => m is IResolvable<Hunk> ? m.ResolveSelf() : m.ResolveSelf())
@@ -188,7 +164,17 @@ namespace ModLoader.Core
 
         public async Task InitializeAsync()
         {
-            List<string> baseText = await DiffCache.GetCachedText(Root, Name);
+            List<string> baseText = new List<string>();
+
+            using (var stream = Base.GetDataStream())
+            using (var reader = new StreamReader(stream))
+            {
+                while (!reader.EndOfStream)
+                {
+                    baseText.Add(await reader.ReadLineAsync());
+                }
+                baseText.Add("");
+            }
 
             using (var data = GetDataStream())
             using (var reader = new StreamReader(data))

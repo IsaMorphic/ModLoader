@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -12,7 +9,7 @@ namespace ModLoader.Core
         {
         }
 
-        public override async Task LoadSelfAsync(CancellationToken token)
+        public override async Task LoadSelfAsync()
         {
             if (Root.Graph.Table[Name] == Id) return;
 

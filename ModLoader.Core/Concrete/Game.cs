@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -63,19 +61,41 @@ namespace ModLoader.Core
 
             Packs = Merger.Mergers.Cast<Pack>();
 
-            Modules = new MergeFilter<Module>(
-                    new ResolveFilter<Module>(
-                        new PriorityFilter<Module>(
-                            new MergeFilter<IResolvable<Module>>(
-                                new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>(
-                                    new FallbackFilter<IResolvable<Module>>(
-                                        new PrioritizeFilter<Module>(Merger)
+            Modules = new WhereFilter<IPotential<Module>>(
+                new MergeFilter<Module>(
+                    new GroupMerger<Module>(
+                        new HashSet<IPotential<IGroup<Module>>> 
+                        {
+                            new ResolveFilter<Module>(
+                                new PriorityFilter<Module>(
+                                    new MergeFilter<IResolvable<Module>>(
+                                        new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>(
+                                            new FallbackFilter<IResolvable<Module>>(
+                                                new PrioritizeFilter<Module>(
+                                                    new WhereFilter<Module>(Merger, m => m.GetType() == typeof(Module) || m.GetType() == typeof(Burn))
+                                                )
+                                            )
                                         )
                                     )
                                 )
-                            )
-                        )
-                    );
+                            ),
+                            new PotentialFilter<Module>(
+                                new GroupMerger<IPotential<Module>>(
+                                    new HashSet<IPotential<IGroup<IPotential<Module>>>>
+                                    {
+                                        new XunkFallbackFilter<Hunk>(
+                                            new PrioritizeFilter<Module>(
+                                                new WhereFilter<Module>(Merger, m => m.GetType() == typeof(Diff))
+                                                )
+                                            ),
+                                        new XunkFallbackFilter<Chunk>(
+                                            new PrioritizeFilter<Module>(
+                                                new WhereFilter<Module>(Merger, m => m.GetType() == typeof(Patch))
+                                                )
+                                            )
+                                    })
+                                )
+                    })), m => (m as Module)?.Parent != BasePack);
         }
 
         public async Task InitializeAsync(string gamePath)
@@ -333,15 +353,15 @@ namespace ModLoader.Core
             return Task.Run(proc.WaitForExit);
         }
 
-        public async Task LoadModulesAsync(CancellationToken token)
+        public async Task LoadModulesAsync()
         {
             foreach (var module in Modules.ResolveSelf().Members.Select(m => m.ResolveSelf()))
             {
-                await module.LoadAsync(token);
+                await module.LoadAsync();
             }
         }
 
-        public async Task ReloadBaseModulesAsync(CancellationToken token)
+        public async Task ReloadBaseModulesAsync()
         {
             var @base = BasePack.Members
                 .Select(m => m.ResolveSelf());
@@ -365,7 +385,7 @@ namespace ModLoader.Core
 
             foreach (var module in toLoad)
             {
-                await module.LoadAsync(token);
+                await module.LoadAsync();
             }
 
             foreach (var module in toRemove)

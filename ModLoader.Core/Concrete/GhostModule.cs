@@ -23,7 +23,7 @@ namespace ModLoader.Core
                 ?.Resolve();
         }
 
-        public override Task LoadSelfAsync(CancellationToken token)
+        public override Task LoadSelfAsync()
         {
             throw new GhostedModuleException("An attempt was made to directly load a ghosted module reference.\nThis is a bug, please contact the developers so that the issue may be resolved.\n\"oh my god.... did I break it again?\" ~Yodadude2003");
         }

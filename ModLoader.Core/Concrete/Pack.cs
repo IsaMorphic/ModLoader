@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -139,11 +138,11 @@ namespace ModLoader.Core
 
         public Pack ResolveSelf() => this;
 
-        public async Task LoadSelfAsync(CancellationToken token)
+        public async Task LoadSelfAsync()
         {
             foreach (var module in Members)
             {
-                await module.Resolve()?.LoadAsync(token);
+                await module.Resolve()?.LoadAsync();
             }
         }
 

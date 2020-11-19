@@ -193,7 +193,7 @@ namespace ModLoader
                 {
                     var merger = ChangeList.SelectedItem as XunkMerger<Hunk>;
                     if (merger == null)
-                        merger = new XunkMerger<Hunk>(null, new HashSet<IPotential<Module>>
+                        merger = new XunkMerger<Hunk>(null, null, new HashSet<IPotential<Module>>
                     { ChangeList.SelectedItem as XunkGroup<Hunk> });
                     new MergerForm<Hunk>(merger).ShowDialog();
 
@@ -204,7 +204,7 @@ namespace ModLoader
                 {
                     var merger = ChangeList.SelectedItem as XunkMerger<Chunk>;
                     if (merger == null)
-                        merger = new XunkMerger<Chunk>(null, new HashSet<IPotential<Module>>
+                        merger = new XunkMerger<Chunk>(null, null, new HashSet<IPotential<Module>>
                     { ChangeList.SelectedItem as XunkGroup<Chunk> });
                     new MergerForm<Chunk>(merger).ShowDialog();
                 }
@@ -249,8 +249,8 @@ namespace ModLoader
                 RunGameButton.Enabled = false;
                 LoadButton.Text = "Loading mods...";
 
-                await Game.ReloadBaseModulesAsync(CancellationToken.None);
-                await Game.LoadModulesAsync(CancellationToken.None);
+                await Game.ReloadBaseModulesAsync();
+                await Game.LoadModulesAsync();
                 await Game.SaveConfigAsync();
                 await Game.SaveGraphAsync();
 
