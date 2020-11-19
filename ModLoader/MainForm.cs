@@ -189,22 +189,22 @@ namespace ModLoader
             {
                 if (Refreshing) return;
 
-                if (ChangeList.SelectedItem is XunkGroup<Hunk>)
+                if (ChangeList.SelectedItem is XunkGroup<Hunk> || ChangeList.SelectedItem is XunkMerger<Hunk>)
                 {
                     var merger = ChangeList.SelectedItem as XunkMerger<Hunk>;
                     if (merger == null)
-                        merger = new XunkMerger<Hunk>(null, null, null, new HashSet<XunkGroup<Hunk>>
+                        merger = new XunkMerger<Hunk>(null, new HashSet<IPotential<Module>>
                     { ChangeList.SelectedItem as XunkGroup<Hunk> });
                     new MergerForm<Hunk>(merger).ShowDialog();
 
                     RefreshModuleList();
                     RefreshChangeList();
                 }
-                else if (ChangeList.SelectedItem is XunkGroup<Chunk>)
+                else if (ChangeList.SelectedItem is XunkGroup<Chunk> || ChangeList.SelectedItem is XunkMerger<Chunk>)
                 {
                     var merger = ChangeList.SelectedItem as XunkMerger<Chunk>;
                     if (merger == null)
-                        merger = new XunkMerger<Chunk>(null, null, null, new HashSet<XunkGroup<Chunk>>
+                        merger = new XunkMerger<Chunk>(null, new HashSet<IPotential<Module>>
                     { ChangeList.SelectedItem as XunkGroup<Chunk> });
                     new MergerForm<Chunk>(merger).ShowDialog();
                 }

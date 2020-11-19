@@ -66,7 +66,7 @@ namespace ModLoader
                 return;
             }
 
-            var members = module.Members.ToArray();
+            var members = module.Xunks.ToArray();
 
             MemberList.Items.Clear();
             MemberList.Items.AddRange(members);
@@ -84,7 +84,7 @@ namespace ModLoader
         {
             Refreshing = true;
 
-            var members = Merger.Resolver.ResolveSelf().Members.ToArray();
+            var members = (Merger.ResolveSelf() as XunkGroup<T>).Xunks.ToArray();
 
             ChangeList.Items.Clear();
             ChangeList.Items.AddRange(members);

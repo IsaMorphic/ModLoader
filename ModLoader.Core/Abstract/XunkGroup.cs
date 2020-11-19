@@ -6,43 +6,49 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Abstract
 {
-    public interface IXunkGroupLoader<T>
+    public interface IXunkLoader<T>
         where T : Xunk<T>
     {
         Task LoadAsync(XunkGroup<T> group, CancellationToken token);
     }
 
+    public static class XunkLoader
+    {
+        public static Dictionary<Type, object> Loaders { get; }
+        static XunkLoader()
+        {
+            Loaders = new Dictionary<Type, object>();
+        }
+    }
+
     public class XunkGroup<T> : Module, IGroup<IPotential<T>>
         where T : Xunk<T>
     {
-        public IXunkGroupLoader<T> Loader { get; }
+        public Module Base { get; }
+        public HashSet<IPotential<T>> Xunks { get; }
 
-        public HashSet<IPotential<T>> Members { get; }
+        IEnumerable<IPotential<T>> IGroup<IPotential<T>>.Members => Xunks;
 
-        IEnumerable<IPotential<T>> IGroup<IPotential<T>>.Members => Members;
-
-        public XunkGroup(Pack parent, string name, Guid id, IXunkGroupLoader<T> loader) : base(parent, name, id)
+        public XunkGroup(Pack parent, string name, Guid id) : base(parent, name, id)
         {
-            Loader = loader;
-            Members = new HashSet<IPotential<T>>();
+            Xunks = new HashSet<IPotential<T>>();
+            Base = this.ResolveFull().Last().ResolveSelf();
         }
 
-        public XunkGroup(Pack parent, string name, IXunkGroupLoader<T> loader, HashSet<IPotential<T>> xunks) : base(parent, name, Guid.Empty)
+        public XunkGroup(string name, Module @base, HashSet<IPotential<T>> xunks) : base(null, name, Guid.NewGuid())
         {
-            Loader = loader;
-            Members = xunks;
+            Xunks = xunks;
+            Base = @base;
         }
 
         public override IPotential<Module> MergeWith(HashSet<IResolvable<Module>> others)
         {
             if (others.All(m => m is XunkGroup<T>))
             {
-                var groups = new HashSet<XunkGroup<T>>(others
-                    .Cast<XunkGroup<T>>());
-
+                var groups = new HashSet<IPotential<Module>>(others);
                 groups.Add(this);
 
-                return new XunkMerger<T>(Parent, Name, Loader, groups);
+                return new XunkMerger<T>(Base, groups);
             }
             else
             {
@@ -52,7 +58,7 @@ namespace ModLoader.Core.Abstract
 
         public override Task LoadSelfAsync(CancellationToken token)
         {
-            return Loader.LoadAsync(this, token);
+            return (XunkLoader.Loaders[typeof(T)] as IXunkLoader<T>).LoadAsync(this, token);
         }
     }
 }

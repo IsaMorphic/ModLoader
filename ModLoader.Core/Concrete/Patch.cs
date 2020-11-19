@@ -45,7 +45,7 @@ namespace ModLoader.Core
 
     public class Patch : XunkGroup<Chunk>
     {
-        public class PatchLoader : IXunkGroupLoader<Chunk>
+        public class PatchLoader : IXunkLoader<Chunk>
         {
             public async Task LoadAsync(XunkGroup<Chunk> group, CancellationToken token)
             {
@@ -61,7 +61,7 @@ namespace ModLoader.Core
 
                 try
                 {
-                    foreach (var chunk in group.Members.Select(m => m.ResolveSelf()))
+                    foreach (var chunk in group.Xunks.Select(m => m.ResolveSelf()))
                     {
                         if (chunk.Offset > file.Stream.Length)
                             throw new InvalidOperationException($"An attempt was made by a patch module to modify data outside of the base module's bounds.\nOffending module: {group.Name}");
@@ -81,13 +81,18 @@ namespace ModLoader.Core
             }
         }
 
-        public Patch(Pack parent, string name, Guid id) : base(parent, name, id, new PatchLoader())
+        static Patch()
+        {
+            XunkLoader.Loaders.Add(typeof(Chunk), new PatchLoader());
+        }
+
+        public Patch(Pack parent, string name, Guid id) : base(parent, name, id)
         {
         }
 
         public Task InitializeAsync()
         {
-            if(!Root.BasePack.Members.Any(m => m.Resolve().Name == Name))
+            if (!Root.BasePack.Members.Any(m => m.Resolve().Name == Name))
                 throw new InvalidOperationException($"An attempt was made to initialize a patch module for which a base version does not exist.\nOffending module: {Name}");
             return Task.Run(() =>
             {
@@ -103,7 +108,7 @@ namespace ModLoader.Core
 
                             var chunk = new Chunk(this, offset, bytes);
 
-                            Members.Add(chunk);
+                            Xunks.Add(chunk);
                         }
                     }
                 }

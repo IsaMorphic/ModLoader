@@ -6,36 +6,36 @@ namespace ModLoader.Core.Abstract
 {
     using Filters;
 
-    public class XunkMerger<T> : XunkGroup<T>
+    public class XunkMerger<T> : IPotential<Module>
         where T : Xunk<T>
     {
-        public HashSet<XunkGroup<T>> Mergers { get; }
+        public Module Base { get; }
 
-        public IPotential<IGroup<IPotential<T>>> Resolver { get; }
+        public HashSet<IPotential<Module>> Mergers { get; }
 
-        public XunkMerger(Pack parent, string name, IXunkGroupLoader<T> loader, HashSet<XunkGroup<T>> mergers) : base(parent, name, Guid.Empty, loader)
+        public XunkMerger(Module @base, HashSet<IPotential<Module>> mergers)
         {
+            Base = @base;
             Mergers = mergers;
-
-            var groups = new HashSet<IGroup<IPotential<T>>>(
-                Mergers.Cast<IGroup<IPotential<T>>>());
-
-            Resolver = new MergeFilter<T>(
-                new CastFilter<IPotential<T>, T>(
-                    new GroupMerger<IPotential<T>>(groups)
-                    )
-                );
         }
 
-        public override Module ResolveSelf()
+        public Module ResolveSelf()
         {
-            var resolved = Resolver.ResolveSelf().Members;
-            return new XunkGroup<T>(Parent, Name, Loader, new HashSet<IPotential<T>>(resolved));
+            var groups = Mergers.Select(m => m.ResolveSelf() as XunkGroup<T>);
+
+            var resolver = new MergeFilter<T>(
+                new CastFilter<IPotential<T>, IMergeable<T>>(
+                    new GroupMerger<IPotential<T>>(new HashSet<IGroup<IPotential<T>>>(groups))
+                    )
+                );
+            var resolved = resolver.ResolveSelf().Members;
+
+            return new XunkGroup<T>(Base?.Name, Base, new HashSet<IPotential<T>>(resolved));
         }
 
         public override string ToString()
         {
-            return $"(MERGER) {Name}";
+            return $"(MERGER) {Base.Name}";
         }
     }
 }

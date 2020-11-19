@@ -214,7 +214,7 @@ namespace ModLoader.Core
                         var group = module as XunkGroup<T>;
                         foreach (var xunkConfig in moduleConfig.Value.Xunks)
                         {
-                            var xunk = group.Members.Select(x => x.ResolveSelf())
+                            var xunk = group.Xunks.Select(x => x.ResolveSelf())
                                 .SingleOrDefault(x => x.Offset == xunkConfig.Key);
 
                             if (xunk == null) continue;
@@ -254,7 +254,7 @@ namespace ModLoader.Core
                         var group = module as XunkGroup<T>;
 
                         xunks = new Dictionary<long, Config.Xunk>();
-                        foreach (var member in group.Members.Select(m => m.ResolveSelf()))
+                        foreach (var member in group.Xunks.Select(m => m.ResolveSelf()))
                         {
                             xunks.Add(member.Offset, new Config.Xunk
                             {

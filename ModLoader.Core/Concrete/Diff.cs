@@ -112,7 +112,7 @@ namespace ModLoader.Core
             }
         }
 
-        public class DiffLoader : IXunkGroupLoader<Hunk>
+        public class DiffLoader : IXunkLoader<Hunk>
         {
             public async Task LoadAsync(XunkGroup<Hunk> group, CancellationToken token)
             {
@@ -121,7 +121,7 @@ namespace ModLoader.Core
                 List<string> lines = (await DiffCache.GetCachedText(group.Root, group.Name)).ToList();
                 List<long> indicies = Enumerable.Range(0, lines.Count).Select(n => (long)n).ToList();
 
-                foreach (var hunk in group.Members
+                foreach (var hunk in group.Xunks
                     .Select(m => m is IResolvable<Hunk> ? m.ResolveSelf() : m.ResolveSelf())
                     .Where(m => m != null)
                     .OrderBy(m => m.Offset))
@@ -177,7 +177,12 @@ namespace ModLoader.Core
             }
         }
 
-        public Diff(Pack parent, string name, Guid id) : base(parent, name, id, new DiffLoader())
+        static Diff()
+        {
+            XunkLoader.Loaders.Add(typeof(Hunk), new DiffLoader());
+        }
+
+        public Diff(Pack parent, string name, Guid id) : base(parent, name, id)
         {
         }
 
@@ -277,11 +282,11 @@ namespace ModLoader.Core
 
                     var hunk = new Hunk(this, lines, offset, errors);
 
-                    if (Members.Select(h => h.ResolveSelf())
+                    if (Xunks.Select(h => h.ResolveSelf())
                         .Any(h => h.CanMergeWith(hunk) || hunk.CanMergeWith(h)))
                         hunk.Errors.Add(new ConflictException<Hunk>("This hunk conflicts with a hunk in this diff that was parsed prior."));
 
-                    Members.Add(hunk);
+                    Xunks.Add(hunk);
                 }
             }
         }
@@ -293,7 +298,7 @@ namespace ModLoader.Core
 
         public override string ToString()
         {
-            bool hasErrors = Members.SelectMany(m => m.ResolveSelf()?.Errors ?? new HashSet<Exception>()).Any();
+            bool hasErrors = Xunks.SelectMany(m => m.ResolveSelf()?.Errors ?? new HashSet<Exception>()).Any();
             return (hasErrors ? "[ERROR] " : "") + base.ToString();
         }
     }
