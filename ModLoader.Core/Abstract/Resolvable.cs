@@ -23,11 +23,11 @@ namespace ModLoader.Core.Abstract
             return unit.Fallback?.Resolve();
         }
 
-        public static List<IResolvable<T>> ResolveFull<T>(this IResolvable<T> unit)
+        public static List<IResolvable<T>> ResolveFull<T>(this IResolvable<T> unit, bool inclusive = true)
             where T : class
         {
             var list = new List<IResolvable<T>>();
-            if (unit.Enabled) list.Add(unit);
+            if (unit.Enabled && inclusive) list.Add(unit);
             return unit.ResolveFull(list);
         }
 

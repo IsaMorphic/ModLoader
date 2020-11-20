@@ -21,17 +21,17 @@ namespace ModLoader.Core
         {
             get
             {
-                var resolved = Parent.ResolveAsIfDisabled();
+                var resolved = Parent.Fallback as Pack;
                 if (resolved == null) return null;
                 else return resolved.Members
-                        .SingleOrDefault(m => m.Resolve()?.Name == Name) ??
+                        .SingleOrDefault(m => m.Name == Name) ??
                         new GhostModule(resolved, Name);
             }
         }
 
         public bool Enabled { get; set; }
 
-        bool IResolvable<Module>.Enabled => Enabled && ((Parent as IResolvable<Pack>)?.Enabled ?? true);
+        bool IResolvable<Module>.Enabled => Enabled && ((Parent as IResolvable<Pack>)?.Enabled ?? true) && (Fallback?.Enabled ?? true);
 
         public Module(Pack parent, string name, Guid id)
         {

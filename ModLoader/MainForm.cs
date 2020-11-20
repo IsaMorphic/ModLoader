@@ -71,8 +71,8 @@ namespace ModLoader
 
             for (int i = 0; i < PackList.Items.Count; i++)
             {
-                var state = (PackList.Items[i] as Pack).Enabled;
-                PackList.SetItemChecked(i, state);
+                var state = (PackList.Items[i] as Pack).Enabled ? CheckState.Checked : CheckState.Unchecked;
+                PackList.SetItemCheckState(i, (PackList.Items[i] as Pack).IsDependency ? CheckState.Indeterminate : state);
             }
 
             FallbackSelect.Items.Clear();
@@ -167,8 +167,7 @@ namespace ModLoader
                 using (var stream = pack.Archive.GetEntry("_pack.png").Open())
                     PackImage.Image = Image.FromStream(stream);
 
-                using (var stream = pack.Archive.GetEntry("_pack.txt").Open())
-                    PackNotes.Text = new StreamReader(stream).ReadToEnd();
+                PackNotes.Text = pack.MetaData.Notes;
             }
             else
             {
@@ -292,10 +291,6 @@ namespace ModLoader
 
         private void FallbackSelect_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var pack = PackList.SelectedItem as Pack;
-
-            pack.Fallback = FallbackSelect.SelectedItem as Pack;
-
             RefreshChangeList();
         }
 

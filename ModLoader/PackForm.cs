@@ -1,4 +1,5 @@
-﻿using ModLoader.Core.Utilities;
+﻿using ModLoader.Core;
+using ModLoader.Core.Utilities;
 using System;
 using System.IO;
 using System.Linq;
@@ -43,6 +44,7 @@ namespace ModLoader
         {
             try
             {
+                var meta = new Pack.Meta(Guid.NewGuid(), null, NameEntry.Text, "ModLoader", NoteEntry.Text);
                 await new PackBuilder(
                         Directory.Exists(FolderDialog.SelectedPath) ? FolderDialog.SelectedPath :
                         throw new Exception("The user has failed to select a vaild directory."),
@@ -50,7 +52,7 @@ namespace ModLoader
                         !NameEntry.Text.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ?
                          NameEntry.Text : throw new Exception("The user has failed to enter a valid pack name. Pack names must be a valid file-name on the host system and cannot be empty."))
                     .WithImageStream(ImageStream ?? throw new Exception("The user has failed to select a valid image file."))
-                    .WithNote(NoteEntry.Text)
+                    .WithMetaData(meta)
                     .BuildAsync();
 
                 Close();

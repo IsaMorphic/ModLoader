@@ -8,29 +8,67 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using Newtonsoft.Json;
     using Persistence;
 
     public class Pack : IGroup<Module>, ILoadable<Pack>
     {
+        public class Meta
+        {
+            public Guid Id { get; }
+            public Guid? Fallback { get; }
+
+            public string Name { get; }
+            public string Author { get; }
+            public string Notes { get; }
+
+            public Meta(Guid id, Guid? fallback, string name, string author, string notes)
+            {
+                Id = id;
+                Fallback = fallback;
+
+                Name = name;
+                Author = author;
+                Notes = notes;
+            }
+
+            public async Task WriteToStreamAsync(Stream stream)
+            {
+                using (var writer = new StreamWriter(stream))
+                    await writer.WriteAsync(JsonConvert.SerializeObject(this));
+            }
+
+            public static async Task<Meta> LoadFromStreamAsync(Stream stream)
+            {
+                using (var reader = new StreamReader(stream))
+                    return JsonConvert.DeserializeObject<Meta>(await reader.ReadToEndAsync());
+            }
+        }
+
         public Game Parent { get; }
-
-        public ZipArchive Archive { get; private set; }
-
-        public Graph Graph { get; private set; }
 
         public string Name { get; }
 
-        public IResolvable<Pack> Fallback { get; set; }
+        public Guid Id => MetaData.Id;
 
-        private bool _initialized { get; set; }
+        public Meta MetaData { get; private set; }
+
+        public HashSet<Module> Members { get; }
+        IEnumerable<Module> IGroup<Module>.Members => Members;
+
+        public Graph Graph { get; private set; }
+
+        public ZipArchive Archive { get; private set; }
+
+        public IResolvable<Pack> Fallback { get; private set; }
 
         private bool _enabled;
         public bool Enabled
         {
-            get => _enabled;
+            get => _enabled || IsDependency;
             set
             {
-                if (_initialized && _enabled != value)
+                if (Initialized && !IsDependency && _enabled != value)
                 {
                     if (value)
                         Reload();
@@ -41,9 +79,8 @@ namespace ModLoader.Core
             }
         }
 
-        public HashSet<Module> Members { get; }
-
-        IEnumerable<Module> IGroup<Module>.Members => Members;
+        public bool IsDependency { get; private set; }
+        public bool Initialized { get; private set; }
 
         public Pack(Game parent, string name)
         {
@@ -53,11 +90,12 @@ namespace ModLoader.Core
             Members = new HashSet<Module>();
 
             Enabled = true;
-            Fallback = Parent.BasePack;
         }
 
-        public async Task InitializeAsync()
+        public async Task InitializeAsync(bool asDependency = false)
         {
+            if (Initialized) return;
+
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
 
@@ -76,9 +114,35 @@ namespace ModLoader.Core
                 }
             }
 
+            using (var stream = Archive.GetEntry("_meta.json").Open())
+            {
+                MetaData = await Meta.LoadFromStreamAsync(stream);
+            }
+
+            if (this != Parent.BasePack)
+            {
+                var fallbackEntry = Archive.GetEntry("_fallback.txt");
+                if (fallbackEntry != null)
+                {
+                    string fallback;
+
+                    using (var stream = fallbackEntry.Open())
+                    using (var reader = new StreamReader(stream))
+                        fallback = (await reader.ReadLineAsync()).ToLowerInvariant();
+
+                    Fallback = Parent.Packs.SingleOrDefault(p => p.Name == fallback) ?? Parent.BasePack;
+                }
+                else
+                {
+                    Fallback = MetaData.Fallback == null ? Parent.BasePack : Parent.Packs.Single(p => p.Id == MetaData.Fallback);
+                }
+
+                await (Fallback as Pack).InitializeAsync(true);
+            }
+
             HashSet<string> burnDirs = new HashSet<string>();
 
-            var entries = Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().EndsWith("/"));
+            var entries = Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().StartsWith("_meta") && !entry.FullName.ToLowerInvariant().StartsWith("_fallback") && !entry.FullName.ToLowerInvariant().EndsWith("/"));
             foreach (var entry in entries)
             {
                 string name = entry.FullName.ToLowerInvariant();
@@ -122,7 +186,8 @@ namespace ModLoader.Core
                 Members.UnionWith(toBurn);
             }
 
-            _initialized = true;
+            IsDependency = asDependency;
+            Initialized = true;
         }
 
         public void Unload()

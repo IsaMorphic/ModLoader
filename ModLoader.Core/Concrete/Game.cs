@@ -10,6 +10,7 @@ namespace ModLoader.Core
     using Exceptions;
     using Filters;
     using Persistence;
+    using System;
     using Utilities;
 
     public class Game
@@ -64,7 +65,7 @@ namespace ModLoader.Core
             Modules = new WhereFilter<IPotential<Module>>(
                 new MergeFilter<Module>(
                     new GroupMerger<Module>(
-                        new HashSet<IPotential<IGroup<Module>>> 
+                        new HashSet<IPotential<IGroup<Module>>>
                         {
                             new ResolveFilter<Module>(
                                 new PriorityFilter<Module>(
@@ -72,7 +73,7 @@ namespace ModLoader.Core
                                         new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>(
                                             new FallbackFilter<IResolvable<Module>>(
                                                 new PrioritizeFilter<Module>(
-                                                    new WhereFilter<Module>(Merger, m => m.GetType() == typeof(Module) || m.GetType() == typeof(Burn))
+                                                    new WhereFilter<Module>(new StackFilter(Merger), m => m.GetType() == typeof(Module) || m.GetType() == typeof(Burn))
                                                 )
                                             )
                                         )
@@ -85,12 +86,12 @@ namespace ModLoader.Core
                                     {
                                         new XunkFallbackFilter<Hunk>(
                                             new PrioritizeFilter<Module>(
-                                                new WhereFilter<Module>(Merger, m => m.GetType() == typeof(Diff))
+                                                new WhereFilter<Module>(new StackFilter(Merger), m => m.GetType() == typeof(Diff))
                                                 )
                                             ),
                                         new XunkFallbackFilter<Chunk>(
                                             new PrioritizeFilter<Module>(
-                                                new WhereFilter<Module>(Merger, m => m.GetType() == typeof(Patch))
+                                                new WhereFilter<Module>(new StackFilter(Merger), m => m.GetType() == typeof(Patch))
                                                 )
                                             )
                                     })
@@ -107,9 +108,10 @@ namespace ModLoader.Core
             Config = new Config(GamePath);
             await SaveConfigAsync();
 
+            var baseMeta = new Pack.Meta(Guid.NewGuid(), null, "Base Game", "ModLoader", "Base Game (DO NOT DELETE!)");
             await new PackBuilder(GamePath, ModPath, "_base_")
                     .WithImageStream(Stream.Null)
-                    .WithNote("Base Game (DO NOT DELETE!)")
+                    .WithMetaData(baseMeta)
                     .BuildAsync();
 
             BasePack = new Pack(this, "_base_");
@@ -146,9 +148,12 @@ namespace ModLoader.Core
 
             foreach (var dir in dirs)
             {
-                await new PackBuilder(dir, Path.GetFileName(dir))
+                string name = Path.GetFileName(dir);
+                var meta = new Pack.Meta(Guid.NewGuid(), null, name, "You", DefaultPackNote);
+
+                await new PackBuilder(dir, name)
                     .WithImageStream(DefaultPackImageStream)
-                    .WithNote(DefaultPackNote)
+                    .WithMetaData(meta)
                     .BuildAsync();
             }
         }
@@ -170,7 +175,6 @@ namespace ModLoader.Core
                 if (packName == "_base_") continue;
 
                 var pack = new Pack(this, packName);
-
                 Merger.Mergers.Add(pack);
             }
 
@@ -211,10 +215,7 @@ namespace ModLoader.Core
 
                 if (pack == null) continue;
 
-                var fallback = Packs.SingleOrDefault(p => p.Name == packConfig.Value.Fallback);
-
                 pack.Enabled = packConfig.Value.Enabled;
-                pack.Fallback = fallback ?? BasePack;
 
                 foreach (var moduleConfig in packConfig.Value.Modules)
                 {

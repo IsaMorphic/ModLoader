@@ -31,7 +31,9 @@ namespace ModLoader.Core.Abstract
         public XunkGroup(Pack parent, string name, Guid id) : base(parent, name, id)
         {
             Xunks = new HashSet<IPotential<T>>();
-            Base = this.ResolveFull().First(r => r.GetType() == typeof(Module)).ResolveSelf();
+            Base = this.ResolveFull().FirstOrDefault(r => r.GetType() == typeof(Module)) as Module;
+            if (Base == null)
+                throw new InvalidOperationException($"Attempted to initialize a xunk group with no viable base.\nOffending Module: {this}");
         }
 
         public XunkGroup(Pack parent, string name, Module @base, HashSet<IPotential<T>> xunks) : base(parent, name, Guid.NewGuid())

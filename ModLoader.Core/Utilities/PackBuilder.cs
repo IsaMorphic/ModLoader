@@ -1,11 +1,12 @@
-﻿using ModLoader.Core.Persistence;
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Compression;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
+    using Persistence;
+
     public class PackBuilder
     {
         private string InputDir { get; }
@@ -14,7 +15,7 @@ namespace ModLoader.Core.Utilities
         private string Name { get; }
 
         private Stream ImageStream { get; set; }
-        private string Note { get; set; }
+        private Pack.Meta MetaData { get; set; }
 
         public PackBuilder(string inputDir, string outputDir, string name)
         {
@@ -40,11 +41,11 @@ namespace ModLoader.Core.Utilities
             return this;
         }
 
-        public PackBuilder WithNote(string note)
+        public PackBuilder WithMetaData(Pack.Meta metaData)
         {
-            if (Note != null)
+            if (MetaData != null)
                 throw new InvalidOperationException("This value has already been specified");
-            Note = note;
+            MetaData = metaData;
             return this;
         }
 
@@ -77,9 +78,8 @@ namespace ModLoader.Core.Utilities
                     await ImageStream.CopyToAsync(entryStream);
                 }
 
-                using (var entryStream = archive.CreateEntry("_pack.txt").Open())
-                using (var writer = new StreamWriter(entryStream))
-                    await writer.WriteAsync(Note);
+                using (var entryStream = archive.CreateEntry("_meta.json").Open())
+                    await MetaData.WriteToStreamAsync(entryStream);
 
                 using (var entryStream = archive.CreateEntry("_pack.json").Open())
                     await graph.WriteToStreamAsync(entryStream);
