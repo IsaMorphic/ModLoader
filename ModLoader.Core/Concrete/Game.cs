@@ -38,7 +38,7 @@ namespace ModLoader.Core
         public IEnumerable<Pack> Packs { get; }
         public Pack BasePack { get; private set; }
 
-        public GroupMerger<Module> Merger { get; }
+        public GroupMerger<Prioritized<Module>> Merger { get; }
         public IPotential<IGroup<IPotential<Module>>> Modules { get; set; }
 
         public IFileSystem Files { get; private set; }
@@ -58,45 +58,49 @@ namespace ModLoader.Core
             ConfigPath = Path.Combine(BasePath, "_config.json");
             ScriptPath = Path.Combine(BasePath, "_script.bat");
 
-            Merger = new GroupMerger<Module>();
+            Merger = new GroupMerger<Prioritized<Module>>();
 
             Packs = Merger.Mergers.Cast<Pack>();
 
-            Modules = new WhereFilter<IPotential<Module>>(
+            var priority = new WhereFilter<Module>(
+                new ResolveFilter<Module>(
+                new PriorityFilter<Module>(
+                    new MergeFilter<IResolvable<Module>>(
+                        Merger
+                        )
+                    )), m => m.Parent != BasePack);
+            Modules =
                 new MergeFilter<Module>(
                     new GroupMerger<Module>(
                         new HashSet<IPotential<IGroup<Module>>>
                         {
-                            new ResolveFilter<Module>(
-                                new PriorityFilter<Module>(
-                                    new MergeFilter<IResolvable<Module>>(
-                                        new CastFilter<IResolvable<IResolvable<Module>>, IMergeable<IResolvable<Module>>>(
-                                            new FallbackFilter<IResolvable<Module>>(
-                                                new PrioritizeFilter<Module>(
-                                                    new WhereFilter<Module>(new StackFilter(Merger), m => m.GetType() == typeof(Module) || m.GetType() == typeof(Burn))
-                                                )
-                                            )
-                                        )
-                                    )
-                                )
-                            ),
+                            new WhereFilter<Module>(
+                                priority,
+                                m => m.GetType() == typeof(Module) || m.GetType() == typeof(Burn)
+                                ),
                             new PotentialFilter<Module>(
                                 new GroupMerger<IPotential<Module>>(
                                     new HashSet<IPotential<IGroup<IPotential<Module>>>>
                                     {
                                         new XunkFallbackFilter<Hunk>(
                                             new PrioritizeFilter<Module>(
-                                                new WhereFilter<Module>(new StackFilter(Merger), m => m.GetType() == typeof(Diff))
+                                                new WhereFilter<Module>(
+                                                    priority,
+                                                    m => m.GetType() == typeof(Diff)
+                                                    )
                                                 )
                                             ),
                                         new XunkFallbackFilter<Chunk>(
                                             new PrioritizeFilter<Module>(
-                                                new WhereFilter<Module>(new StackFilter(Merger), m => m.GetType() == typeof(Patch))
+                                                new WhereFilter<Module>(
+                                                    priority,
+                                                    m => m.GetType() == typeof(Patch)
+                                                    )
                                                 )
                                             )
                                     })
                                 )
-                    })), m => (m as Module)?.Parent != BasePack);
+                    }));
         }
 
         public async Task InitializeAsync(string gamePath)

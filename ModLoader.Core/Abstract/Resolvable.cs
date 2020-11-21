@@ -35,9 +35,12 @@ namespace ModLoader.Core.Abstract
             where T : class
         {
             var next = unit.Fallback;
-            if (next?.Enabled ?? false)
+            if (next != null)
             {
-                list.Add(next);
+                if (next.Enabled)
+                {
+                    list.Add(next);
+                }
                 return next.ResolveFull(list);
             }
             else

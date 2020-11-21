@@ -3,6 +3,7 @@
 namespace ModLoader.Core.Filters
 {
     using Abstract;
+    using System;
     using System.Collections.Generic;
 
     public class XunkFallbackFilter<T> : GroupFilter<IResolvable<IResolvable<Module>>, IPotential<Module>>
@@ -23,8 +24,11 @@ namespace ModLoader.Core.Filters
                 .Where(x => x.b.Any())
                 .Select(x => new PrioritizedXunkMerger<T>(
                     (x.b.First().ResolveSelf() as Module).Parent,
-                    x.a.First(m => m.GetType() == typeof(Module)) as Module,
-                    new HashSet<Prioritized<Module>>(x.b)
+                    x.a.TakeWhile(m => m.GetType() != typeof(Module))
+                    .Any(m => m.GetType() == typeof(Burn)) ? 
+                    throw new InvalidOperationException("Death is upon those who burn a file below a diff/patch") : 
+                    x.a.FirstOrDefault(m => m.GetType() == typeof(Module)) as Module,
+                    new HashSet<Prioritized<Module>>(x.b.Where(m => !(m.ResolveSelf() is GhostModule)))
                     ));
 
             return new Group<IPotential<Module>>(filtered);

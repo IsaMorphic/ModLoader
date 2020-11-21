@@ -41,7 +41,7 @@ namespace ModLoader.Core.Abstract
                 );
             var resolved = resolver.ResolveSelf().Members;
 
-            return new XunkGroup<T>(Parent, Base?.Name, Base, new HashSet<IPotential<T>>(resolved));
+            return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base, new HashSet<IPotential<T>>(resolved));
         }
     }
 }

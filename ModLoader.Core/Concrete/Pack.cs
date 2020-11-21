@@ -11,7 +11,7 @@ namespace ModLoader.Core
     using Newtonsoft.Json;
     using Persistence;
 
-    public class Pack : IGroup<Module>, ILoadable<Pack>
+    public class Pack : IGroup<Module>, IGroup<Prioritized<Module>>, ILoadable<Pack>
     {
         public class Meta
         {
@@ -56,6 +56,8 @@ namespace ModLoader.Core
         public HashSet<Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members;
 
+        IEnumerable<Prioritized<Module>> IGroup<Prioritized<Module>>.Members => Members.Select(m => new Prioritized<Module>(m, DependencyLevel));
+
         public Graph Graph { get; private set; }
 
         public ZipArchive Archive { get; private set; }
@@ -65,10 +67,10 @@ namespace ModLoader.Core
         private bool _enabled;
         public bool Enabled
         {
-            get => _enabled || IsDependency;
+            get => _enabled;
             set
             {
-                if (Initialized && !IsDependency && _enabled != value)
+                if (Initialized && _enabled != value)
                 {
                     if (value)
                         Reload();
@@ -79,8 +81,8 @@ namespace ModLoader.Core
             }
         }
 
-        public bool IsDependency { get; private set; }
         public bool Initialized { get; private set; }
+        public int DependencyLevel { get; private set; }
 
         public Pack(Game parent, string name)
         {
@@ -92,8 +94,10 @@ namespace ModLoader.Core
             Enabled = true;
         }
 
-        public async Task InitializeAsync(bool asDependency = false)
+        public async Task InitializeAsync(int dependencyLevel = 0)
         {
+            DependencyLevel = Math.Max(DependencyLevel, dependencyLevel);
+
             if (Initialized) return;
 
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
@@ -114,9 +118,16 @@ namespace ModLoader.Core
                 }
             }
 
-            using (var stream = Archive.GetEntry("_meta.json").Open())
+            if (Archive.GetEntry("_meta.json") != null)
             {
-                MetaData = await Meta.LoadFromStreamAsync(stream);
+                using (var stream = Archive.GetEntry("_meta.json").Open())
+                {
+                    MetaData = await Meta.LoadFromStreamAsync(stream);
+                }
+            }
+            else
+            {
+                MetaData = new Meta(Guid.NewGuid(), null, "meta placeholder", "meta placeholder", "meta placeholder");
             }
 
             if (this != Parent.BasePack)
@@ -137,7 +148,7 @@ namespace ModLoader.Core
                     Fallback = MetaData.Fallback == null ? Parent.BasePack : Parent.Packs.Single(p => p.Id == MetaData.Fallback);
                 }
 
-                await (Fallback as Pack).InitializeAsync(true);
+                await (Fallback as Pack).InitializeAsync(DependencyLevel + 1);
             }
 
             HashSet<string> burnDirs = new HashSet<string>();
@@ -186,7 +197,6 @@ namespace ModLoader.Core
                 Members.UnionWith(toBurn);
             }
 
-            IsDependency = asDependency;
             Initialized = true;
         }
 

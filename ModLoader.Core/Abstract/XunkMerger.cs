@@ -42,7 +42,7 @@ namespace ModLoader.Core.Abstract
 
         public override string ToString()
         {
-            return $"(MERGER) {Base.Name}";
+            return $"(MERGER) {Base?.Name ?? "[ERROR: UNRESOLVED]"}";
         }
     }
 }

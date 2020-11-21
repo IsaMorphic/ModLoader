@@ -25,7 +25,8 @@ namespace ModLoader.Core.Abstract
 
         public bool CanMergeWith(IResolvable<IResolvable<T>> other)
         {
-            return Inner.CanMergeWith((other as Prioritized<T>).Inner);
+            var p = other as Prioritized<T>;
+            return Inner.CanMergeWith(p.Inner) && Inner.ResolveFull().Contains(p.Inner);
         }
 
         public IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)

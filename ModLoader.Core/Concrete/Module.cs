@@ -31,7 +31,7 @@ namespace ModLoader.Core
 
         public bool Enabled { get; set; }
 
-        bool IResolvable<Module>.Enabled => Enabled && ((Parent as IResolvable<Pack>)?.Enabled ?? true) && (Fallback?.Enabled ?? true);
+        bool IResolvable<Module>.Enabled => Enabled && ((Parent as IResolvable<Pack>)?.Enabled ?? true);
 
         public Module(Pack parent, string name, Guid id)
         {

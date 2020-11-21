@@ -280,6 +280,7 @@
             // FallbackSelect
             // 
             this.FallbackSelect.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FallbackSelect.Enabled = false;
             this.FallbackSelect.FormattingEnabled = true;
             this.FallbackSelect.Location = new System.Drawing.Point(132, 6);
             this.FallbackSelect.Margin = new System.Windows.Forms.Padding(6);

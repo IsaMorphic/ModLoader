@@ -71,8 +71,8 @@ namespace ModLoader
 
             for (int i = 0; i < PackList.Items.Count; i++)
             {
-                var state = (PackList.Items[i] as Pack).Enabled ? CheckState.Checked : CheckState.Unchecked;
-                PackList.SetItemCheckState(i, (PackList.Items[i] as Pack).IsDependency ? CheckState.Indeterminate : state);
+                var state = (PackList.Items[i] as Pack).Enabled;
+                PackList.SetItemChecked(i, state);
             }
 
             FallbackSelect.Items.Clear();
@@ -242,12 +242,13 @@ namespace ModLoader
 
         private async void LoadButton_Click(object sender, EventArgs e)
         {
+            Hide();
+
+            var waiter = new WaitingForm();
+            waiter.Show();
+
             try
             {
-                LoadButton.Enabled = false;
-                RunGameButton.Enabled = false;
-                LoadButton.Text = "Loading mods...";
-
                 await Game.ReloadBaseModulesAsync();
                 await Game.LoadModulesAsync();
                 await Game.SaveConfigAsync();
@@ -263,9 +264,8 @@ namespace ModLoader
             }
             finally
             {
-                LoadButton.Enabled = true;
-                RunGameButton.Enabled = true;
-                LoadButton.Text = "Load All Mods";
+                waiter.Hide();
+                Show();
             }
         }
 
