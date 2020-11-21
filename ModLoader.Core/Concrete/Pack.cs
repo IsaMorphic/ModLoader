@@ -56,7 +56,7 @@ namespace ModLoader.Core
         public HashSet<Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members;
 
-        IEnumerable<Prioritized<Module>> IGroup<Prioritized<Module>>.Members => Members.Select(m => new Prioritized<Module>(m, DependencyLevel));
+        IEnumerable<Prioritized<Module>> IGroup<Prioritized<Module>>.Members => Members.Select(m => new PrioritizedModule(m, DependencyLevel));
 
         public Graph Graph { get; private set; }
 
