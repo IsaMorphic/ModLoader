@@ -20,10 +20,7 @@ namespace ModLoader.Core.Abstract
 
         public IGroup<T> ResolveSelf()
         {
-            return new Group<T>(
-                new HashSet<T>(Mergers
-                .SelectMany(m => m.ResolveSelf().Members)
-                ));
+            return new Group<T>(Mergers.SelectMany(m => m.ResolveSelf().Members));
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ModLoader.Core.Filters
 {
     using Abstract;
-    using System;
-    using System.Collections.Generic;
 
     public class XunkFallbackFilter<T> : GroupFilter<IResolvable<IResolvable<Module>>, IPotential<Module>>
         where T : Xunk<T>

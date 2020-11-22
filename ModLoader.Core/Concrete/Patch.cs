@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -49,6 +48,9 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Chunk> group)
             {
+                if (group.Base == null)
+                    throw new InvalidOperationException($"Attempted to load a patch with an unresolved base.\nOffending Pack: {group.Parent}");
+
                 if (group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 var file = await group.Root.Files.StageFileAsync(group.Name);
@@ -88,8 +90,6 @@ namespace ModLoader.Core
 
         public Task InitializeAsync()
         {
-            if (!Root.BasePack.Members.Any(m => m.Resolve().Name == Name))
-                throw new InvalidOperationException($"An attempt was made to initialize a patch module for which a base version does not exist.\nOffending module: {Name}");
             return Task.Run(() =>
             {
                 try
