@@ -69,7 +69,8 @@ namespace ModLoader.Core.Utilities
                         await fileStream.CopyToAsync(entryStream);
                     }
 
-                    graph.Table.Add(name, Guid.NewGuid());
+                    if (name != "_fallback.txt")
+                        graph.Table.Add(name, Guid.NewGuid());
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())

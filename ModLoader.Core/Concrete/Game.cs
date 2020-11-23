@@ -112,7 +112,15 @@ namespace ModLoader.Core
             Config = new Config(GamePath);
             await SaveConfigAsync();
 
-            var baseMeta = new Pack.Meta(Guid.NewGuid(), null, "Base Game", "ModLoader", "Base Game (DO NOT DELETE!)");
+            var baseMeta = new Pack.Meta
+            {
+                Id = Guid.NewGuid(),
+                Fallback = null,
+                Name = "Base Game",
+                Author = "ModLoader",
+                Notes = "Base Game (DO NOT DELETE!)"
+            };
+
             await new PackBuilder(GamePath, ModPath, "_base_")
                     .WithImageStream(Stream.Null)
                     .WithMetaData(baseMeta)
@@ -153,7 +161,15 @@ namespace ModLoader.Core
             foreach (var dir in dirs)
             {
                 string name = Path.GetFileName(dir);
-                var meta = new Pack.Meta(Guid.NewGuid(), null, name, "You", DefaultPackNote);
+
+                var meta = new Pack.Meta
+                {
+                    Id = Guid.NewGuid(),
+                    Fallback = null,
+                    Name = $"[TEST] {name}",
+                    Author = "You",
+                    Notes = DefaultPackNote
+                };
 
                 await new PackBuilder(dir, name)
                     .WithImageStream(DefaultPackImageStream)
@@ -180,6 +196,11 @@ namespace ModLoader.Core
 
                 var pack = new Pack(this, packName);
                 Merger.Mergers.Add(pack);
+            }
+
+            foreach (var pack in Packs)
+            {
+                await pack.ReadMetaDataAsync();
             }
 
             foreach (var pack in Packs)

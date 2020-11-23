@@ -28,24 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.ChangeList = new System.Windows.Forms.ListBox();
             this.ChangeGroup = new System.Windows.Forms.GroupBox();
             this.PackGroup = new System.Windows.Forms.GroupBox();
             this.PacksPane = new System.Windows.Forms.SplitContainer();
             this.PackList = new System.Windows.Forms.CheckedListBox();
+            this.PackContext = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.UpdateButton = new System.Windows.Forms.ToolStripMenuItem();
+            this.MetaGroup = new System.Windows.Forms.GroupBox();
+            this.MetaPane = new System.Windows.Forms.TableLayoutPanel();
             this.DetailsPane = new System.Windows.Forms.SplitContainer();
+            this.EditPane = new System.Windows.Forms.TableLayoutPanel();
+            this.label1 = new System.Windows.Forms.Label();
+            this.NameEdit = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.AuthorEdit = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.FallbackEdit = new System.Windows.Forms.ComboBox();
+            this.NotesGroup = new System.Windows.Forms.GroupBox();
+            this.NotesEdit = new System.Windows.Forms.TextBox();
             this.PackImage = new System.Windows.Forms.PictureBox();
-            this.NoteGroup = new System.Windows.Forms.GroupBox();
-            this.PackNotes = new System.Windows.Forms.TextBox();
-            this.PropGroup = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.FallbackLabel = new System.Windows.Forms.Label();
-            this.FallbackSelect = new System.Windows.Forms.ComboBox();
-            this.ActionGroup = new System.Windows.Forms.GroupBox();
-            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.RunGameButton = new System.Windows.Forms.Button();
-            this.LoadButton = new System.Windows.Forms.Button();
-            this.RebuildButton = new System.Windows.Forms.Button();
             this.ConflictGroup = new System.Windows.Forms.GroupBox();
             this.ConflictList = new System.Windows.Forms.CheckedListBox();
             this.ModuleGroup = new System.Windows.Forms.GroupBox();
@@ -55,32 +58,33 @@
             this.OpenGameButton = new System.Windows.Forms.ToolStripMenuItem();
             this.OpenModsButton = new System.Windows.Forms.ToolStripMenuItem();
             this.ImportModButton = new System.Windows.Forms.ToolStripMenuItem();
-            this.buildToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.BuildPackButton = new System.Windows.Forms.ToolStripMenuItem();
-            this.BuildPatchButton = new System.Windows.Forms.ToolStripMenuItem();
             this.AboutButton = new System.Windows.Forms.ToolStripMenuItem();
             this.ImportFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.TopPane = new System.Windows.Forms.SplitContainer();
             this.MainPane = new System.Windows.Forms.SplitContainer();
             this.BottomPane = new System.Windows.Forms.SplitContainer();
             this.OtherPane = new System.Windows.Forms.SplitContainer();
-            this.PropActionPane = new System.Windows.Forms.SplitContainer();
+            this.ActionGroup = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.RunGameButton = new System.Windows.Forms.Button();
+            this.LoadButton = new System.Windows.Forms.Button();
+            this.RebuildButton = new System.Windows.Forms.Button();
             this.ChangeGroup.SuspendLayout();
             this.PackGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PacksPane)).BeginInit();
             this.PacksPane.Panel1.SuspendLayout();
             this.PacksPane.Panel2.SuspendLayout();
             this.PacksPane.SuspendLayout();
+            this.PackContext.SuspendLayout();
+            this.MetaGroup.SuspendLayout();
+            this.MetaPane.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DetailsPane)).BeginInit();
             this.DetailsPane.Panel1.SuspendLayout();
             this.DetailsPane.Panel2.SuspendLayout();
             this.DetailsPane.SuspendLayout();
+            this.EditPane.SuspendLayout();
+            this.NotesGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PackImage)).BeginInit();
-            this.NoteGroup.SuspendLayout();
-            this.PropGroup.SuspendLayout();
-            this.tableLayoutPanel2.SuspendLayout();
-            this.ActionGroup.SuspendLayout();
-            this.tableLayoutPanel1.SuspendLayout();
             this.ConflictGroup.SuspendLayout();
             this.ModuleGroup.SuspendLayout();
             this.MenuBar.SuspendLayout();
@@ -100,10 +104,8 @@
             this.OtherPane.Panel1.SuspendLayout();
             this.OtherPane.Panel2.SuspendLayout();
             this.OtherPane.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PropActionPane)).BeginInit();
-            this.PropActionPane.Panel1.SuspendLayout();
-            this.PropActionPane.Panel2.SuspendLayout();
-            this.PropActionPane.SuspendLayout();
+            this.ActionGroup.SuspendLayout();
+            this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // ChangeList
@@ -159,7 +161,7 @@
             // 
             // PacksPane.Panel2
             // 
-            this.PacksPane.Panel2.Controls.Add(this.DetailsPane);
+            this.PacksPane.Panel2.Controls.Add(this.MetaGroup);
             this.PacksPane.Size = new System.Drawing.Size(1104, 608);
             this.PacksPane.SplitterDistance = 647;
             this.PacksPane.SplitterWidth = 8;
@@ -167,6 +169,7 @@
             // 
             // PackList
             // 
+            this.PackList.ContextMenuStrip = this.PackContext;
             this.PackList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.PackList.FormattingEnabled = true;
             this.PackList.HorizontalScrollbar = true;
@@ -179,183 +182,173 @@
             this.PackList.ItemCheck += new System.Windows.Forms.ItemCheckEventHandler(this.PackList_ItemCheck);
             this.PackList.SelectedIndexChanged += new System.EventHandler(this.PackList_SelectedIndexChanged);
             // 
+            // PackContext
+            // 
+            this.PackContext.ImageScalingSize = new System.Drawing.Size(36, 36);
+            this.PackContext.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.UpdateButton});
+            this.PackContext.Name = "PackContext";
+            this.PackContext.Size = new System.Drawing.Size(290, 48);
+            this.PackContext.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.PackContext_ItemClicked);
+            // 
+            // UpdateButton
+            // 
+            this.UpdateButton.Name = "UpdateButton";
+            this.UpdateButton.Size = new System.Drawing.Size(289, 44);
+            this.UpdateButton.Text = "Update Selected";
+            // 
+            // MetaGroup
+            // 
+            this.MetaGroup.Controls.Add(this.MetaPane);
+            this.MetaGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MetaGroup.Location = new System.Drawing.Point(0, 0);
+            this.MetaGroup.Name = "MetaGroup";
+            this.MetaGroup.Size = new System.Drawing.Size(449, 608);
+            this.MetaGroup.TabIndex = 2;
+            this.MetaGroup.TabStop = false;
+            this.MetaGroup.Text = "Metadata";
+            // 
+            // MetaPane
+            // 
+            this.MetaPane.ColumnCount = 1;
+            this.MetaPane.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.MetaPane.Controls.Add(this.DetailsPane, 0, 1);
+            this.MetaPane.Controls.Add(this.PackImage, 0, 0);
+            this.MetaPane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MetaPane.Location = new System.Drawing.Point(3, 39);
+            this.MetaPane.Name = "MetaPane";
+            this.MetaPane.RowCount = 2;
+            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 49.99999F));
+            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.00001F));
+            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.MetaPane.Size = new System.Drawing.Size(443, 566);
+            this.MetaPane.TabIndex = 1;
+            // 
             // DetailsPane
             // 
             this.DetailsPane.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DetailsPane.Location = new System.Drawing.Point(0, 0);
-            this.DetailsPane.Margin = new System.Windows.Forms.Padding(6);
+            this.DetailsPane.Location = new System.Drawing.Point(3, 285);
             this.DetailsPane.Name = "DetailsPane";
             this.DetailsPane.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // DetailsPane.Panel1
             // 
-            this.DetailsPane.Panel1.Controls.Add(this.PackImage);
+            this.DetailsPane.Panel1.Controls.Add(this.EditPane);
             // 
             // DetailsPane.Panel2
             // 
-            this.DetailsPane.Panel2.Controls.Add(this.NoteGroup);
-            this.DetailsPane.Size = new System.Drawing.Size(449, 608);
-            this.DetailsPane.SplitterDistance = 397;
-            this.DetailsPane.SplitterWidth = 7;
+            this.DetailsPane.Panel2.Controls.Add(this.NotesGroup);
+            this.DetailsPane.Size = new System.Drawing.Size(437, 278);
+            this.DetailsPane.SplitterDistance = 145;
             this.DetailsPane.TabIndex = 0;
+            // 
+            // EditPane
+            // 
+            this.EditPane.ColumnCount = 2;
+            this.EditPane.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.EditPane.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 75F));
+            this.EditPane.Controls.Add(this.label1, 0, 0);
+            this.EditPane.Controls.Add(this.NameEdit, 1, 0);
+            this.EditPane.Controls.Add(this.label2, 0, 1);
+            this.EditPane.Controls.Add(this.AuthorEdit, 1, 1);
+            this.EditPane.Controls.Add(this.label3, 0, 2);
+            this.EditPane.Controls.Add(this.FallbackEdit, 1, 2);
+            this.EditPane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.EditPane.Location = new System.Drawing.Point(0, 0);
+            this.EditPane.Name = "EditPane";
+            this.EditPane.RowCount = 3;
+            this.EditPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.EditPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.EditPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.EditPane.Size = new System.Drawing.Size(437, 145);
+            this.EditPane.TabIndex = 6;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(3, 0);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(94, 37);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Name:";
+            // 
+            // NameEdit
+            // 
+            this.NameEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NameEdit.Location = new System.Drawing.Point(112, 3);
+            this.NameEdit.Name = "NameEdit";
+            this.NameEdit.ReadOnly = true;
+            this.NameEdit.Size = new System.Drawing.Size(322, 43);
+            this.NameEdit.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(3, 48);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(98, 48);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Author:";
+            // 
+            // AuthorEdit
+            // 
+            this.AuthorEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.AuthorEdit.Location = new System.Drawing.Point(112, 51);
+            this.AuthorEdit.Name = "AuthorEdit";
+            this.AuthorEdit.ReadOnly = true;
+            this.AuthorEdit.Size = new System.Drawing.Size(322, 43);
+            this.AuthorEdit.TabIndex = 3;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(3, 96);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(99, 49);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Fallback:";
+            // 
+            // FallbackEdit
+            // 
+            this.FallbackEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.FallbackEdit.Enabled = false;
+            this.FallbackEdit.FormattingEnabled = true;
+            this.FallbackEdit.Location = new System.Drawing.Point(112, 99);
+            this.FallbackEdit.Name = "FallbackEdit";
+            this.FallbackEdit.Size = new System.Drawing.Size(322, 45);
+            this.FallbackEdit.TabIndex = 5;
+            // 
+            // NotesGroup
+            // 
+            this.NotesGroup.Controls.Add(this.NotesEdit);
+            this.NotesGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NotesGroup.Location = new System.Drawing.Point(0, 0);
+            this.NotesGroup.Name = "NotesGroup";
+            this.NotesGroup.Size = new System.Drawing.Size(437, 129);
+            this.NotesGroup.TabIndex = 1;
+            this.NotesGroup.TabStop = false;
+            this.NotesGroup.Text = "Notes:";
+            // 
+            // NotesEdit
+            // 
+            this.NotesEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NotesEdit.Location = new System.Drawing.Point(3, 39);
+            this.NotesEdit.Multiline = true;
+            this.NotesEdit.Name = "NotesEdit";
+            this.NotesEdit.ReadOnly = true;
+            this.NotesEdit.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.NotesEdit.Size = new System.Drawing.Size(431, 87);
+            this.NotesEdit.TabIndex = 0;
             // 
             // PackImage
             // 
             this.PackImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PackImage.Location = new System.Drawing.Point(0, 0);
-            this.PackImage.Margin = new System.Windows.Forms.Padding(6);
+            this.PackImage.Location = new System.Drawing.Point(3, 3);
             this.PackImage.Name = "PackImage";
-            this.PackImage.Size = new System.Drawing.Size(449, 397);
+            this.PackImage.Size = new System.Drawing.Size(437, 276);
             this.PackImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.PackImage.TabIndex = 2;
+            this.PackImage.TabIndex = 1;
             this.PackImage.TabStop = false;
-            // 
-            // NoteGroup
-            // 
-            this.NoteGroup.Controls.Add(this.PackNotes);
-            this.NoteGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NoteGroup.Location = new System.Drawing.Point(0, 0);
-            this.NoteGroup.Margin = new System.Windows.Forms.Padding(6);
-            this.NoteGroup.Name = "NoteGroup";
-            this.NoteGroup.Padding = new System.Windows.Forms.Padding(6);
-            this.NoteGroup.Size = new System.Drawing.Size(449, 204);
-            this.NoteGroup.TabIndex = 3;
-            this.NoteGroup.TabStop = false;
-            this.NoteGroup.Text = "Notes";
-            // 
-            // PackNotes
-            // 
-            this.PackNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PackNotes.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.PackNotes.Location = new System.Drawing.Point(6, 42);
-            this.PackNotes.Margin = new System.Windows.Forms.Padding(6);
-            this.PackNotes.Multiline = true;
-            this.PackNotes.Name = "PackNotes";
-            this.PackNotes.ReadOnly = true;
-            this.PackNotes.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.PackNotes.Size = new System.Drawing.Size(437, 156);
-            this.PackNotes.TabIndex = 0;
-            // 
-            // PropGroup
-            // 
-            this.PropGroup.Controls.Add(this.tableLayoutPanel2);
-            this.PropGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PropGroup.Enabled = false;
-            this.PropGroup.Location = new System.Drawing.Point(0, 0);
-            this.PropGroup.Margin = new System.Windows.Forms.Padding(6);
-            this.PropGroup.Name = "PropGroup";
-            this.PropGroup.Padding = new System.Windows.Forms.Padding(6);
-            this.PropGroup.Size = new System.Drawing.Size(646, 240);
-            this.PropGroup.TabIndex = 5;
-            this.PropGroup.TabStop = false;
-            this.PropGroup.Text = "Properties";
-            // 
-            // tableLayoutPanel2
-            // 
-            this.tableLayoutPanel2.ColumnCount = 2;
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 80F));
-            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 21F));
-            this.tableLayoutPanel2.Controls.Add(this.FallbackLabel, 0, 0);
-            this.tableLayoutPanel2.Controls.Add(this.FallbackSelect, 1, 0);
-            this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 42);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4);
-            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
-            this.tableLayoutPanel2.RowCount = 1;
-            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(634, 192);
-            this.tableLayoutPanel2.TabIndex = 3;
-            // 
-            // FallbackLabel
-            // 
-            this.FallbackLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FallbackLabel.Location = new System.Drawing.Point(0, 0);
-            this.FallbackLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.FallbackLabel.Name = "FallbackLabel";
-            this.FallbackLabel.Size = new System.Drawing.Size(126, 192);
-            this.FallbackLabel.TabIndex = 1;
-            this.FallbackLabel.Text = "Fallback:";
-            // 
-            // FallbackSelect
-            // 
-            this.FallbackSelect.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.FallbackSelect.Enabled = false;
-            this.FallbackSelect.FormattingEnabled = true;
-            this.FallbackSelect.Location = new System.Drawing.Point(132, 6);
-            this.FallbackSelect.Margin = new System.Windows.Forms.Padding(6);
-            this.FallbackSelect.Name = "FallbackSelect";
-            this.FallbackSelect.Size = new System.Drawing.Size(496, 45);
-            this.FallbackSelect.TabIndex = 0;
-            this.FallbackSelect.SelectedIndexChanged += new System.EventHandler(this.FallbackSelect_SelectedIndexChanged);
-            // 
-            // ActionGroup
-            // 
-            this.ActionGroup.Controls.Add(this.tableLayoutPanel1);
-            this.ActionGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.ActionGroup.Location = new System.Drawing.Point(0, 0);
-            this.ActionGroup.Margin = new System.Windows.Forms.Padding(6);
-            this.ActionGroup.Name = "ActionGroup";
-            this.ActionGroup.Padding = new System.Windows.Forms.Padding(6);
-            this.ActionGroup.Size = new System.Drawing.Size(462, 240);
-            this.ActionGroup.TabIndex = 6;
-            this.ActionGroup.TabStop = false;
-            this.ActionGroup.Text = "Actions";
-            // 
-            // tableLayoutPanel1
-            // 
-            this.tableLayoutPanel1.ColumnCount = 1;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.tableLayoutPanel1.Controls.Add(this.RunGameButton, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.LoadButton, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.RebuildButton, 0, 0);
-            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 42);
-            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6);
-            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 3;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(450, 192);
-            this.tableLayoutPanel1.TabIndex = 0;
-            // 
-            // RunGameButton
-            // 
-            this.RunGameButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RunGameButton.Location = new System.Drawing.Point(6, 133);
-            this.RunGameButton.Margin = new System.Windows.Forms.Padding(6);
-            this.RunGameButton.Name = "RunGameButton";
-            this.RunGameButton.Size = new System.Drawing.Size(438, 53);
-            this.RunGameButton.TabIndex = 7;
-            this.RunGameButton.Text = "Launch Game";
-            this.RunGameButton.UseVisualStyleBackColor = true;
-            this.RunGameButton.Click += new System.EventHandler(this.RunGameButton_Click);
-            // 
-            // LoadButton
-            // 
-            this.LoadButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.LoadButton.Location = new System.Drawing.Point(6, 69);
-            this.LoadButton.Margin = new System.Windows.Forms.Padding(6);
-            this.LoadButton.Name = "LoadButton";
-            this.LoadButton.Size = new System.Drawing.Size(438, 52);
-            this.LoadButton.TabIndex = 6;
-            this.LoadButton.Text = "Load All Mods";
-            this.LoadButton.UseVisualStyleBackColor = true;
-            this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
-            // 
-            // RebuildButton
-            // 
-            this.RebuildButton.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.RebuildButton.Location = new System.Drawing.Point(6, 6);
-            this.RebuildButton.Margin = new System.Windows.Forms.Padding(6);
-            this.RebuildButton.Name = "RebuildButton";
-            this.RebuildButton.Size = new System.Drawing.Size(438, 51);
-            this.RebuildButton.TabIndex = 4;
-            this.RebuildButton.Text = "Rebuild Packs / Reload";
-            this.RebuildButton.UseVisualStyleBackColor = true;
-            this.RebuildButton.Click += new System.EventHandler(this.RebuildButton_Click);
             // 
             // ConflictGroup
             // 
@@ -417,7 +410,6 @@
             this.MenuBar.ImageScalingSize = new System.Drawing.Size(36, 36);
             this.MenuBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.buildToolStripMenuItem,
             this.AboutButton});
             this.MenuBar.Location = new System.Drawing.Point(0, 0);
             this.MenuBar.Name = "MenuBar";
@@ -457,30 +449,6 @@
             this.ImportModButton.Size = new System.Drawing.Size(424, 48);
             this.ImportModButton.Text = "Import Mod";
             this.ImportModButton.Click += new System.EventHandler(this.ImportModButton_Click);
-            // 
-            // buildToolStripMenuItem
-            // 
-            this.buildToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.BuildPackButton,
-            this.BuildPatchButton});
-            this.buildToolStripMenuItem.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.buildToolStripMenuItem.Name = "buildToolStripMenuItem";
-            this.buildToolStripMenuItem.Size = new System.Drawing.Size(99, 41);
-            this.buildToolStripMenuItem.Text = "Build";
-            // 
-            // BuildPackButton
-            // 
-            this.BuildPackButton.Name = "BuildPackButton";
-            this.BuildPackButton.Size = new System.Drawing.Size(231, 48);
-            this.BuildPackButton.Text = "Pack";
-            this.BuildPackButton.Click += new System.EventHandler(this.BuildPackButton_Click);
-            // 
-            // BuildPatchButton
-            // 
-            this.BuildPatchButton.Name = "BuildPatchButton";
-            this.BuildPatchButton.Size = new System.Drawing.Size(231, 48);
-            this.BuildPatchButton.Text = "Patch";
-            this.BuildPatchButton.Click += new System.EventHandler(this.BuildPatchButton_Click);
             // 
             // AboutButton
             // 
@@ -562,7 +530,7 @@
             // 
             // OtherPane.Panel1
             // 
-            this.OtherPane.Panel1.Controls.Add(this.PropActionPane);
+            this.OtherPane.Panel1.Controls.Add(this.ActionGroup);
             // 
             // OtherPane.Panel2
             // 
@@ -572,24 +540,73 @@
             this.OtherPane.SplitterWidth = 7;
             this.OtherPane.TabIndex = 10;
             // 
-            // PropActionPane
+            // ActionGroup
             // 
-            this.PropActionPane.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PropActionPane.Location = new System.Drawing.Point(0, 0);
-            this.PropActionPane.Margin = new System.Windows.Forms.Padding(6);
-            this.PropActionPane.Name = "PropActionPane";
+            this.ActionGroup.Controls.Add(this.tableLayoutPanel1);
+            this.ActionGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.ActionGroup.Location = new System.Drawing.Point(0, 0);
+            this.ActionGroup.Margin = new System.Windows.Forms.Padding(6);
+            this.ActionGroup.Name = "ActionGroup";
+            this.ActionGroup.Padding = new System.Windows.Forms.Padding(6);
+            this.ActionGroup.Size = new System.Drawing.Size(1116, 240);
+            this.ActionGroup.TabIndex = 7;
+            this.ActionGroup.TabStop = false;
+            this.ActionGroup.Text = "Actions";
             // 
-            // PropActionPane.Panel1
+            // tableLayoutPanel1
             // 
-            this.PropActionPane.Panel1.Controls.Add(this.PropGroup);
+            this.tableLayoutPanel1.ColumnCount = 1;
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.Controls.Add(this.RunGameButton, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.LoadButton, 0, 1);
+            this.tableLayoutPanel1.Controls.Add(this.RebuildButton, 0, 0);
+            this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tableLayoutPanel1.Location = new System.Drawing.Point(6, 42);
+            this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(6);
+            this.tableLayoutPanel1.Name = "tableLayoutPanel1";
+            this.tableLayoutPanel1.RowCount = 3;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33334F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(1104, 192);
+            this.tableLayoutPanel1.TabIndex = 0;
             // 
-            // PropActionPane.Panel2
+            // RunGameButton
             // 
-            this.PropActionPane.Panel2.Controls.Add(this.ActionGroup);
-            this.PropActionPane.Size = new System.Drawing.Size(1116, 240);
-            this.PropActionPane.SplitterDistance = 646;
-            this.PropActionPane.SplitterWidth = 8;
-            this.PropActionPane.TabIndex = 0;
+            this.RunGameButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RunGameButton.Location = new System.Drawing.Point(6, 133);
+            this.RunGameButton.Margin = new System.Windows.Forms.Padding(6);
+            this.RunGameButton.Name = "RunGameButton";
+            this.RunGameButton.Size = new System.Drawing.Size(1092, 53);
+            this.RunGameButton.TabIndex = 7;
+            this.RunGameButton.Text = "Launch Game";
+            this.RunGameButton.UseVisualStyleBackColor = true;
+            this.RunGameButton.Click += new System.EventHandler(this.RunGameButton_Click);
+            // 
+            // LoadButton
+            // 
+            this.LoadButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.LoadButton.Location = new System.Drawing.Point(6, 69);
+            this.LoadButton.Margin = new System.Windows.Forms.Padding(6);
+            this.LoadButton.Name = "LoadButton";
+            this.LoadButton.Size = new System.Drawing.Size(1092, 52);
+            this.LoadButton.TabIndex = 6;
+            this.LoadButton.Text = "Load All Mods";
+            this.LoadButton.UseVisualStyleBackColor = true;
+            this.LoadButton.Click += new System.EventHandler(this.LoadButton_Click);
+            // 
+            // RebuildButton
+            // 
+            this.RebuildButton.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RebuildButton.Location = new System.Drawing.Point(6, 6);
+            this.RebuildButton.Margin = new System.Windows.Forms.Padding(6);
+            this.RebuildButton.Name = "RebuildButton";
+            this.RebuildButton.Size = new System.Drawing.Size(1092, 51);
+            this.RebuildButton.TabIndex = 4;
+            this.RebuildButton.Text = "Rebuild Packs / Reload";
+            this.RebuildButton.UseVisualStyleBackColor = true;
+            this.RebuildButton.Click += new System.EventHandler(this.RebuildButton_Click);
             // 
             // MainForm
             // 
@@ -611,17 +628,18 @@
             this.PacksPane.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.PacksPane)).EndInit();
             this.PacksPane.ResumeLayout(false);
+            this.PackContext.ResumeLayout(false);
+            this.MetaGroup.ResumeLayout(false);
+            this.MetaPane.ResumeLayout(false);
             this.DetailsPane.Panel1.ResumeLayout(false);
             this.DetailsPane.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DetailsPane)).EndInit();
             this.DetailsPane.ResumeLayout(false);
+            this.EditPane.ResumeLayout(false);
+            this.EditPane.PerformLayout();
+            this.NotesGroup.ResumeLayout(false);
+            this.NotesGroup.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PackImage)).EndInit();
-            this.NoteGroup.ResumeLayout(false);
-            this.NoteGroup.PerformLayout();
-            this.PropGroup.ResumeLayout(false);
-            this.tableLayoutPanel2.ResumeLayout(false);
-            this.ActionGroup.ResumeLayout(false);
-            this.tableLayoutPanel1.ResumeLayout(false);
             this.ConflictGroup.ResumeLayout(false);
             this.ModuleGroup.ResumeLayout(false);
             this.MenuBar.ResumeLayout(false);
@@ -642,10 +660,8 @@
             this.OtherPane.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.OtherPane)).EndInit();
             this.OtherPane.ResumeLayout(false);
-            this.PropActionPane.Panel1.ResumeLayout(false);
-            this.PropActionPane.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.PropActionPane)).EndInit();
-            this.PropActionPane.ResumeLayout(false);
+            this.ActionGroup.ResumeLayout(false);
+            this.tableLayoutPanel1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -657,39 +673,42 @@
         private System.Windows.Forms.GroupBox ChangeGroup;
         private System.Windows.Forms.GroupBox PackGroup;
         private System.Windows.Forms.CheckedListBox PackList;
-        private System.Windows.Forms.GroupBox PropGroup;
-        private System.Windows.Forms.GroupBox ActionGroup;
         private System.Windows.Forms.GroupBox ConflictGroup;
-        private System.Windows.Forms.Label FallbackLabel;
-        private System.Windows.Forms.ComboBox FallbackSelect;
-        private System.Windows.Forms.PictureBox PackImage;
         private System.Windows.Forms.GroupBox ModuleGroup;
-        private System.Windows.Forms.GroupBox NoteGroup;
-        private System.Windows.Forms.TextBox PackNotes;
         private System.Windows.Forms.CheckedListBox ConflictList;
         private System.Windows.Forms.CheckedListBox ModuleList;
         private System.Windows.Forms.MenuStrip MenuBar;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem OpenModsButton;
         private System.Windows.Forms.ToolStripMenuItem ImportModButton;
-        private System.Windows.Forms.ToolStripMenuItem buildToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem BuildPackButton;
-        private System.Windows.Forms.ToolStripMenuItem BuildPatchButton;
         private System.Windows.Forms.OpenFileDialog ImportFileDialog;
         private System.Windows.Forms.ToolStripMenuItem OpenGameButton;
         private System.Windows.Forms.ToolStripMenuItem AboutButton;
         private System.Windows.Forms.SplitContainer PacksPane;
-        private System.Windows.Forms.SplitContainer PropActionPane;
-        private System.Windows.Forms.SplitContainer DetailsPane;
         private System.Windows.Forms.SplitContainer TopPane;
         private System.Windows.Forms.SplitContainer MainPane;
         private System.Windows.Forms.SplitContainer BottomPane;
         private System.Windows.Forms.SplitContainer OtherPane;
+        private System.Windows.Forms.ContextMenuStrip PackContext;
+        private System.Windows.Forms.ToolStripMenuItem UpdateButton;
+        private System.Windows.Forms.GroupBox MetaGroup;
+        private System.Windows.Forms.TableLayoutPanel MetaPane;
+        private System.Windows.Forms.SplitContainer DetailsPane;
+        private System.Windows.Forms.TableLayoutPanel EditPane;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.TextBox NameEdit;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.TextBox AuthorEdit;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.ComboBox FallbackEdit;
+        private System.Windows.Forms.PictureBox PackImage;
+        private System.Windows.Forms.GroupBox NotesGroup;
+        private System.Windows.Forms.TextBox NotesEdit;
+        private System.Windows.Forms.GroupBox ActionGroup;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.Button RunGameButton;
         private System.Windows.Forms.Button LoadButton;
         private System.Windows.Forms.Button RebuildButton;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
     }
 }
 

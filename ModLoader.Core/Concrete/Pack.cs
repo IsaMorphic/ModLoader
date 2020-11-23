@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -8,29 +9,18 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
-    using Newtonsoft.Json;
     using Persistence;
 
     public class Pack : IGroup<Module>, IGroup<Prioritized<Module>>, ILoadable<Pack>
     {
         public class Meta
         {
-            public Guid Id { get; }
-            public Guid? Fallback { get; }
+            public Guid Id { get; set; }
+            public Guid? Fallback { get; set; }
 
-            public string Name { get; }
-            public string Author { get; }
-            public string Notes { get; }
-
-            public Meta(Guid id, Guid? fallback, string name, string author, string notes)
-            {
-                Id = id;
-                Fallback = fallback;
-
-                Name = name;
-                Author = author;
-                Notes = notes;
-            }
+            public string Name { get; set; }
+            public string Author { get; set; }
+            public string Notes { get; set; }
 
             public async Task WriteToStreamAsync(Stream stream)
             {
@@ -94,14 +84,43 @@ namespace ModLoader.Core
             Enabled = true;
         }
 
+        public async Task ReadMetaDataAsync()
+        {
+            if (Initialized) return;
+
+            var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
+            Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
+
+            if (Archive.GetEntry("_meta.json") != null)
+            {
+                using (var stream = Archive.GetEntry("_meta.json").Open())
+                {
+                    MetaData = await Meta.LoadFromStreamAsync(stream);
+                }
+            }
+            else
+            {
+                MetaData = new Meta
+                {
+                    Id = Guid.NewGuid(),
+                    Fallback = null,
+                    Name = "Unnamed",
+                    Author = "Unknown",
+                    Notes = "This pack is missing its _meta.json file. Please update this pack to add some."
+                };
+            }
+        }
+
         public async Task InitializeAsync(int dependencyLevel = 0)
         {
             DependencyLevel = Math.Max(DependencyLevel, dependencyLevel);
 
             if (Initialized) return;
 
-            var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
-            Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
+            if (MetaData == null)
+            {
+                await ReadMetaDataAsync();
+            }
 
             try
             {
@@ -118,16 +137,14 @@ namespace ModLoader.Core
                 }
             }
 
-            if (Archive.GetEntry("_meta.json") != null)
+            var noteEntry = Archive.GetEntry("_pack.txt");
+            if (noteEntry != null)
             {
-                using (var stream = Archive.GetEntry("_meta.json").Open())
+                using (var stream = noteEntry.Open())
+                using (var reader = new StreamReader(stream))
                 {
-                    MetaData = await Meta.LoadFromStreamAsync(stream);
+                    MetaData.Notes = await reader.ReadToEndAsync();
                 }
-            }
-            else
-            {
-                MetaData = new Meta(Guid.NewGuid(), null, "meta placeholder", "meta placeholder", "meta placeholder");
             }
 
             if (this != Parent.BasePack)
@@ -145,10 +162,13 @@ namespace ModLoader.Core
                 }
                 else
                 {
-                    Fallback = MetaData.Fallback == null ? Parent.BasePack : Parent.Packs.Single(p => p.Id == MetaData.Fallback);
+                    Fallback = MetaData.Fallback == null ? Parent.BasePack : Parent.Packs.SingleOrDefault(p => p.Id == MetaData.Fallback);
+                    if (Fallback == null) throw new InvalidOperationException($"{this} is missing a dependency.");
                 }
 
                 await (Fallback as Pack).InitializeAsync(DependencyLevel + 1);
+
+                MetaData.Fallback = (Fallback as Pack).Id;
             }
 
             HashSet<string> burnDirs = new HashSet<string>();
@@ -203,6 +223,7 @@ namespace ModLoader.Core
         public void Unload()
         {
             Archive?.Dispose();
+            Archive = null;
         }
 
         public void Reload()
