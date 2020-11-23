@@ -189,13 +189,14 @@
             this.UpdateButton});
             this.PackContext.Name = "PackContext";
             this.PackContext.Size = new System.Drawing.Size(290, 48);
-            this.PackContext.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.PackContext_ItemClicked);
             // 
             // UpdateButton
             // 
+            this.UpdateButton.Enabled = false;
             this.UpdateButton.Name = "UpdateButton";
             this.UpdateButton.Size = new System.Drawing.Size(289, 44);
             this.UpdateButton.Text = "Update Selected";
+            this.UpdateButton.Click += new System.EventHandler(this.UpdateButton_Click);
             // 
             // MetaGroup
             // 

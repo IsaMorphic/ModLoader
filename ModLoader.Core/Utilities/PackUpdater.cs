@@ -171,7 +171,7 @@ namespace ModLoader.Core.Utilities
             using (var stream = Archive.CreateEntry("_pack.json").Open())
                 await Graph.WriteToStreamAsync(stream);
 
-            Archive.GetEntry("_meta.json").Delete();
+            Archive.GetEntry("_meta.json")?.Delete();
             using (var stream = Archive.CreateEntry("_meta.json").Open())
                 await MetaData.WriteToStreamAsync(stream);
 

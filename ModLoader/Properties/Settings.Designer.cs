@@ -202,5 +202,77 @@ namespace ModLoader.Properties {
                 this["MergerAppHeight"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.3")]
+        public double UpdaterMainPanelSplit {
+            get {
+                return ((double)(this["UpdaterMainPanelSplit"]));
+            }
+            set {
+                this["UpdaterMainPanelSplit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.7")]
+        public double UpdaterLeftPanelSplit {
+            get {
+                return ((double)(this["UpdaterLeftPanelSplit"]));
+            }
+            set {
+                this["UpdaterLeftPanelSplit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.4")]
+        public double UpdaterTopPanelSplit {
+            get {
+                return ((double)(this["UpdaterTopPanelSplit"]));
+            }
+            set {
+                this["UpdaterTopPanelSplit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        public double UpdaterDetailsPanelSplit {
+            get {
+                return ((double)(this["UpdaterDetailsPanelSplit"]));
+            }
+            set {
+                this["UpdaterDetailsPanelSplit"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
+        public double UpdaterAppWidth {
+            get {
+                return ((double)(this["UpdaterAppWidth"]));
+            }
+            set {
+                this["UpdaterAppWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        public double UpdaterAppHeight {
+            get {
+                return ((double)(this["UpdaterAppHeight"]));
+            }
+            set {
+                this["UpdaterAppHeight"] = value;
+            }
+        }
     }
 }

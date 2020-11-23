@@ -47,5 +47,23 @@
     <Setting Name="MergerAppHeight" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.4</Value>
     </Setting>
+    <Setting Name="UpdaterMainPanelSplit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.3</Value>
+    </Setting>
+    <Setting Name="UpdaterLeftPanelSplit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.7</Value>
+    </Setting>
+    <Setting Name="UpdaterTopPanelSplit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.4</Value>
+    </Setting>
+    <Setting Name="UpdaterDetailsPanelSplit" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.6</Value>
+    </Setting>
+    <Setting Name="UpdaterAppWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.5</Value>
+    </Setting>
+    <Setting Name="UpdaterAppHeight" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">0.6</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

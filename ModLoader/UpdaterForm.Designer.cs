@@ -323,11 +323,11 @@ namespace ModLoader
             this.ActionsPane.Location = new System.Drawing.Point(0, 0);
             this.ActionsPane.Name = "ActionsPane";
             this.ActionsPane.RowCount = 5;
-            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0005F));
-            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0005F));
-            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20.0005F));
-            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 20F));
-            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 19.9985F));
+            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.00062F));
+            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.00062F));
+            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.00062F));
+            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.ActionsPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.99813F));
             this.ActionsPane.Size = new System.Drawing.Size(503, 275);
             this.ActionsPane.TabIndex = 0;
             // 

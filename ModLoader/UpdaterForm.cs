@@ -1,5 +1,6 @@
 ﻿using ModLoader.Core;
 using ModLoader.Core.Utilities;
+using ModLoader.Properties;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -47,6 +48,18 @@ namespace ModLoader
         private async void UpdaterForm_Load(object sender, System.EventArgs e)
         {
             Text = $"Editing {Updater.Pack}";
+
+            Width = (int)(Settings.Default.UpdaterAppWidth * Screen.PrimaryScreen.Bounds.Width);
+            Height = (int)(Settings.Default.UpdaterAppHeight * Screen.PrimaryScreen.Bounds.Height);
+
+            Top = Screen.PrimaryScreen.Bounds.Y + Screen.PrimaryScreen.Bounds.Height / 2 - Height / 2;
+            Left = Screen.PrimaryScreen.Bounds.X + Screen.PrimaryScreen.Bounds.Width / 2 - Width / 2;
+
+            MainPane.SplitterDistance = (int)(Settings.Default.UpdaterMainPanelSplit * MainPane.Width);
+            TopPane.SplitterDistance = (int)(Settings.Default.UpdaterTopPanelSplit * TopPane.Width);
+            LeftPane.SplitterDistance = (int)(Settings.Default.UpdaterLeftPanelSplit * LeftPane.Height);
+            DetailsPane.SplitterDistance = (int)(Settings.Default.UpdaterDetailsPanelSplit * DetailsPane.Height);
+
             MessageBox.Show("Before updating a pack file, it is wise to make a backup copy!\nAlso, before updating this pack, make sure any test folders of the same name have been moved outside of the Mods directory.\nIf you do not do this, your changes will be overwritten!", "Warning!!!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             await Updater.RevertChangesAsync();
             RefreshModuleList();
@@ -153,6 +166,13 @@ namespace ModLoader
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Settings.Default.UpdaterMainPanelSplit = (double)MainPane.SplitterDistance / MainPane.Width;
+            Settings.Default.UpdaterTopPanelSplit = (double)TopPane.SplitterDistance / TopPane.Width;
+            Settings.Default.UpdaterLeftPanelSplit = (double)LeftPane.SplitterDistance / LeftPane.Height;
+            Settings.Default.UpdaterDetailsPanelSplit = (double)DetailsPane.SplitterDistance / DetailsPane.Height;
+
+            Settings.Default.Save();
+
             Updater.Dispose();
         }
     }

@@ -146,7 +146,13 @@ namespace ModLoader
         private void PackList_SelectedIndexChanged(object sender, EventArgs e)
         {
             var pack = PackList.SelectedItem as Pack;
-            if (pack == null) return;
+            if (pack == null)
+            {
+                UpdateButton.Enabled = false;
+                return;
+            }
+
+            UpdateButton.Enabled = true;
 
             RefreshModuleList();
 
@@ -364,13 +370,10 @@ namespace ModLoader
             new AboutForm().ShowDialog();
         }
 
-        private void PackContext_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        private void UpdateButton_Click(object sender, EventArgs e)
         {
-            if (e.ClickedItem == UpdateButton)
-            {
-                new UpdaterForm((PackList.SelectedItem as Pack)).ShowDialog();
-                RebuildButton.PerformClick();
-            }
+            new UpdaterForm((PackList.SelectedItem as Pack)).ShowDialog();
+            RebuildButton.PerformClick();
         }
     }
 }
