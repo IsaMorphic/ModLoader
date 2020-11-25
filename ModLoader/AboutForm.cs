@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -11,11 +12,17 @@ namespace ModLoader
         public AboutForm()
         {
             InitializeComponent();
+            label1.Text = $"ModLoader v{GetType().Assembly.GetName().Version}";
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("https://www.chosenfewsoftware.com/");
+            var info = new ProcessStartInfo
+            {
+                FileName = "https://www.chosenfewsoftware.com/",
+                UseShellExecute = true
+            };
+            Process.Start(info);
         }
     }
 }

@@ -35,6 +35,8 @@ namespace ModLoader
             LeftPane.SplitterDistance = (int)(Settings.Default.MergerLeftPanelSplit * LeftPane.Height);
             TopPane.SplitterDistance = (int)(Settings.Default.MergerTopPanelSplit * TopPane.Width);
             BottomPane.SplitterDistance = (int)(Settings.Default.MergerBottomPanelSplit * BottomPane.Width);
+
+            WindowState = Settings.Default.MergerMaximized ? FormWindowState.Maximized : FormWindowState.Normal;
         }
 
         private void RefreshModuleList()
@@ -178,8 +180,16 @@ namespace ModLoader
 
         private void MergerForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Settings.Default.MergerAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
-            Settings.Default.MergerAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+            if (WindowState == FormWindowState.Maximized)
+            {
+                Settings.Default.MergerMaximized = true;
+            }
+            else
+            {
+                Settings.Default.MergerMaximized = false;
+                Settings.Default.MergerAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
+                Settings.Default.MergerAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+            }
 
             Settings.Default.MergerMainPanelSplit = (double)MainPane.SplitterDistance / MainPane.Width;
             Settings.Default.MergerTopPanelSplit = (double)TopPane.SplitterDistance / TopPane.Width;

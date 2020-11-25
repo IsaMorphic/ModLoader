@@ -25,7 +25,7 @@ namespace ModLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.55")]
         public double LoaderMainPanelSplit {
             get {
                 return ((double)(this["LoaderMainPanelSplit"]));
@@ -49,7 +49,7 @@ namespace ModLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.25")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.35")]
         public double LoaderBottomPanelSplit {
             get {
                 return ((double)(this["LoaderBottomPanelSplit"]));
@@ -61,7 +61,7 @@ namespace ModLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.75")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
         public double LoaderPacksPanelSplit {
             get {
                 return ((double)(this["LoaderPacksPanelSplit"]));
@@ -73,7 +73,7 @@ namespace ModLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.4")]
         public double LoaderDetailsPanelSplit {
             get {
                 return ((double)(this["LoaderDetailsPanelSplit"]));
@@ -109,7 +109,7 @@ namespace ModLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.4")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.45")]
         public double LoaderAppWidth {
             get {
                 return ((double)(this["LoaderAppWidth"]));
@@ -121,7 +121,7 @@ namespace ModLoader.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("0.6")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.7")]
         public double LoaderAppHeight {
             get {
                 return ((double)(this["LoaderAppHeight"]));
@@ -272,6 +272,42 @@ namespace ModLoader.Properties {
             }
             set {
                 this["UpdaterAppHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool LoaderMaximized {
+            get {
+                return ((bool)(this["LoaderMaximized"]));
+            }
+            set {
+                this["LoaderMaximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool MergerMaximized {
+            get {
+                return ((bool)(this["MergerMaximized"]));
+            }
+            set {
+                this["MergerMaximized"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UpdaterMaximized {
+            get {
+                return ((bool)(this["UpdaterMaximized"]));
+            }
+            set {
+                this["UpdaterMaximized"] = value;
             }
         }
     }

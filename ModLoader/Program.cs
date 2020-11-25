@@ -14,7 +14,7 @@ namespace ModLoader
         {
             Game.DefaultPackImageStream = System.Reflection.Assembly.GetExecutingAssembly()
                 .GetManifestResourceStream("ModLoader.Resources.UnderDevPack.png");
-            Game.DefaultPackNote = "This is a generated test pack. Once you're ready to ship your mod, go to Build->Pack and follow the steps!";
+            Game.DefaultPackNote = "This is a generated test pack. Once you're ready to ship your mod, select it in the \"Packs\" pane, right click, and hit \"Update Selected\" to add metadata and a custom image!";
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);

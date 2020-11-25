@@ -125,17 +125,9 @@ namespace ModLoader.Core
                                 }
                                 break;
                             case Operation.Add:
-                                if (index >= lines.Count - 1)
-                                {
-                                    lines.Add(line.Text);
-                                    indicies.Add(index);
-                                }
-                                else
-                                {
-                                    lines.Insert(index, line.Text);
-                                    indicies.Insert(index, index);
-                                    index++;
-                                }
+                                lines.Insert(index, line.Text);
+                                indicies.Insert(index, index);
+                                index++;
                                 break;
                         }
                     }

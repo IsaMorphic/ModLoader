@@ -2,7 +2,6 @@
 using ModLoader.Core.Utilities;
 using ModLoader.Properties;
 using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -10,6 +9,8 @@ namespace ModLoader
 {
     public partial class UpdaterForm : Form
     {
+        private bool Saved { get; set; }
+
         private PackUpdater Updater { get; }
 
         private Game Game => Updater.Pack.Parent;
@@ -60,7 +61,15 @@ namespace ModLoader
             LeftPane.SplitterDistance = (int)(Settings.Default.UpdaterLeftPanelSplit * LeftPane.Height);
             DetailsPane.SplitterDistance = (int)(Settings.Default.UpdaterDetailsPanelSplit * DetailsPane.Height);
 
-            MessageBox.Show("Before updating a pack file, it is wise to make a backup copy!\nAlso, before updating this pack, make sure any test folders of the same name have been moved outside of the Mods directory.\nIf you do not do this, your changes will be overwritten!", "Warning!!!", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            WindowState = Settings.Default.UpdaterMaximized ? FormWindowState.Maximized : FormWindowState.Normal;
+
+            MessageBox.Show(
+                "Before updating a pack file, it is wise to make a backup copy!\n" +
+                "Also, before updating this pack, make sure any test folders of the same name have been moved outside of the Mods directory.\n" +
+                "If you do not do this, your changes will be overwritten!",
+                "Warning!!!", MessageBoxButtons.OK, MessageBoxIcon.Warning
+                );
+
             await Updater.RevertChangesAsync();
             RefreshModuleList();
             RefreshMetaData();
@@ -88,8 +97,15 @@ namespace ModLoader
 
         private async void RevertButton_Click(object sender, System.EventArgs e)
         {
-            await Updater.RevertChangesAsync();
+            var result = MessageBox.Show(
+                "This action will discard all currently staged changes to the pack's files and metadata.\n" +
+                "Are you sure you want to continue?",
+                "Warning!!!", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
+                );
 
+            if (result == DialogResult.No) return;
+
+            await Updater.RevertChangesAsync();
             RefreshModuleList();
             RefreshMetaData();
         }
@@ -97,7 +113,14 @@ namespace ModLoader
         private async void SaveButton_Click(object sender, System.EventArgs e)
         {
             await Updater.SaveChangesAsync();
-            MessageBox.Show("Changes saved!", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Saved = true;
+
+            MessageBox.Show(
+                $"All changes to {Updater.Pack} have been saved!\n" +
+                "If you do not see your changes in the loader window, make sure that " +
+                "you've moved this mod's test folder out of the Mods directory.",
+                "Information", MessageBoxButtons.OK, MessageBoxIcon.Information
+                );
             Close();
         }
 
@@ -166,6 +189,29 @@ namespace ModLoader
 
         private void UpdaterForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            if (!Saved)
+            {
+                var result = MessageBox.Show(
+                    "Are you sure you want to abandon your updates?\n" +
+                    "Any changes that you've made thus far to this pack will be lost if you continue!",
+                    "Abandon Changes?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
+                );
+
+                if (e.Cancel = result == DialogResult.No) 
+                    return;
+            }
+
+            if (WindowState == FormWindowState.Maximized)
+            {
+                Settings.Default.UpdaterMaximized = true;
+            }
+            else
+            {
+                Settings.Default.UpdaterMaximized = false;
+                Settings.Default.UpdaterAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
+                Settings.Default.UpdaterAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+            }
+
             Settings.Default.UpdaterMainPanelSplit = (double)MainPane.SplitterDistance / MainPane.Width;
             Settings.Default.UpdaterTopPanelSplit = (double)TopPane.SplitterDistance / TopPane.Width;
             Settings.Default.UpdaterLeftPanelSplit = (double)LeftPane.SplitterDistance / LeftPane.Height;

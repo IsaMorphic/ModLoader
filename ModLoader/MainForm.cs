@@ -102,6 +102,44 @@ namespace ModLoader
             Refreshing = false;
         }
 
+        private void RefreshPackMeta(Pack pack)
+        {
+            if (pack?.Enabled == true)
+            {
+                PackImage.Image?.Dispose();
+
+                using (var stream = pack.Archive.GetEntry("_pack.png").Open())
+                    PackImage.Image = Image.FromStream(stream);
+
+                NameEdit.Text = pack.MetaData.Name;
+                AuthorEdit.Text = pack.MetaData.Author;
+
+                FallbackEdit.SelectedItem = (object)Game.Packs.SingleOrDefault(p => p.Id == pack.MetaData.Fallback) ?? "";
+                FallbackEdit.SelectedText = null;
+
+                NotesEdit.Text = pack.MetaData.Notes;
+            }
+            else
+            {
+                if (pack?.Enabled == false)
+                {
+                    using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("ModLoader.Resources.UnloadedPack.png"))
+                        PackImage.Image = Image.FromStream(stream);
+                }
+                else
+                {
+                    PackImage.Image = null;
+                }
+
+                NameEdit.Text = null;
+                AuthorEdit.Text = null;
+
+                FallbackEdit.SelectedItem = null;
+
+                NotesEdit.Text = null;
+            }
+        }
+
         private async void MainForm_Load(object sender, EventArgs e)
         {
             BeginInvoke((Action)Hide);
@@ -116,8 +154,10 @@ namespace ModLoader
             TopPane.SplitterDistance = (int)(Settings.Default.LoaderTopPanelSplit * TopPane.Width);
             BottomPane.SplitterDistance = (int)(Settings.Default.LoaderBottomPanelSplit * BottomPane.Width);
             PacksPane.SplitterDistance = (int)(Settings.Default.LoaderPacksPanelSplit * PacksPane.Width);
-            DetailsPane.SplitterDistance = (int)(Settings.Default.LoaderDetailsPanelSplit * MetaPane.Height);
+            DetailsPane.SplitterDistance = (int)(Settings.Default.LoaderDetailsPanelSplit * DetailsPane.Height);
             OtherPane.SplitterDistance = (int)(Settings.Default.LoaderOtherPanelSplit * OtherPane.Height);
+
+            WindowState = Settings.Default.LoaderMaximized ? FormWindowState.Maximized : FormWindowState.Normal;
 
             var waiter = new WaitingForm();
             waiter.Show();
@@ -155,27 +195,7 @@ namespace ModLoader
             UpdateButton.Enabled = true;
 
             RefreshModuleList();
-
-            if (pack.Enabled)
-            {
-                PackImage.Image?.Dispose();
-
-                using (var stream = pack.Archive.GetEntry("_pack.png").Open())
-                    PackImage.Image = Image.FromStream(stream);
-
-                NameEdit.Text = pack.MetaData.Name;
-                AuthorEdit.Text = pack.MetaData.Author;
-
-                FallbackEdit.SelectedItem = (object)Game.Packs.SingleOrDefault(p => p.Id == pack.MetaData.Fallback) ?? "";
-                FallbackEdit.SelectedText = null;
-
-                NotesEdit.Text = pack.MetaData.Notes;
-            }
-            else
-            {
-                using (var stream = System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("ModLoader.Resources.UnloadedPack.png"))
-                    PackImage.Image = Image.FromStream(stream);
-            }
+            RefreshPackMeta(pack);
         }
 
         private void ChangeList_SelectedIndexChanged(object sender, EventArgs e)
@@ -227,6 +247,8 @@ namespace ModLoader
 
             RefreshChangeList();
             RefreshModuleList();
+
+            RefreshPackMeta(pack);
         }
 
         private void ModuleList_ItemCheck(object sender, ItemCheckEventArgs e)
@@ -320,6 +342,9 @@ namespace ModLoader
             RefreshPackList();
             RefreshModuleList();
             RefreshChangeList();
+
+            var pack = PackList.SelectedItem as Pack;
+            RefreshPackMeta(pack);
         }
 
         private void OpenGameButton_Click(object sender, EventArgs e)
@@ -350,15 +375,24 @@ namespace ModLoader
 
         private async void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
-            Settings.Default.LoaderAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
-            Settings.Default.LoaderAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+            if (WindowState == FormWindowState.Maximized)
+            {
+                Settings.Default.LoaderMaximized = true;
+            }
+            else
+            {
+                Settings.Default.LoaderMaximized = false;
+                Settings.Default.LoaderAppWidth = (double)Width / Screen.PrimaryScreen.Bounds.Width;
+                Settings.Default.LoaderAppHeight = (double)Height / Screen.PrimaryScreen.Bounds.Height;
+            }
 
             Settings.Default.LoaderMainPanelSplit = (double)MainPane.SplitterDistance / MainPane.Height;
             Settings.Default.LoaderTopPanelSplit = (double)TopPane.SplitterDistance / TopPane.Width;
             Settings.Default.LoaderBottomPanelSplit = (double)BottomPane.SplitterDistance / BottomPane.Width;
             Settings.Default.LoaderPacksPanelSplit = (double)PacksPane.SplitterDistance / PacksPane.Width;
-            Settings.Default.LoaderDetailsPanelSplit = (double)DetailsPane.SplitterDistance / MetaPane.Height;
+            Settings.Default.LoaderDetailsPanelSplit = (double)DetailsPane.SplitterDistance / DetailsPane.Height;
             Settings.Default.LoaderOtherPanelSplit = (double)OtherPane.SplitterDistance / OtherPane.Height;
+            Settings.Default.LoaderMaximized = WindowState == FormWindowState.Maximized;
 
             Settings.Default.Save();
 

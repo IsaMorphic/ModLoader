@@ -29,6 +29,7 @@ namespace ModLoader
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(UpdaterForm));
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
@@ -303,6 +304,7 @@ namespace ModLoader
             // 
             this.ModuleList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.ModuleList.FormattingEnabled = true;
+            this.ModuleList.HorizontalScrollbar = true;
             this.ModuleList.IntegralHeight = false;
             this.ModuleList.ItemHeight = 37;
             this.ModuleList.Location = new System.Drawing.Point(3, 39);
@@ -469,6 +471,7 @@ namespace ModLoader
             this.ClientSize = new System.Drawing.Size(1511, 1024);
             this.Controls.Add(this.MainPane);
             this.Controls.Add(this.MenuBar);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuBar;
             this.Name = "UpdaterForm";
             this.Text = "UpdaterForm";

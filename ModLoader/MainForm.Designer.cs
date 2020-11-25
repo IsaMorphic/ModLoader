@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.ChangeList = new System.Windows.Forms.ListBox();
             this.ChangeGroup = new System.Windows.Forms.GroupBox();
             this.PackGroup = new System.Windows.Forms.GroupBox();
@@ -37,8 +38,11 @@
             this.PackContext = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.UpdateButton = new System.Windows.Forms.ToolStripMenuItem();
             this.MetaGroup = new System.Windows.Forms.GroupBox();
-            this.MetaPane = new System.Windows.Forms.TableLayoutPanel();
             this.DetailsPane = new System.Windows.Forms.SplitContainer();
+            this.PackImage = new System.Windows.Forms.PictureBox();
+            this.MetaPane = new System.Windows.Forms.TableLayoutPanel();
+            this.NotesGroup = new System.Windows.Forms.GroupBox();
+            this.NotesEdit = new System.Windows.Forms.TextBox();
             this.EditPane = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
             this.NameEdit = new System.Windows.Forms.TextBox();
@@ -46,9 +50,6 @@
             this.AuthorEdit = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.FallbackEdit = new System.Windows.Forms.ComboBox();
-            this.NotesGroup = new System.Windows.Forms.GroupBox();
-            this.NotesEdit = new System.Windows.Forms.TextBox();
-            this.PackImage = new System.Windows.Forms.PictureBox();
             this.ConflictGroup = new System.Windows.Forms.GroupBox();
             this.ConflictList = new System.Windows.Forms.CheckedListBox();
             this.ModuleGroup = new System.Windows.Forms.GroupBox();
@@ -69,6 +70,7 @@
             this.RunGameButton = new System.Windows.Forms.Button();
             this.LoadButton = new System.Windows.Forms.Button();
             this.RebuildButton = new System.Windows.Forms.Button();
+            this.splitter1 = new System.Windows.Forms.Splitter();
             this.ChangeGroup.SuspendLayout();
             this.PackGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PacksPane)).BeginInit();
@@ -77,14 +79,14 @@
             this.PacksPane.SuspendLayout();
             this.PackContext.SuspendLayout();
             this.MetaGroup.SuspendLayout();
-            this.MetaPane.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.DetailsPane)).BeginInit();
             this.DetailsPane.Panel1.SuspendLayout();
             this.DetailsPane.Panel2.SuspendLayout();
             this.DetailsPane.SuspendLayout();
-            this.EditPane.SuspendLayout();
-            this.NotesGroup.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.PackImage)).BeginInit();
+            this.MetaPane.SuspendLayout();
+            this.NotesGroup.SuspendLayout();
+            this.EditPane.SuspendLayout();
             this.ConflictGroup.SuspendLayout();
             this.ModuleGroup.SuspendLayout();
             this.MenuBar.SuspendLayout();
@@ -200,7 +202,7 @@
             // 
             // MetaGroup
             // 
-            this.MetaGroup.Controls.Add(this.MetaPane);
+            this.MetaGroup.Controls.Add(this.DetailsPane);
             this.MetaGroup.Dock = System.Windows.Forms.DockStyle.Fill;
             this.MetaGroup.Location = new System.Drawing.Point(0, 0);
             this.MetaGroup.Name = "MetaGroup";
@@ -209,39 +211,71 @@
             this.MetaGroup.TabStop = false;
             this.MetaGroup.Text = "Metadata";
             // 
-            // MetaPane
-            // 
-            this.MetaPane.ColumnCount = 1;
-            this.MetaPane.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.MetaPane.Controls.Add(this.DetailsPane, 0, 1);
-            this.MetaPane.Controls.Add(this.PackImage, 0, 0);
-            this.MetaPane.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MetaPane.Location = new System.Drawing.Point(3, 39);
-            this.MetaPane.Name = "MetaPane";
-            this.MetaPane.RowCount = 2;
-            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 49.99999F));
-            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.00001F));
-            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.MetaPane.Size = new System.Drawing.Size(443, 566);
-            this.MetaPane.TabIndex = 1;
-            // 
             // DetailsPane
             // 
             this.DetailsPane.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.DetailsPane.Location = new System.Drawing.Point(3, 285);
+            this.DetailsPane.Location = new System.Drawing.Point(3, 39);
             this.DetailsPane.Name = "DetailsPane";
             this.DetailsPane.Orientation = System.Windows.Forms.Orientation.Horizontal;
             // 
             // DetailsPane.Panel1
             // 
-            this.DetailsPane.Panel1.Controls.Add(this.EditPane);
+            this.DetailsPane.Panel1.Controls.Add(this.PackImage);
             // 
             // DetailsPane.Panel2
             // 
-            this.DetailsPane.Panel2.Controls.Add(this.NotesGroup);
-            this.DetailsPane.Size = new System.Drawing.Size(437, 278);
-            this.DetailsPane.SplitterDistance = 145;
+            this.DetailsPane.Panel2.Controls.Add(this.MetaPane);
+            this.DetailsPane.Size = new System.Drawing.Size(443, 566);
+            this.DetailsPane.SplitterDistance = 147;
             this.DetailsPane.TabIndex = 0;
+            // 
+            // PackImage
+            // 
+            this.PackImage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.PackImage.Location = new System.Drawing.Point(0, 0);
+            this.PackImage.Name = "PackImage";
+            this.PackImage.Size = new System.Drawing.Size(443, 147);
+            this.PackImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.PackImage.TabIndex = 0;
+            this.PackImage.TabStop = false;
+            // 
+            // MetaPane
+            // 
+            this.MetaPane.ColumnCount = 1;
+            this.MetaPane.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.MetaPane.Controls.Add(this.NotesGroup, 0, 1);
+            this.MetaPane.Controls.Add(this.EditPane, 0, 0);
+            this.MetaPane.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.MetaPane.Location = new System.Drawing.Point(0, 0);
+            this.MetaPane.Name = "MetaPane";
+            this.MetaPane.RowCount = 2;
+            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 49.99999F));
+            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50.00002F));
+            this.MetaPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.MetaPane.Size = new System.Drawing.Size(443, 415);
+            this.MetaPane.TabIndex = 3;
+            // 
+            // NotesGroup
+            // 
+            this.NotesGroup.Controls.Add(this.NotesEdit);
+            this.NotesGroup.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NotesGroup.Location = new System.Drawing.Point(3, 210);
+            this.NotesGroup.Name = "NotesGroup";
+            this.NotesGroup.Size = new System.Drawing.Size(437, 202);
+            this.NotesGroup.TabIndex = 8;
+            this.NotesGroup.TabStop = false;
+            this.NotesGroup.Text = "Notes:";
+            // 
+            // NotesEdit
+            // 
+            this.NotesEdit.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.NotesEdit.Location = new System.Drawing.Point(3, 39);
+            this.NotesEdit.Multiline = true;
+            this.NotesEdit.Name = "NotesEdit";
+            this.NotesEdit.ReadOnly = true;
+            this.NotesEdit.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.NotesEdit.Size = new System.Drawing.Size(431, 160);
+            this.NotesEdit.TabIndex = 0;
             // 
             // EditPane
             // 
@@ -255,14 +289,14 @@
             this.EditPane.Controls.Add(this.label3, 0, 2);
             this.EditPane.Controls.Add(this.FallbackEdit, 1, 2);
             this.EditPane.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.EditPane.Location = new System.Drawing.Point(0, 0);
+            this.EditPane.Location = new System.Drawing.Point(3, 3);
             this.EditPane.Name = "EditPane";
             this.EditPane.RowCount = 3;
             this.EditPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.EditPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
             this.EditPane.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 33.33333F));
-            this.EditPane.Size = new System.Drawing.Size(437, 145);
-            this.EditPane.TabIndex = 6;
+            this.EditPane.Size = new System.Drawing.Size(437, 201);
+            this.EditPane.TabIndex = 7;
             // 
             // label1
             // 
@@ -285,16 +319,16 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 48);
+            this.label2.Location = new System.Drawing.Point(3, 67);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(98, 48);
+            this.label2.Size = new System.Drawing.Size(98, 67);
             this.label2.TabIndex = 2;
             this.label2.Text = "Author:";
             // 
             // AuthorEdit
             // 
             this.AuthorEdit.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.AuthorEdit.Location = new System.Drawing.Point(112, 51);
+            this.AuthorEdit.Location = new System.Drawing.Point(112, 70);
             this.AuthorEdit.Name = "AuthorEdit";
             this.AuthorEdit.ReadOnly = true;
             this.AuthorEdit.Size = new System.Drawing.Size(322, 43);
@@ -303,9 +337,9 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(3, 96);
+            this.label3.Location = new System.Drawing.Point(3, 134);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(99, 49);
+            this.label3.Size = new System.Drawing.Size(99, 67);
             this.label3.TabIndex = 4;
             this.label3.Text = "Fallback:";
             // 
@@ -314,42 +348,10 @@
             this.FallbackEdit.Dock = System.Windows.Forms.DockStyle.Fill;
             this.FallbackEdit.Enabled = false;
             this.FallbackEdit.FormattingEnabled = true;
-            this.FallbackEdit.Location = new System.Drawing.Point(112, 99);
+            this.FallbackEdit.Location = new System.Drawing.Point(112, 137);
             this.FallbackEdit.Name = "FallbackEdit";
             this.FallbackEdit.Size = new System.Drawing.Size(322, 45);
             this.FallbackEdit.TabIndex = 5;
-            // 
-            // NotesGroup
-            // 
-            this.NotesGroup.Controls.Add(this.NotesEdit);
-            this.NotesGroup.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NotesGroup.Location = new System.Drawing.Point(0, 0);
-            this.NotesGroup.Name = "NotesGroup";
-            this.NotesGroup.Size = new System.Drawing.Size(437, 129);
-            this.NotesGroup.TabIndex = 1;
-            this.NotesGroup.TabStop = false;
-            this.NotesGroup.Text = "Notes:";
-            // 
-            // NotesEdit
-            // 
-            this.NotesEdit.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.NotesEdit.Location = new System.Drawing.Point(3, 39);
-            this.NotesEdit.Multiline = true;
-            this.NotesEdit.Name = "NotesEdit";
-            this.NotesEdit.ReadOnly = true;
-            this.NotesEdit.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.NotesEdit.Size = new System.Drawing.Size(431, 87);
-            this.NotesEdit.TabIndex = 0;
-            // 
-            // PackImage
-            // 
-            this.PackImage.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.PackImage.Location = new System.Drawing.Point(3, 3);
-            this.PackImage.Name = "PackImage";
-            this.PackImage.Size = new System.Drawing.Size(437, 276);
-            this.PackImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.PackImage.TabIndex = 1;
-            this.PackImage.TabStop = false;
             // 
             // ConflictGroup
             // 
@@ -609,6 +611,14 @@
             this.RebuildButton.UseVisualStyleBackColor = true;
             this.RebuildButton.Click += new System.EventHandler(this.RebuildButton_Click);
             // 
+            // splitter1
+            // 
+            this.splitter1.Location = new System.Drawing.Point(3, 39);
+            this.splitter1.Name = "splitter1";
+            this.splitter1.Size = new System.Drawing.Size(10, 142);
+            this.splitter1.TabIndex = 1;
+            this.splitter1.TabStop = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 37F);
@@ -616,6 +626,7 @@
             this.ClientSize = new System.Drawing.Size(1682, 1362);
             this.Controls.Add(this.MainPane);
             this.Controls.Add(this.MenuBar);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuBar;
             this.Margin = new System.Windows.Forms.Padding(9);
             this.Name = "MainForm";
@@ -631,16 +642,16 @@
             this.PacksPane.ResumeLayout(false);
             this.PackContext.ResumeLayout(false);
             this.MetaGroup.ResumeLayout(false);
-            this.MetaPane.ResumeLayout(false);
             this.DetailsPane.Panel1.ResumeLayout(false);
             this.DetailsPane.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.DetailsPane)).EndInit();
             this.DetailsPane.ResumeLayout(false);
-            this.EditPane.ResumeLayout(false);
-            this.EditPane.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.PackImage)).EndInit();
+            this.MetaPane.ResumeLayout(false);
             this.NotesGroup.ResumeLayout(false);
             this.NotesGroup.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.PackImage)).EndInit();
+            this.EditPane.ResumeLayout(false);
+            this.EditPane.PerformLayout();
             this.ConflictGroup.ResumeLayout(false);
             this.ModuleGroup.ResumeLayout(false);
             this.MenuBar.ResumeLayout(false);
@@ -693,8 +704,16 @@
         private System.Windows.Forms.ContextMenuStrip PackContext;
         private System.Windows.Forms.ToolStripMenuItem UpdateButton;
         private System.Windows.Forms.GroupBox MetaGroup;
-        private System.Windows.Forms.TableLayoutPanel MetaPane;
+        private System.Windows.Forms.GroupBox ActionGroup;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.Button RunGameButton;
+        private System.Windows.Forms.Button LoadButton;
+        private System.Windows.Forms.Button RebuildButton;
         private System.Windows.Forms.SplitContainer DetailsPane;
+        private System.Windows.Forms.PictureBox PackImage;
+        private System.Windows.Forms.TableLayoutPanel MetaPane;
+        private System.Windows.Forms.GroupBox NotesGroup;
+        private System.Windows.Forms.TextBox NotesEdit;
         private System.Windows.Forms.TableLayoutPanel EditPane;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox NameEdit;
@@ -702,14 +721,7 @@
         private System.Windows.Forms.TextBox AuthorEdit;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.ComboBox FallbackEdit;
-        private System.Windows.Forms.PictureBox PackImage;
-        private System.Windows.Forms.GroupBox NotesGroup;
-        private System.Windows.Forms.TextBox NotesEdit;
-        private System.Windows.Forms.GroupBox ActionGroup;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.Button RunGameButton;
-        private System.Windows.Forms.Button LoadButton;
-        private System.Windows.Forms.Button RebuildButton;
+        private System.Windows.Forms.Splitter splitter1;
     }
 }
 

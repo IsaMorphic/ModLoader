@@ -3,19 +3,19 @@
   <Profiles />
   <Settings>
     <Setting Name="LoaderMainPanelSplit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.5</Value>
+      <Value Profile="(Default)">0.55</Value>
     </Setting>
     <Setting Name="LoaderTopPanelSplit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.25</Value>
     </Setting>
     <Setting Name="LoaderBottomPanelSplit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.25</Value>
+      <Value Profile="(Default)">0.35</Value>
     </Setting>
     <Setting Name="LoaderPacksPanelSplit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.75</Value>
+      <Value Profile="(Default)">0.6</Value>
     </Setting>
     <Setting Name="LoaderDetailsPanelSplit" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.6</Value>
+      <Value Profile="(Default)">0.4</Value>
     </Setting>
     <Setting Name="LoaderOtherPanelSplit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.4</Value>
@@ -24,10 +24,10 @@
       <Value Profile="(Default)">0.75</Value>
     </Setting>
     <Setting Name="LoaderAppWidth" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.4</Value>
+      <Value Profile="(Default)">0.45</Value>
     </Setting>
     <Setting Name="LoaderAppHeight" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">0.6</Value>
+      <Value Profile="(Default)">0.7</Value>
     </Setting>
     <Setting Name="MergerMainPanelSplit" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.6</Value>
@@ -64,6 +64,15 @@
     </Setting>
     <Setting Name="UpdaterAppHeight" Type="System.Double" Scope="User">
       <Value Profile="(Default)">0.6</Value>
+    </Setting>
+    <Setting Name="LoaderMaximized" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="MergerMaximized" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="UpdaterMaximized" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>
 </SettingsFile>
