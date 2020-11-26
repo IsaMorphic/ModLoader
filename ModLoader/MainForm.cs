@@ -111,8 +111,8 @@ namespace ModLoader
                 using (var stream = pack.Archive.GetEntry("_pack.png").Open())
                     PackImage.Image = Image.FromStream(stream);
 
-                NameEdit.Text = pack.MetaData.Name;
-                AuthorEdit.Text = pack.MetaData.Author;
+                NameEdit.Text = pack.MetaData.Name ?? "Unnamed";
+                AuthorEdit.Text = pack.MetaData.Author ?? "Unknown";
 
                 FallbackEdit.SelectedItem = (object)Game.Packs.SingleOrDefault(p => p.Id == pack.MetaData.Fallback) ?? "";
                 FallbackEdit.SelectedText = null;
@@ -406,8 +406,10 @@ namespace ModLoader
 
         private void UpdateButton_Click(object sender, EventArgs e)
         {
-            new UpdaterForm((PackList.SelectedItem as Pack)).ShowDialog();
-            RebuildButton.PerformClick();
+            var updater = new UpdaterForm(PackList.SelectedItem as Pack);
+            updater.ShowDialog();
+
+            if (!updater.Abandoning) RebuildButton.PerformClick();
         }
     }
 }

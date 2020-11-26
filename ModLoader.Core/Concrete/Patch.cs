@@ -51,7 +51,7 @@ namespace ModLoader.Core
                 if (group.Base == null)
                     throw new InvalidOperationException($"Attempted to load a patch with an unresolved base.\nOffending Pack: {group.Parent}");
 
-                if (group.Root.Graph.Table[group.Name] == group.Id) return;
+                if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 var file = await group.Root.Files.StageFileAsync(group.Name);
 
@@ -69,12 +69,15 @@ namespace ModLoader.Core
 
                     await group.Root.Files.CommitFileAsync(file);
 
-                    group.Root.Graph.Table[group.Name] = group.Id;
+                    if (group.Root.Graph.Table.ContainsKey(group.Name))
+                        group.Root.Graph.Table[group.Name] = group.Id;
+                    else
+                        group.Root.Graph.Table.Add(group.Name, group.Id);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     await group.Root.Files.UnstageFileAsync(file);
-                    throw ex;
+                    throw;
                 }
             }
         }

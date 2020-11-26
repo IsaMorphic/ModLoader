@@ -104,8 +104,8 @@ namespace ModLoader.Core
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,
-                    Name = "Unnamed",
-                    Author = "Unknown",
+                    Name = null,
+                    Author = null,
                     Notes = "This pack is missing its _meta.json file. Please update this pack to add some."
                 };
             }
@@ -244,7 +244,7 @@ namespace ModLoader.Core
 
         public override string ToString()
         {
-            return Name;
+            return MetaData.Name ?? Name;
         }
     }
 }

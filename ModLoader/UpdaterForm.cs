@@ -15,6 +15,8 @@ namespace ModLoader
 
         private Game Game => Updater.Pack.Parent;
 
+        public bool Abandoning { get; private set; }
+
         public UpdaterForm(Pack pack)
         {
             Updater = new PackUpdater(pack);
@@ -199,6 +201,8 @@ namespace ModLoader
 
                 if (e.Cancel = result == DialogResult.No) 
                     return;
+
+                Abandoning = true;
             }
 
             if (WindowState == FormWindowState.Maximized)

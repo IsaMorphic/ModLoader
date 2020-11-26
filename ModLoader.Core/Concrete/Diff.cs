@@ -81,7 +81,7 @@ namespace ModLoader.Core
                 if (group.Base == null)
                     throw new InvalidOperationException($"Attempted to load a diff with an unresolved base.\nOffending Pack: {group.Parent}");
 
-                if (group.Root.Graph.Table[group.Name] == group.Id) return;
+                if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 List<string> lines = new List<string>();
                 List<long> indicies = new List<long>();
@@ -142,9 +142,20 @@ namespace ModLoader.Core
 
                 await writer.FlushAsync();
 
-                await group.Root.Files.CommitFileAsync(file);
+                try
+                {
+                    await group.Root.Files.CommitFileAsync(file);
 
-                group.Root.Graph.Table[group.Name] = group.Id;
+                    if (group.Root.Graph.Table.ContainsKey(group.Name))
+                        group.Root.Graph.Table[group.Name] = group.Id;
+                    else
+                        group.Root.Graph.Table.Add(group.Name, group.Id);
+                }
+                catch (Exception)
+                {
+                    await group.Root.Files.UnstageFileAsync(file);
+                    throw;
+                }
             }
         }
 
@@ -188,6 +199,9 @@ namespace ModLoader.Core
 
                     bool validIdxLine = int.TryParse(line.Remove(0, 2), out int offset) && line.StartsWith(": ");
                     bool validSearchLine = !string.IsNullOrWhiteSpace(line.Remove(0, 2)) && line.StartsWith("= ");
+
+                    if (offset < 0)
+                        offset = baseText.Count + offset;
 
                     if (!validIdxLine)
                     {

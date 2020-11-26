@@ -52,8 +52,11 @@ namespace ModLoader.Core
             string localDir = Path.GetDirectoryName(localFile);
             Directory.CreateDirectory(localDir);
 
-            return Task.Run(() => File.Copy(tempFile, localFile, true))
-                .ContinueWith(t => File.Delete(tempFile));
+            return Task.Run(() =>
+            {
+                File.Copy(tempFile, localFile, true);
+                File.Delete(tempFile);
+            });
         }
 
         public Task RemoveFileAsync(string path)
