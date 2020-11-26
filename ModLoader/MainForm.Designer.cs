@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.ChangeList = new System.Windows.Forms.ListBox();
             this.ChangeGroup = new System.Windows.Forms.GroupBox();
             this.PackGroup = new System.Windows.Forms.GroupBox();
@@ -626,12 +625,13 @@
             this.ClientSize = new System.Drawing.Size(1682, 1362);
             this.Controls.Add(this.MainPane);
             this.Controls.Add(this.MenuBar);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuBar;
             this.Margin = new System.Windows.Forms.Padding(9);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ModLoader";
+            this.Icon = new System.Drawing.Icon(GetType().Assembly
+                .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ChangeGroup.ResumeLayout(false);

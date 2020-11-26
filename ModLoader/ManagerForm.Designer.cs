@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ManagerForm));
             this.GameList = new System.Windows.Forms.ListBox();
             this.ModuleGroup = new System.Windows.Forms.GroupBox();
             this.LoadGameButton = new System.Windows.Forms.Button();
@@ -107,7 +106,8 @@
             this.Controls.Add(this.LoadGameButton);
             this.Controls.Add(this.ModuleGroup);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = new System.Drawing.Icon(GetType().Assembly
+                .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
             this.Margin = new System.Windows.Forms.Padding(9, 9, 9, 9);
             this.MaximizeBox = false;
             this.Name = "ManagerForm";

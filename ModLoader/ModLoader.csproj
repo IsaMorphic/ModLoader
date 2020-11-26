@@ -8,10 +8,18 @@
     <Company>Chosen Few Software</Company>
     <PackageId>ModLoader</PackageId>
     <Version>1.14</Version>
-    <ApplicationIcon>ModLoader_Logo.ico</ApplicationIcon>
+    <ApplicationIcon>Logo\Icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\*" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Remove="Logo\Icon.ico" />
+    <None Remove="Logo\Translucent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Logo\Icon.ico" />
+    <EmbeddedResource Include="Logo\Translucent.png" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.IO.Compression" Version="4.3.0" />

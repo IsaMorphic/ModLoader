@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(GameForm));
             this.FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             this.Step1Label = new System.Windows.Forms.Label();
             this.FolderBrowseButton = new System.Windows.Forms.Button();
@@ -103,7 +102,8 @@
             this.Controls.Add(this.FolderBrowseButton);
             this.Controls.Add(this.Step1Label);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = new System.Drawing.Icon(GetType().Assembly
+                .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
             this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.MaximizeBox = false;
             this.Name = "GameForm";

@@ -31,7 +31,6 @@ namespace ModLoader
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MergerForm<T>));
             this.TextBox = new System.Windows.Forms.RichTextBox();
             this.ConflictList = new System.Windows.Forms.CheckedListBox();
             this.ConflictGroup = new System.Windows.Forms.GroupBox();
@@ -276,7 +275,8 @@ namespace ModLoader
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1570, 1058);
             this.Controls.Add(this.MainPane);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Icon = new System.Drawing.Icon(GetType().Assembly
+                .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
             this.Margin = new System.Windows.Forms.Padding(9, 10, 9, 10);
             this.Name = "MergerForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
