@@ -27,7 +27,7 @@ namespace ModLoader.Core
         }
     }
 
-    public class Hunk : Xunk<Hunk>
+    public class Hunk : Xunk<Hunk>, IExceptional
     {
         public List<Line> Lines { get; }
 
@@ -78,9 +78,6 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Hunk> group)
             {
-                if (group.Base == null)
-                    throw new InvalidOperationException($"Attempted to load a diff with an unresolved base.\nOffending Pack: {group.Parent}");
-
                 if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 List<string> lines = new List<string>();
@@ -105,9 +102,6 @@ namespace ModLoader.Core
                     .Where(m => m != null)
                     .OrderBy(m => m.Offset))
                 {
-                    if (hunk.Errors.Any())
-                        throw new InvalidOperationException($"Cannot load diff because one or more hunks is in an error state.\nOffending module: {group}");
-
                     int index = indicies.LastIndexOf(hunk.Offset);
                     foreach (var line in hunk.Lines)
                     {
@@ -217,18 +211,18 @@ namespace ModLoader.Core
                             }
                             catch (InvalidOperationException)
                             {
-                                errors.Add(new FormatException($"Could not find \"{str}\" in _base_ version of module.\nOffending line: \"{line}\""));
+                                errors.Add(new FormatException($"Could not find \"{str}\" in _base_ version of module.\nOffending line: \"{line}\"\nOffending module: {this}"));
                                 offset = -1;
                             }
                         }
                         else
                         {
-                            errors.Add(new FormatException($"Invalid hunk header. Expecting a line starting with: \": <line number>\" or \"= <search string>\".\nOffending line: \"{line}\""));
+                            errors.Add(new FormatException($"Invalid hunk header. Expecting a line starting with: \": <line number>\" or \"= <search string>\".\nOffending line: \"{line}\"\nOffending module: {this}"));
                         }
                     }
                     else if (offset < 0 || offset > baseText.Count - 1)
                     {
-                        errors.Add(new FormatException($"Line offset \"{offset}\" is out of the file's bounds.\nOffending line: \"{line}\""));
+                        errors.Add(new FormatException($"Line offset \"{offset}\" is out of the file's bounds.\nOffending line: \"{line}\"\nOffending module: {this}"));
                     }
 
                     List<Line> lines = new List<Line>();
@@ -257,7 +251,7 @@ namespace ModLoader.Core
                         else if (line.StartsWith("> "))
                         {
                             if (lines.Any())
-                                errors.Add(new FormatException($"If a hunk has a \">\" line present, it must be the only line in the hunk. Bogus? Maybe. Ask Yoda and Polly, but do so at your own risk...\nOffending line: \"{line}\""));
+                                errors.Add(new FormatException($"If a hunk has a \">\" line present, it must be the only line in the hunk. Bogus? Maybe. Ask Yoda and Polly, but do so at your own risk...\nOffending line: \"{line}\"\nOffending module: {this}"));
                             else
                             {
                                 lines.Add(new Line("", Operation.Remove));
@@ -266,7 +260,7 @@ namespace ModLoader.Core
                         }
                         else if (!string.IsNullOrWhiteSpace(line))
                         {
-                            errors.Add(new FormatException($"Expected line starting with \"+\", \"-\", \"|\", or \">\".\nOffending line: \"{line}\""));
+                            errors.Add(new FormatException($"Expected line starting with \"+\", \"-\", \"|\", or \">\".\nOffending line: \"{line}\"\nOffending module: {this}"));
                         }
 
                         if (reader.EndOfStream)
@@ -279,7 +273,7 @@ namespace ModLoader.Core
 
                     if (Xunks.Select(h => h.ResolveSelf())
                         .Any(h => h.CanMergeWith(hunk) || hunk.CanMergeWith(h)))
-                        hunk.Errors.Add(new ConflictException<Hunk>("This hunk conflicts with a hunk in this diff that was parsed prior."));
+                        hunk.Errors.Add(new ConflictException<Hunk>($"This hunk conflicts with a hunk in this diff that was parsed prior.\nOffending module: {this}"));
 
                     Xunks.Add(hunk);
                 }
@@ -289,12 +283,6 @@ namespace ModLoader.Core
         public override Stream GetDataStream()
         {
             return Parent.Archive.GetEntry($"{Name}.diff").Open();
-        }
-
-        public override string ToString()
-        {
-            bool hasErrors = Xunks.SelectMany(m => m.ResolveSelf()?.Errors ?? new HashSet<Exception>()).Any();
-            return (hasErrors ? "[ERROR] " : "") + base.ToString();
         }
     }
 }

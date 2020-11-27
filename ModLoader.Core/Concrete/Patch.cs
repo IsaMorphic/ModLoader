@@ -48,9 +48,6 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Chunk> group)
             {
-                if (group.Base == null)
-                    throw new InvalidOperationException($"Attempted to load a patch with an unresolved base.\nOffending Pack: {group.Parent}");
-
                 if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 var file = await group.Root.Files.StageFileAsync(group.Name);

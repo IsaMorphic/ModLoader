@@ -20,11 +20,20 @@ namespace ModLoader.Core.Abstract
         }
     }
 
-    public class XunkGroup<T> : Module, IGroup<IPotential<T>>
+    public class XunkGroup<T> : Module, IGroup<IPotential<T>>, IExceptional
         where T : Xunk<T>
     {
         public Module Base { get; }
         public HashSet<IPotential<T>> Xunks { get; }
+
+        private HashSet<Exception> Errors { get; }
+
+        HashSet<Exception> IExceptional.Errors => Xunks
+            .SelectMany(m => (m as IExceptional)?.Errors ?? new HashSet<Exception>())
+            .Concat(Errors)
+            .ToHashSet();
+
+        public bool HasErrors => (this as IExceptional).Errors.Any();
 
         IEnumerable<IPotential<T>> IGroup<IPotential<T>>.Members => Xunks;
 
@@ -32,14 +41,20 @@ namespace ModLoader.Core.Abstract
         {
             Xunks = new HashSet<IPotential<T>>();
             Base = this.ResolveFull().FirstOrDefault(r => r.GetType() == typeof(Module)) as Module;
+
+            Errors = new HashSet<Exception>();
             if (Base == null)
-                throw new InvalidOperationException($"Attempted to initialize a xunk group with no viable base.\nOffending Module: {this}");
+                Errors.Add(new InvalidOperationException($"Attempted to initialize a xunk group with no viable base.\nOffending module: {this}"));
         }
 
         public XunkGroup(Pack parent, string name, Module @base, HashSet<IPotential<T>> xunks) : base(parent, name, Guid.NewGuid())
         {
             Xunks = xunks;
             Base = @base;
+
+            Errors = new HashSet<Exception>();
+            if (Base == null)
+                Errors.Add(new InvalidOperationException($"This xunk group has an unresolved base.\nOffending pack: {Parent}"));
         }
 
         public override IPotential<Module> MergeWith(HashSet<IResolvable<Module>> others)
@@ -60,6 +75,11 @@ namespace ModLoader.Core.Abstract
         public override Task LoadSelfAsync()
         {
             return (XunkLoader.Loaders[typeof(T)] as IXunkLoader<T>).LoadAsync(this);
+        }
+
+        public override string ToString()
+        {
+            return (HasErrors ? "[ERROR] " : "") + base.ToString();
         }
     }
 }

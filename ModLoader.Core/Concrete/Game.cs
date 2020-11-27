@@ -245,7 +245,7 @@ namespace ModLoader.Core
                 foreach (var moduleConfig in packConfig.Value.Modules)
                 {
                     var module = pack.Members
-                        .Select(m => m.ResolveSelf())
+                        .Cast<Module>()
                         .SingleOrDefault(m => m.Name == moduleConfig.Key);
 
                     if (module == null) continue;
@@ -284,7 +284,7 @@ namespace ModLoader.Core
                 var packConfig = new Config.Pack()
                 {
                     Enabled = pack.Enabled,
-                    Fallback = pack.Fallback?.ResolveSelf().Name,
+                    Fallback = null
                 };
 
                 foreach (var module in pack.Members.Cast<Module>())
@@ -381,7 +381,19 @@ namespace ModLoader.Core
 
         public async Task LoadModulesAsync()
         {
-            foreach (var module in Modules.ResolveSelf().Members.Select(m => m.ResolveSelf()))
+            var modules = Modules
+                .ResolveSelf().Members
+                .Select(m => m.ResolveSelf())
+                .ToHashSet();
+
+            var ex = modules
+                .Where(m => m is IExceptional)
+                .SelectMany(m => (m as IExceptional).Errors)
+                .FirstOrDefault();
+
+            if (ex != null) throw ex;
+
+            foreach (var module in modules)
             {
                 await module.LoadAsync();
             }

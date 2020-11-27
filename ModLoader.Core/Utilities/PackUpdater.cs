@@ -60,7 +60,7 @@ namespace ModLoader.Core.Utilities
         {
             Pack = pack;
             Pack.Unload();
-            PackPath = Path.Combine(Pack.Parent.ModPath, $"{Pack}.zip");
+            PackPath = Path.Combine(Pack.Parent.ModPath, $"{Pack.Name}.zip");
         }
 
         public async Task RevertChangesAsync()
@@ -81,8 +81,8 @@ namespace ModLoader.Core.Utilities
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,
-                    Name = "Unnamed",
-                    Author = "Unknown",
+                    Name = null,
+                    Author = null,
                     Notes = "This pack is missing its _meta.json file. Please update this pack to add some."
                 };
             }
