@@ -28,7 +28,7 @@ namespace ModLoader.Core.Abstract
                     .Select(x => new Prioritized<T>(x.ResolveSelf(), m.Priority))
                     );
 
-            var resolver = new MergeFilter<T>(
+            var resolver =
                 new PotentialFilter<T>(
                     new PriorityFilter<T>(
                         new MergeFilter<IResolvable<T>>(
@@ -37,8 +37,7 @@ namespace ModLoader.Core.Abstract
                                 )
                             )
                         )
-                    )
-                );
+                    );
             var resolved = resolver.ResolveSelf().Members;
 
             return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base, new HashSet<IPotential<T>>(resolved));

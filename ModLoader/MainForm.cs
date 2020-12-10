@@ -265,15 +265,17 @@ namespace ModLoader
 
         private async void LoadButton_Click(object sender, EventArgs e)
         {
-            Hide();
-
             var waiter = new WaitingForm();
-            waiter.Show();
 
             try
             {
+                var modules = Game.ResolveModules();
+
+                Hide();
+                waiter.Show();
+
                 await Game.ReloadBaseModulesAsync();
-                await Game.LoadModulesAsync();
+                await Game.LoadModulesAsync(modules);
                 await Game.SaveConfigAsync();
                 await Game.SaveGraphAsync();
 

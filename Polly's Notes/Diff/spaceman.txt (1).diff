@@ -1,0 +1,15 @@
+= scale
+-
++ scale = 0.3
+= acceleration
+-
++ acceleration = 5
+= tiptoe_speed
+- 
++ tiptoe_speed=0.3
+= walk_speed
+-
++ walk_speed=1
+= run_speed
+-
++ run_speed=1.5

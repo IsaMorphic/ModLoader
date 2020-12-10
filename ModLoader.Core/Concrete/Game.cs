@@ -379,7 +379,7 @@ namespace ModLoader.Core
             return Task.Run(proc.WaitForExit);
         }
 
-        public async Task LoadModulesAsync()
+        public HashSet<Module> ResolveModules()
         {
             var modules = Modules
                 .ResolveSelf().Members
@@ -393,6 +393,11 @@ namespace ModLoader.Core
 
             if (ex != null) throw ex;
 
+            return modules;
+        }
+
+        public async Task LoadModulesAsync(HashSet<Module> modules)
+        { 
             foreach (var module in modules)
             {
                 await module.LoadAsync();

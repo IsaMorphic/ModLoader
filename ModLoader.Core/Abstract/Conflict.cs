@@ -6,7 +6,7 @@ namespace ModLoader.Core.Abstract
 {
     using Exceptions;
 
-    public class Conflict<T> : IPotential<T>
+    public class Conflict<T> : IPotential<T>, IExceptional
         where T : class
     {
 
@@ -15,6 +15,12 @@ namespace ModLoader.Core.Abstract
         public IResolvable<T> Instigator { get; }
 
         public HashSet<IResolvable<T>> Conflictors { get; }
+
+        HashSet<Exception> IExceptional.Errors => 
+            new HashSet<Exception> 
+            { 
+                new ConflictException<T>($"Execution halted because mergable with name: \"{Name}\" instigated a conflict.\nPlease resolve the conflict before trying again.", this) 
+            };
 
         public Conflict(string name, IResolvable<T> instigator, HashSet<IResolvable<T>> conflictors)
         {
