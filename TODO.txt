@@ -14,3 +14,5 @@ folder and reloads?)
 ^ do this as well
 
 See .\Polly's Notes\ for more
+
+Bug: FTP filesystem fails when trying to load a file into a directory that does not exist
