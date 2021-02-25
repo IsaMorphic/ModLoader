@@ -27,9 +27,9 @@ namespace ModLoader.Core.Abstract
                 .Select(m => m.ResolveSelf() as XunkGroup<T>)
                 .Select(m => new TrivialPotential<IGroup<IPotential<T>>>(m));
 
-            var resolver = new MergeFilter<T>(
+            var resolver = new MergeFilter<T, XunkKey>(
                 new ResolveFilter<T>(
-                    new CastFilter<IPotential<T>, IMergeable<T>>(
+                    new CastFilter<IPotential<T>, IMergeable<T, XunkKey>>(
                         new GroupMerger<IPotential<T>>(new HashSet<IPotential<IGroup<IPotential<T>>>>(groups))
                         )
                     )
@@ -41,20 +41,8 @@ namespace ModLoader.Core.Abstract
 
         public override string ToString()
         {
-            var groups = Mergers
-                .Select(m => m.ResolveSelf() as XunkGroup<T>)
-                .Select(m => new TrivialPotential<IGroup<IPotential<T>>>(m));
-
-            var resolver = new MergeFilter<T>(
-                new ResolveFilter<T>(
-                    new CastFilter<IPotential<T>, IMergeable<T>>(
-                        new GroupMerger<IPotential<T>>(new HashSet<IPotential<IGroup<IPotential<T>>>>(groups))
-                        )
-                    )
-                );
-            var resolved = resolver.ResolveSelf().Members;
-
-            return $"({(resolved.Any(x => x is Conflict<T>) ? "CONFLICT" : "MERGER")}) {Base?.Name ?? "[ERROR: UNRESOLVED]"}";
+            var self = ResolveSelf() as XunkGroup<T>;
+            return $"({(self.Xunks.Any(x => x is Conflict<T>) ? "CONFLICT" : "MERGER")}) {Base?.Name ?? "[ERROR: UNRESOLVED]"}";
         }
     }
 }

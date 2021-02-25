@@ -11,7 +11,7 @@ namespace ModLoader.Core
     using Abstract;
     using Persistence;
 
-    public class Pack : IGroup<Module>, IGroup<Prioritized<Module>>, ILoadable<Pack>
+    public class Pack : IGroup<Module>, IGroup<Prioritized<Module, string>>, ILoadable<Pack>
     {
         public class Meta
         {
@@ -46,7 +46,7 @@ namespace ModLoader.Core
         public HashSet<Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members;
 
-        IEnumerable<Prioritized<Module>> IGroup<Prioritized<Module>>.Members => Members.Select(m => new PrioritizedModule(m, DependencyLevel));
+        IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Select(m => new PrioritizedModule(m, DependencyLevel));
 
         public Graph Graph { get; private set; }
 

@@ -8,7 +8,7 @@ namespace ModLoader.Core
 {
     using Abstract;
 
-    public class Module : ILoadable<Module>, IMergeable<Module>
+    public class Module : ILoadable<Module>, IMergeable<Module, string>
     {
         public Guid Id { get; }
 
@@ -32,6 +32,8 @@ namespace ModLoader.Core
         public bool Enabled { get; set; }
 
         bool IResolvable<Module>.Enabled => Enabled && ((Parent as IResolvable<Pack>)?.Enabled ?? true);
+
+        public string MergeKey => Name;
 
         public Module(Pack parent, string name, Guid id)
         {

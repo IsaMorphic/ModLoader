@@ -1,20 +1,21 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class PrioritizeFilter<T> : GroupFilter<IMergeable<T>, Prioritized<T>>
+    public class PrioritizeFilter<T, U> : GroupFilter<IMergeable<T, U>, Prioritized<T, U>>
         where T : class
     {
-        public PrioritizeFilter(IPotential<IGroup<IMergeable<T>>> input) : base(input)
+        public PrioritizeFilter(IPotential<IGroup<IMergeable<T, U>>> input) : base(input)
         {
         }
 
-        public override IGroup<Prioritized<T>> Apply(IGroup<IMergeable<T>> group)
+        public override IGroup<Prioritized<T, U>> Apply(IGroup<IMergeable<T, U>> group)
         {
-            var filtered = group.Members.Select(m => new Prioritized<T>(m, 0));
-            return new Group<Prioritized<T>>(filtered);
+            var filtered = group.Members.Select(m => new Prioritized<T, U>(m, 0));
+            return new Group<Prioritized<T, U>>(filtered);
         }
     }
 }

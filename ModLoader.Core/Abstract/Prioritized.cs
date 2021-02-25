@@ -1,22 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace ModLoader.Core.Abstract
 {
-    public class Prioritized<T> : IMergeable<IResolvable<T>>
+    public class Prioritized<T, U> : IMergeable<IResolvable<T>, U>
         where T : class
     {
         public int Priority { get; }
-        public IMergeable<T> Inner { get; }
+        public IMergeable<T, U> Inner { get; }
 
-        public Prioritized(IMergeable<T> inner, int priority)
+        public Prioritized(IMergeable<T, U> inner, int priority)
         {
             Priority = priority;
             Inner = inner;
         }
 
-        public IResolvable<IResolvable<T>> Fallback => Inner.Fallback == null ? null : new Prioritized<T>(Inner.Fallback as IMergeable<T>, Priority + 1);
+        public IResolvable<IResolvable<T>> Fallback => Inner.Fallback == null ? null : new Prioritized<T, U>(Inner.Fallback as IMergeable<T, U>, Priority + 1);
         public bool Enabled => Inner.Enabled;
+
+        public U MergeKey => Inner.MergeKey;
 
         public IResolvable<T> ResolveSelf()
         {
@@ -25,13 +28,13 @@ namespace ModLoader.Core.Abstract
 
         public virtual bool CanMergeWith(IResolvable<IResolvable<T>> other)
         {
-            return Inner.CanMergeWith((other as Prioritized<T>).Inner);
+            return MergeKey.Equals((other as Prioritized<T, U>).MergeKey);
         }
 
         public IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
         {
             others.Add(this);
-            var resolved = others.Cast<Prioritized<T>>()
+            var resolved = others.Cast<Prioritized<T, U>>()
                 .GroupBy(o => o.Priority)
                 .OrderBy(g => g.Key)
                 .First()

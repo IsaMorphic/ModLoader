@@ -11,9 +11,9 @@ namespace ModLoader.Core.Abstract
         public Module Base { get; }
         public Pack Parent { get; }
 
-        public HashSet<Prioritized<Module>> Mergers { get; }
+        public HashSet<Prioritized<Module, string>> Mergers { get; }
 
-        public PrioritizedXunkMerger(Pack parent, Module @base, HashSet<Prioritized<Module>> mergers)
+        public PrioritizedXunkMerger(Pack parent, Module @base, HashSet<Prioritized<Module, string>> mergers)
         {
             Base = @base;
             Parent = parent;
@@ -25,15 +25,15 @@ namespace ModLoader.Core.Abstract
         {
             var group = Mergers
                 .SelectMany(m => (m.ResolveSelf() as XunkGroup<T>).Xunks
-                    .Select(x => new Prioritized<T>(x.ResolveSelf(), m.Priority))
+                    .Select(x => new Prioritized<T, XunkKey>(x.ResolveSelf(), m.Priority))
                     );
 
             var resolver =
                 new PotentialFilter<T>(
                     new PriorityFilter<T>(
-                        new MergeFilter<IResolvable<T>>(
-                            new TrivialPotential<IGroup<Prioritized<T>>>(
-                                new Group<Prioritized<T>>(group)
+                        new MergeFilter<IResolvable<T>, XunkKey>(
+                            new TrivialPotential<IGroup<Prioritized<T, XunkKey>>>(
+                                new Group<Prioritized<T, XunkKey>>(group)
                                 )
                             )
                         )

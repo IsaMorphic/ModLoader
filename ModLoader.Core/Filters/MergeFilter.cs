@@ -5,64 +5,35 @@ namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class MergeFilter<T> : GroupFilter<IMergeable<T>, IPotential<T>>
+    public class MergeFilter<T, U> : GroupFilter<IMergeable<T, U>, IPotential<T>>
         where T : class
     {
-        public MergeFilter(IPotential<IGroup<IMergeable<T>>> input) : base(input)
+        public MergeFilter(IPotential<IGroup<IMergeable<T, U>>> input) : base(input)
         {
         }
 
-        class MergingUnit
+        public override IGroup<IPotential<T>> Apply(IGroup<IMergeable<T, U>> group)
         {
-            public IMergeable<T> Unit { get; }
-            public HashSet<MergingUnit> Mergers { get; set; }
+            var groups = new Dictionary<U, HashSet<IMergeable<T, U>>>();
 
-            public MergingUnit(IMergeable<T> unit)
+            foreach (var member in group.Members)
             {
-                Unit = unit;
-                Mergers = new HashSet<MergingUnit>();
-            }
-        }
-
-        public override IGroup<IPotential<T>> Apply(IGroup<IMergeable<T>> group)
-        {
-            HashSet<MergingUnit> units =
-                new HashSet<MergingUnit>(group.Members
-                    .Select(m => new MergingUnit(m))
-                    );
-
-            foreach (var thisUnit in units)
-            {
-                foreach (var otherUnit in units)
-                {
-                    if (thisUnit != otherUnit && thisUnit.Unit.CanMergeWith(otherUnit.Unit))
-                    {
-                        thisUnit.Mergers.Add(otherUnit);
-                        otherUnit.Mergers.Add(thisUnit);
-                    }
-                }
+                if (!groups.ContainsKey(member.MergeKey))
+                    groups.Add(member.MergeKey, new HashSet<IMergeable<T, U>> { member });
+                else
+                    groups[member.MergeKey].Add(member);
             }
 
-            HashSet<IPotential<T>> merged =
-                new HashSet<IPotential<T>>(units
-                .Where(u => !u.Mergers.Any())
-                .Select(u => u.Unit)
-                );
-
-            HashSet<MergingUnit> instigators = new HashSet<MergingUnit>();
-
-            foreach (var thisUnit in units.Where(u => u.Mergers.Any()))
+            HashSet<IPotential<T>> merged = new HashSet<IPotential<T>>();
+            foreach (var g in groups.Values)
             {
-                var members = thisUnit.Mergers
-                    .Except(instigators.Concat(instigators.SelectMany(u => u.Mergers)).Distinct())
-                    .Select(u => u.Unit);
+                var instigator = g.First();
+                var mergers = g.Skip(1);
 
-                if (members.Any())
-                {
-                    var merger = thisUnit.Unit.MergeWith(new HashSet<IResolvable<T>>(members));
-                    instigators.Add(thisUnit);
-                    merged.Add(merger);
-                }
+                if (mergers.Any())
+                    merged.Add(instigator.MergeWith(mergers.Cast<IResolvable<T>>().ToHashSet()));
+                else
+                    merged.Add(instigator);
             }
 
             return new Group<IPotential<T>>(merged);

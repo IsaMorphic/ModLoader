@@ -17,18 +17,18 @@ namespace ModLoader.Core.Filters
         {
             var resolved = group.Members
                 .Select(m => m.ResolveFull()
-                    .Cast<Prioritized<Module>>()
+                    .Cast<Prioritized<Module, string>>()
                     );
             var filtered = resolved
                 .Select(g => (a: g.Select(m => m.ResolveSelf()), b: g.TakeWhile(r => r.ResolveSelf().GetType() != typeof(Module))))
                 .Where(x => x.b.Any())
-                .Select(x => new PrioritizedXunkMerger<T>(
-                    (x.b.First().ResolveSelf() as Module).Parent,
-                    x.a.TakeWhile(m => m.GetType() != typeof(Module))
-                    .Any(m => m.GetType() == typeof(Burn)) ? 
-                    throw new InvalidOperationException("Death is upon those who burn a file below a diff/patch") : 
-                    x.a.FirstOrDefault(m => m.GetType() == typeof(Module)) as Module,
-                    new HashSet<Prioritized<Module>>(x.b.Where(m => !(m.ResolveSelf() is GhostModule)))
+                .Select(x => new PrioritizedXunkMerger<T>( 
+                    (x.b.First().ResolveSelf() as Module).Parent,                                                   // Evil code.  Here's a summary.
+                    x.a.TakeWhile(m => m.GetType() != typeof(Module))                                               // If there's a burn module directly under a diff/patch
+                    .Any(m => m.GetType() == typeof(Burn)) ?                                                        // .................
+                    throw new InvalidOperationException("Death is upon those who burn a file below a diff/patch") : // Throw an error cause that's bad.
+                    x.a.FirstOrDefault(m => m.GetType() == typeof(Module)) as Module,                               // otherwise use the closest non-diff/patch ancestor as  
+                    new HashSet<Prioritized<Module, string>>(x.b.Where(m => !(m.ResolveSelf() is GhostModule)))             // the base of the merger.  
                     ));
 
             return new Group<IPotential<Module>>(filtered);

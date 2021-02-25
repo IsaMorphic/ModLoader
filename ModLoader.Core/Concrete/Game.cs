@@ -38,7 +38,7 @@ namespace ModLoader.Core
         public IEnumerable<Pack> Packs { get; }
         public Pack BasePack { get; private set; }
 
-        public GroupMerger<Prioritized<Module>> Merger { get; }
+        public GroupMerger<Prioritized<Module, string>> Merger { get; }
         public IPotential<IGroup<IPotential<Module>>> Modules { get; set; }
 
         public IFileSystem Files { get; private set; }
@@ -58,19 +58,19 @@ namespace ModLoader.Core
             ConfigPath = Path.Combine(BasePath, "_config.json");
             ScriptPath = Path.Combine(BasePath, "_script.bat");
 
-            Merger = new GroupMerger<Prioritized<Module>>();
+            Merger = new GroupMerger<Prioritized<Module, string>>();
 
             Packs = Merger.Mergers.Cast<Pack>();
 
             var priority = new WhereFilter<Module>(
                 new ResolveFilter<Module>(
                 new PriorityFilter<Module>(
-                    new MergeFilter<IResolvable<Module>>(
+                    new MergeFilter<IResolvable<Module>, string>(
                         Merger
                         )
                     )), m => m.Parent != BasePack);
             Modules =
-                new MergeFilter<Module>(
+                new MergeFilter<Module, string>(
                     new GroupMerger<Module>(
                         new HashSet<IPotential<IGroup<Module>>>
                         {
@@ -83,7 +83,7 @@ namespace ModLoader.Core
                                     new HashSet<IPotential<IGroup<IPotential<Module>>>>
                                     {
                                         new XunkFallbackFilter<Hunk>(
-                                            new PrioritizeFilter<Module>(
+                                            new PrioritizeFilter<Module, string>(
                                                 new WhereFilter<Module>(
                                                     priority,
                                                     m => m.GetType() == typeof(Diff)
@@ -91,7 +91,7 @@ namespace ModLoader.Core
                                                 )
                                             ),
                                         new XunkFallbackFilter<Chunk>(
-                                            new PrioritizeFilter<Module>(
+                                            new PrioritizeFilter<Module, string>(
                                                 new WhereFilter<Module>(
                                                     priority,
                                                     m => m.GetType() == typeof(Patch)
