@@ -23,9 +23,8 @@ namespace ModLoader.Core
             {
                 var resolved = Parent.Fallback as Pack;
                 if (resolved == null) return null;
-                else return resolved.Members
-                        .SingleOrDefault(m => m.Name == Name) ??
-                        new GhostModule(resolved, Name);
+                else return resolved.Members.ContainsKey(Name) ? 
+                        resolved.Members[Name] : new GhostModule(resolved, Name);
             }
         }
 

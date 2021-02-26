@@ -244,12 +244,9 @@ namespace ModLoader.Core
 
                 foreach (var moduleConfig in packConfig.Value.Modules)
                 {
-                    var module = pack.Members
-                        .Cast<Module>()
-                        .SingleOrDefault(m => m.Name == moduleConfig.Key);
+                    if (!pack.Members.ContainsKey(moduleConfig.Key)) continue;
 
-                    if (module == null) continue;
-
+                    var module = pack.Members[moduleConfig.Key];
                     module.Enabled = moduleConfig.Value.Enabled;
 
                     void LoadXunks<T>()
@@ -287,7 +284,7 @@ namespace ModLoader.Core
                     Fallback = null
                 };
 
-                foreach (var module in pack.Members.Cast<Module>())
+                foreach (var module in pack.Members.Values.Cast<Module>())
                 {
                     if (!packConfig.Modules.ContainsKey(module.Name))
                         packConfig.Modules.Add(module.Name, null);
@@ -397,7 +394,7 @@ namespace ModLoader.Core
         }
 
         public async Task LoadModulesAsync(HashSet<Module> modules)
-        { 
+        {
             foreach (var module in modules)
             {
                 await module.LoadAsync();
@@ -406,14 +403,14 @@ namespace ModLoader.Core
 
         public async Task ReloadBaseModulesAsync()
         {
-            var @base = BasePack.Members
+            var @base = BasePack.Members.Values
                 .Select(m => m.ResolveSelf());
 
             var active = Modules.ResolveSelf().Members
                 .Select(m => m.ResolveSelf());
 
             var inactive = Packs
-                .SelectMany(m => m.Members)
+                .SelectMany(m => m.Members.Values)
                 .Select(m => m.ResolveSelf())
                 .Where(m => !active.Any(n => n.Name == m.Name));
 

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -15,11 +14,10 @@ namespace ModLoader.Core
 
         public override Module ResolveSelf()
         {
-            return Parent
-                .ResolveAsIfDisabled()?.Members
-                .Select(m => m.ResolveSelf())
-                .SingleOrDefault(m => m.Name == Name)
-                ?.Resolve();
+            var resolved = Parent.ResolveAsIfDisabled();
+            if (resolved == null) return null;
+            else return resolved.Members.ContainsKey(Name) ?
+                    resolved.Members[Name].Resolve() : null;
         }
 
         public override Task LoadSelfAsync()

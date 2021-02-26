@@ -48,7 +48,7 @@ namespace ModLoader
 
             if (pack != null)
             {
-                ModuleList.Items.AddRange(pack.Members.ToArray());
+                ModuleList.Items.AddRange(pack.Members.Values.ToArray());
                 for (int i = 0; i < ModuleList.Items.Count; i++)
                 {
                     var state = (ModuleList.Items[i] as Module).Enabled;

@@ -43,10 +43,10 @@ namespace ModLoader.Core
 
         public Meta MetaData { get; private set; }
 
-        public HashSet<Module> Members { get; }
-        IEnumerable<Module> IGroup<Module>.Members => Members;
+        public Dictionary<string, Module> Members { get; }
+        IEnumerable<Module> IGroup<Module>.Members => Members.Values;
 
-        IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Select(m => new PrioritizedModule(m, DependencyLevel));
+        IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Values.Select(m => new PrioritizedModule(m, DependencyLevel));
 
         public Graph Graph { get; private set; }
 
@@ -79,7 +79,7 @@ namespace ModLoader.Core
             Name = name;
             Parent = parent;
 
-            Members = new HashSet<Module>();
+            Members = new Dictionary<string, Module>();
 
             Enabled = true;
         }
@@ -181,15 +181,17 @@ namespace ModLoader.Core
 
                 if (name.EndsWith(".diff"))
                 {
-                    var diff = new Diff(this, name.Replace(".diff", ""), id);
+                    var key = name.Replace(".diff", "");
+                    var diff = new Diff(this, key, id);
                     await diff.InitializeAsync();
-                    Members.Add(diff);
+                    Members.Add(key, diff);
                 }
                 else if (name.EndsWith(".patch"))
                 {
-                    var patch = new Patch(this, name.Replace(".patch", ""), id);
+                    var key = name.Replace(".patch", "");
+                    var patch = new Patch(this, key, id);
                     await patch.InitializeAsync();
-                    Members.Add(patch);
+                    Members.Add(key, patch);
                 }
                 else if (Path.GetFileName(name) == ".burn")
                 {
@@ -198,23 +200,26 @@ namespace ModLoader.Core
                 }
                 else if (name.EndsWith(".burn"))
                 {
-                    var burn = new Burn(this, name.Replace(".burn", ""), id);
-                    Members.Add(burn);
+                    var key = name.Replace(".burn", "");
+                    var burn = new Burn(this, key, id);
+                    Members.Add(key, burn);
                 }
                 else
                 {
                     var module = new Module(this, name, id);
-                    Members.Add(module);
+                    Members.Add(name, module);
                 }
             }
 
             foreach (var dir in burnDirs)
             {
-                var toBurn = Parent.BasePack.Members
-                        .Select(m => m.Resolve().Name)
-                        .Where(n => n.StartsWith(dir) && !Members.Any(m => m.Resolve().Name == n))
-                        .Select(n => new Burn(this, n, Guid.NewGuid()));
-                Members.UnionWith(toBurn);
+                var namesToBurn = Parent.BasePack.Members.Keys
+                    .Where(n => n.StartsWith(dir) && !Members.ContainsKey(n));
+
+                foreach (var name in namesToBurn)
+                {
+                    Members.Add(name, new Burn(this, name, Guid.NewGuid()));
+                }
             }
 
             Initialized = true;
@@ -236,7 +241,7 @@ namespace ModLoader.Core
 
         public async Task LoadSelfAsync()
         {
-            foreach (var module in Members)
+            foreach (var module in Members.Values)
             {
                 await module.Resolve()?.LoadAsync();
             }
