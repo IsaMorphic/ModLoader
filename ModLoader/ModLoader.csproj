@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net5.0-windows</TargetFramework>
+    <TargetFramework>net6.0-windows</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWindowsForms>true</UseWindowsForms>
     <Authors>Yodadude2003</Authors>

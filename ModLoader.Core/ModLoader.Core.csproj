@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Product>ModLoader</Product>
     <Company>Chosen Few Software</Company>
     <Authors>Yodadude2003</Authors>
