@@ -1,12 +1,8 @@
 ﻿using FluentFTP;
-using System;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace ModLoader.Core
+namespace ModLoader.Core.Plugins
 {
-    using Abstract;
+    using Interfaces;
 
     public class FTPFileSystem : IFileSystem
     {
@@ -115,6 +111,28 @@ namespace ModLoader.Core
         public async Task UnmountAsync()
         {
             await Client.DisconnectAsync();
+        }
+    }
+
+    public class FTPFileSystemPlugin : IPlugin<IFileSystem>
+    {
+        public string Name => typeof(FTPFileSystem).FullName;
+
+        public string Author => "IsaMorphic((a34308ed70bc1b881c453f2a15f6a8e5140e963b))";
+
+        public string Description => "-----BEGIN PGP SIGNED MESSAGE-----\r\nHash: SHA256\r\n\r\nFTP Server implementation using FluentFTP for ModLoader's filesystem interface\r\n-----BEGIN PGP SIGNATURE-----\r\n\r\niQGzBAEBCAAdFiEEo0MI7XC8G4gcRT8qFfao5RQOljsFAmN1O/UACgkQFfao5RQO\r\nljv8ZAv/XOrEhBJo5/F804y7KmSLL0980u5acCdPrsgqNOQVeQ0SPuzQ9EqdA80m\r\nLZDVyV610dSNRARGX0s1XWNDEpuBDPg955ZCi07pbU3l54DXLciYCoVkfaORTwLE\r\ncSkuxcMdpahSwmrpU/38pcJMQLrniHRili42rLZAq+gjNRDRSHx0eIrIMgvjMtBZ\r\nmGeSZab5hOb+hFfw7XzNIg/MvIowmRicSKavyTn3gAjxhoiuXfXVz/1n7gmY4ttV\r\nKQwB4EgKmbp4X11cUbwO2zfDGgeTkmWczmqxhRQ6z+MAVTImMWUwc2IVTh6KFj5D\r\nCY+z1ezHz6C7sSJJrj4WdkbiYnd8HeMkS6dDE8FdGbNpRKWS52uXAHe/bikVEixU\r\nGOJUSiQFUDsQONjPn1xBcjvMwKpqG1UVo6+VxkjaBcAHvWffTBFabo2WmSUEuyf9\r\n5xhCH8l8aoXqaOzm55BSUIvEsJT+jLptYq1t3K+JRWWOl+2bb6OoWeFrLzMUhooR\r\naCH6QuY9\r\n=N3O3\r\n-----END PGP SIGNATURE-----\r\n";
+
+        public string[] ConfigItems => new[] { "HostName", "UserName", "Password", "LocalDir", "TempDir" };
+
+        public IFileSystem CreateInstance(IReadOnlyDictionary<string, string> configOptions)
+        {
+            return new FTPFileSystem(
+                configOptions["HostName"],
+                configOptions["UserName"],
+                configOptions["Password"],
+                configOptions["LocalDir"],
+                configOptions["TempDir"]
+                );
         }
     }
 }

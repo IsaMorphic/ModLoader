@@ -48,22 +48,26 @@ namespace ModLoader.Core.Persistence
 
         public string GamePath { get; }
 
-        public Dictionary<string, string> Extras { get; }
-
         public Dictionary<string, Pack> Packs { get; }
+
+        public Dictionary<string, string> Handlers { get; }
+
+        public Dictionary<string, Dictionary<string, string>> Plugins { get; }
 
         internal Config(string gamePath)
         {
             GamePath = gamePath;
             Packs = new Dictionary<string, Pack>();
-            Extras = new Dictionary<string, string>();
+            Handlers = new Dictionary<string, string>();
+            Plugins = new Dictionary<string, Dictionary<string, string>>();
         }
 
-        public Config(string gamePath, Dictionary<string, Pack> packs, Dictionary<string, string> extras)
+        public Config(string gamePath, Dictionary<string, Pack> packs, Dictionary<string, string> handlers, Dictionary<string, Dictionary<string, string>> plugins)
         {
             GamePath = gamePath;
             Packs = packs;
-            Extras = extras;
+            Handlers = handlers;
+            Plugins = plugins;
         }
 
         public async Task WriteToStreamAsync(Stream stream)

@@ -28,7 +28,7 @@ namespace ModLoader.Core.Filters
                     .Any(m => m.GetType() == typeof(Burn)) ?                                                        // .................
                     throw new InvalidOperationException("Death is upon those who burn a file below a diff/patch") : // Throw an error cause that's bad.
                     x.a.FirstOrDefault(m => m.GetType() == typeof(Module)) as Module,                               // otherwise use the closest non-diff/patch ancestor as  
-                    new HashSet<Prioritized<Module, string>>(x.b.Where(m => !(m.ResolveSelf() is GhostModule)))             // the base of the merger.  
+                    new HashSet<Prioritized<Module, string>>(x.b.Where(m => !(m.ResolveSelf() is GhostModule)))     // the base of the merger.  
                     ));
 
             return new Group<IPotential<Module>>(filtered);
