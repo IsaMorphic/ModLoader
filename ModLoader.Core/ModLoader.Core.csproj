@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Product>ModLoader</Product>
     <Company>Chosen Few Software</Company>
     <Authors>Yodadude2003</Authors>
@@ -11,6 +11,10 @@
   <ItemGroup>
     <PackageReference Include="FluentFTP" Version="33.0.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ModLoader.Core.Plugins\ModLoader.Core.Plugins.csproj" />
   </ItemGroup>
 
 </Project>

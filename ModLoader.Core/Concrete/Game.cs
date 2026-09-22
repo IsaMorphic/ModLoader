@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -7,10 +8,12 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using Concrete;
     using Exceptions;
     using Filters;
+    using ModLoader.Core.Plugins;
     using Persistence;
-    using System;
+    using Plugins.Interfaces;
     using Utilities;
 
     public class Game
@@ -21,6 +24,7 @@ namespace ModLoader.Core
         public string BasePath { get; }
 
         public string ModPath { get; }
+        public string PluginPath { get; }
         public string TempPath { get; }
         public string GamePath { get; private set; }
 
@@ -41,6 +45,8 @@ namespace ModLoader.Core
         public GroupMerger<Prioritized<Module, string>> Merger { get; }
         public IPotential<IGroup<IPotential<Module>>> Modules { get; set; }
 
+        public IPluginSource Plugins { get; private set; }
+
         public IFileSystem Files { get; private set; }
 
         public Game(GameManager parent, string name)
@@ -52,6 +58,7 @@ namespace ModLoader.Core
             BasePath = Path.Combine(Parent.BasePath, Name);
 
             ModPath = Path.Combine(BasePath, "Mods");
+            PluginPath = Path.Combine(BasePath, "Plugins");
             TempPath = Path.Combine(BasePath, "_tmp");
 
             GraphPath = Path.Combine(BasePath, "_pack.json");
@@ -110,6 +117,8 @@ namespace ModLoader.Core
             GamePath = gamePath;
 
             Config = new Config(GamePath);
+            Config.Handlers.Add(typeof(IFileSystem).FullName, typeof(LocalFileSystem).FullName);
+
             await SaveConfigAsync();
 
             var baseMeta = new Pack.Meta
@@ -210,21 +219,22 @@ namespace ModLoader.Core
 
             await LoadConfigAsync();
 
-            if (Config.Extras != null && Config.Extras.ContainsKey("FileHandler"))
-            {
-                switch (Config.Extras["FileHandler"])
-                {
-                    case "FTP":
-                        Files = new FTPFileSystem(Config.Extras["HostName"], Config.Extras["UserName"], Config.Extras["Password"], GamePath, TempPath);
-                        break;
-                }
-            }
-            else
-            {
-                Files = new LocalFileSystem(GamePath, TempPath);
-            }
+            ReloadPlugins();
 
             await Files.MountAsync();
+        }
+
+        private void ReloadPlugins() 
+        {
+            Plugins = new DirectoryPluginSource(PluginPath);
+
+            var fsHandlerName = Config.Handlers[typeof(IFileSystem).FullName];
+            var validPlugins = Plugins.GetPluginsOfInterface<IFileSystem>();
+
+            if (validPlugins.ContainsKey(fsHandlerName))
+            {
+                Files = validPlugins[fsHandlerName].CreateInstance(Config.Plugins[fsHandlerName]);
+            }
         }
 
         public async Task LoadConfigAsync()
