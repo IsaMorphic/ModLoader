@@ -226,14 +226,31 @@ namespace ModLoader.Core
 
         private void ReloadPlugins() 
         {
-            Plugins = new DirectoryPluginSource(PluginPath);
+            AggregatePluginSource plugins = new();
+
+            plugins.Sources.Add(new DirectoryPluginSource(AppContext.BaseDirectory));
+
+            if (Directory.Exists(PluginPath)) 
+            {
+                plugins.Sources.Add(new DirectoryPluginSource(PluginPath));
+            }
+
+            Plugins = plugins;
 
             var fsHandlerName = Config.Handlers[typeof(IFileSystem).FullName];
             var validPlugins = Plugins.GetPluginsOfInterface<IFileSystem>();
 
-            if (validPlugins.ContainsKey(fsHandlerName))
+            if (validPlugins.TryGetValue(fsHandlerName, out var plugin))
             {
-                Files = validPlugins[fsHandlerName].CreateInstance(Config.Plugins[fsHandlerName]);
+                if (!Config.Plugins.TryGetValue(fsHandlerName, out var pluginConfig)) 
+                {
+                    pluginConfig = new();
+                }
+
+                pluginConfig.TryAdd("LocalDir", GamePath);
+                pluginConfig.TryAdd("TempDir", TempPath);
+
+                Files = plugin.CreateInstance(pluginConfig);
             }
         }
 
