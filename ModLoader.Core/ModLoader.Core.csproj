@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Product>ModLoader</Product>
     <Company>Chosen Few Software</Company>
-    <Authors>Yodadude2003</Authors>
+    <Authors>IsaMorphic</Authors>
     <Version>1.14</Version>
   </PropertyGroup>
 

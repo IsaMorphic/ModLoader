@@ -1,14 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net6.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <UseWindowsForms>true</UseWindowsForms>
-    <Authors>Yodadude2003</Authors>
+    <Authors>IsaMorphic</Authors>
     <Company>Chosen Few Software</Company>
     <PackageId>ModLoader</PackageId>
     <Version>1.14</Version>
     <ApplicationIcon>Logo\Icon.ico</ApplicationIcon>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\*" />
