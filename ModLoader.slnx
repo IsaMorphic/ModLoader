@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ModLoader.Core.Plugins/ModLoader.Core.Plugins.csproj" />
+  <Project Path="ModLoader.Core/ModLoader.Core.csproj" />
+  <Project Path="ModLoader/ModLoader.csproj" />
+</Solution>
