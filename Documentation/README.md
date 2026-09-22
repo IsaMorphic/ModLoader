@@ -1,6 +1,6 @@
 # Introduction
 
-Hello! I'm known on the internet as Yodadude2003, but for simplicity's sake you can also call me Ian.  I'm the founder and owner of Chosen Few Software, as well as the sole developer of ModLoader.  
+Hello! I'm known on the internet as IsaMorphic, but for simplicity's sake you can also call me Izzy.  I'm the founder and owner of Chosen Few Software, as well as the sole developer of ModLoader.  
 
 Being the developer of this tool, it is my belief that I have a duty to explain how it is intended to be used so that you, the user, may use it to its fullest potential.  Before I get into the nitty gritty details, though, I do think that some clarifications are in order.  Most importantly, is the "problem statement".  Every tool I write is built to serve a purpose; to solve a problem.  Clarifying to users what exactly this problem is can help them decide whether the tool will ultimately help them or not.  So let's do it!
 

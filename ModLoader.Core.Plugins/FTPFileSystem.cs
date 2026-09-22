@@ -2,6 +2,7 @@
 
 namespace ModLoader.Core.Plugins
 {
+    using FluentFTP.Helpers;
     using Interfaces;
 
     public class FTPFileSystem : IFileSystem
@@ -29,7 +30,7 @@ namespace ModLoader.Core.Plugins
 
         private async Task<(bool exists, string realName)> CheckFileAsync(string path)
         {
-            var names = await Client.GetNameListingAsync();
+            var names = Client.GetNameListing();
             var lower = names
                 .Select(n => n.ToLowerInvariant())
                 .ToArray();
@@ -47,9 +48,11 @@ namespace ModLoader.Core.Plugins
         public async Task MountAsync()
         {
             Directory.CreateDirectory(TempDir);
-
-            Client = new FtpClient(HostName, UserName, Password);
-            await Client.AutoConnectAsync();
+            await Task.Run(() =>
+            {
+                Client = new FtpClient(HostName, UserName, Password);
+                Client.AutoConnect();
+            });
         }
 
         public Task<StagedFile> StageFileAsync(string path)
@@ -79,38 +82,44 @@ namespace ModLoader.Core.Plugins
 
             string tempFile = Path.Combine(TempDir, file.Path);
 
-            string localFilePath = LocalDir.CombineLocalPath(file.Path).GetFtpPath();
+            string localFilePath = LocalDir.CombineLocalPath(file.Path);
 
             string localFileDir = localFilePath.GetFtpDirectoryName();
             string localFileName = localFilePath.GetFtpFileName();
 
-            var check = await CheckFileAsync(localFileName);
+            await Task.Run(async Task () =>
+            {
+                Client.SetWorkingDirectory(localFileDir);
 
-            await Client.SetWorkingDirectoryAsync(localFileDir);
+                var check = await CheckFileAsync(localFileName);
 
-            await Client.UploadFileAsync(tempFile, check.realName ?? localFileName, FtpRemoteExists.Overwrite, true);
+                Client.UploadFile(tempFile, check.realName ?? localFileName, FtpRemoteExists.Overwrite, true);
 
-            await Task.Run(() => File.Delete(Path.Combine(TempDir, file.Path)));
+                File.Delete(Path.Combine(TempDir, file.Path));
+            });
         }
 
         public async Task RemoveFileAsync(string path)
         {
-            string localFilePath = LocalDir.CombineLocalPath(path).GetFtpPath();
+            string localFilePath = LocalDir.CombineLocalPath(path);
 
             string localFileDir = localFilePath.GetFtpDirectoryName();
             string localFileName = localFilePath.GetFtpFileName();
 
-            await Client.SetWorkingDirectoryAsync(localFileDir);
+            await Task.Run(async Task () =>
+            {
+                Client.SetWorkingDirectory(localFileDir);
 
-            var check = await CheckFileAsync(localFileName);
+                var check = await CheckFileAsync(localFileName);
 
-            if (check.exists)
-                await Client.DeleteFileAsync(check.realName);
+                if (check.exists)
+                    Client.DeleteFile(check.realName);
+            });
         }
 
-        public async Task UnmountAsync()
+        public Task UnmountAsync()
         {
-            await Client.DisconnectAsync();
+            return Task.Run(Client.Disconnect);
         }
     }
 
