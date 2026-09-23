@@ -281,7 +281,7 @@ namespace ModLoader.Core
 
         public override Stream GetDataStream()
         {
-            return Parent.Archive.GetEntry($"{Name}.diff").Open();
+            return Parent.GetStream($"{Name}.diff");
         }
     }
 }

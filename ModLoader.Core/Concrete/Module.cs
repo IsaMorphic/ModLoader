@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core
@@ -14,14 +13,14 @@ namespace ModLoader.Core
 
         public string Name { get; }
 
-        public Pack Parent { get; }
+        public IPackBase Parent { get; }
         public Game Root { get; }
 
         public IResolvable<Module> Fallback
         {
             get
             {
-                var resolved = Parent.Fallback as Pack;
+                var resolved = Parent.Fallback as IPackBase;
                 if (resolved == null) return null;
                 else return resolved.Members.ContainsKey(Name) ? 
                         resolved.Members[Name] : new GhostModule(resolved, Name);
@@ -34,7 +33,7 @@ namespace ModLoader.Core
 
         public string MergeKey => Name;
 
-        public Module(Pack parent, string name, Guid id)
+        public Module(IPackBase parent, string name, Guid id)
         {
             Id = id;
             Name = name;
@@ -59,7 +58,7 @@ namespace ModLoader.Core
 
         public virtual Stream GetDataStream()
         {
-            return Parent.Archive.GetEntry(Name).Open();
+            return Parent.GetStream(Name);
         }
 
         public virtual async Task LoadSelfAsync()
@@ -83,10 +82,10 @@ namespace ModLoader.Core
 
                 Root.Graph.Table[Name] = Id;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 await Root.Files.UnstageFileAsync(file);
-                throw ex;
+                throw;
             }
         }
 

@@ -114,7 +114,7 @@ namespace ModLoader.Core
 
         public override Stream GetDataStream()
         {
-            return Parent.Archive.GetEntry($"{Name}.patch").Open();
+            return Parent.GetStream($"{Name}.patch");
         }
     }
 }

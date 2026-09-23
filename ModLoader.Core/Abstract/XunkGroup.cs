@@ -37,7 +37,7 @@ namespace ModLoader.Core.Abstract
 
         IEnumerable<IPotential<T>> IGroup<IPotential<T>>.Members => Xunks;
 
-        public XunkGroup(Pack parent, string name, Guid id) : base(parent, name, id)
+        public XunkGroup(IPackBase parent, string name, Guid id) : base(parent, name, id)
         {
             Xunks = new HashSet<IPotential<T>>();
             Base = this.ResolveFull().FirstOrDefault(r => r.GetType() == typeof(Module)) as Module;
@@ -47,7 +47,7 @@ namespace ModLoader.Core.Abstract
                 Errors.Add(new InvalidOperationException($"Attempted to initialize a xunk group with no viable base.\nOffending module: {this}"));
         }
 
-        public XunkGroup(Pack parent, string name, Module @base, HashSet<IPotential<T>> xunks) : base(parent, name, Guid.NewGuid())
+        public XunkGroup(IPackBase parent, string name, Module @base, HashSet<IPotential<T>> xunks) : base(parent, name, Guid.NewGuid())
         {
             Xunks = xunks;
             Base = @base;
@@ -64,7 +64,7 @@ namespace ModLoader.Core.Abstract
                 var groups = new HashSet<IPotential<Module>>(others);
                 groups.Add(this);
 
-                return new XunkMerger<T>(Parent, Base, groups);
+                return new XunkMerger<T>(Parent as Pack, Base, groups);
             }
             else
             {

@@ -40,7 +40,7 @@ namespace ModLoader.Core
         public Config Config { get; private set; }
 
         public IEnumerable<Pack> Packs { get; }
-        public Pack BasePack { get; private set; }
+        public BasePack BasePack { get; private set; }
 
         public GroupMerger<Prioritized<Module, string>> Merger { get; }
         public IPotential<IGroup<IPotential<Module>>> Modules { get; set; }
@@ -121,21 +121,8 @@ namespace ModLoader.Core
 
             await SaveConfigAsync();
 
-            var baseMeta = new Pack.Meta
-            {
-                Id = Guid.NewGuid(),
-                Fallback = null,
-                Name = "Base Game",
-                Author = "ModLoader",
-                Notes = "Base Game (DO NOT DELETE!)"
-            };
 
-            await new PackBuilder(GamePath, ModPath, "_base_")
-                    .WithImageStream(Stream.Null)
-                    .WithMetaData(baseMeta)
-                    .BuildAsync();
-
-            BasePack = new Pack(this, "_base_");
+            BasePack = new BasePack(this);
             await BasePack.InitializeAsync();
 
             using (var stream = File.Create(GraphPath))
@@ -170,8 +157,9 @@ namespace ModLoader.Core
             foreach (var dir in dirs)
             {
                 string name = Path.GetFileName(dir);
+                if (name == "_base_") continue;
 
-                var meta = new Pack.Meta
+                var meta = new PackMeta
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,
@@ -193,10 +181,12 @@ namespace ModLoader.Core
 
             await RebuildTestPacksAsync();
 
-            BasePack = new Pack(this, "_base_");
-            await BasePack.InitializeAsync();
-
             await LoadGraphAsync();
+
+            await LoadConfigEarlyAsync();
+
+            BasePack = new BasePack(this);
+            await BasePack.InitializeAsync();
 
             foreach (var file in Directory.EnumerateFiles(ModPath, "*.zip"))
             {
@@ -254,13 +244,16 @@ namespace ModLoader.Core
             }
         }
 
-        public async Task LoadConfigAsync()
+        private async Task LoadConfigEarlyAsync() 
         {
             using (var stream = File.OpenRead(ConfigPath))
                 Config = await Config.LoadFromStreamAsync(stream);
 
             GamePath = Config.GamePath;
+        }
 
+        public async Task LoadConfigAsync()
+        {
             foreach (var packConfig in Config.Packs)
             {
                 var pack = Packs.SingleOrDefault(p => p.Name == packConfig.Key);

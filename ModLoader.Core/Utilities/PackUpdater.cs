@@ -52,7 +52,7 @@ namespace ModLoader.Core.Utilities
         public Dictionary<string, Module> Modules { get; private set; }
 
         public Graph Graph { get; private set; }
-        public Pack.Meta MetaData { get; private set; }
+        public PackMeta MetaData { get; private set; }
 
         public string ImagePath { get; set; }
 
@@ -72,12 +72,12 @@ namespace ModLoader.Core.Utilities
             {
                 using (var stream = Archive.GetEntry("_meta.json").Open())
                 {
-                    MetaData = await Pack.Meta.LoadFromStreamAsync(stream);
+                    MetaData = await PackMeta.LoadFromStreamAsync(stream);
                 }
             }
             else
             {
-                MetaData = new Pack.Meta
+                MetaData = new PackMeta
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,

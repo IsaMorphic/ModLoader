@@ -8,7 +8,7 @@ namespace ModLoader.Core
 
     public class GhostModule : Module
     {
-        public GhostModule(Pack parent, string name) : base(parent, name, Guid.Empty)
+        public GhostModule(IPackBase parent, string name) : base(parent, name, Guid.Empty)
         {
         }
 
@@ -22,7 +22,7 @@ namespace ModLoader.Core
 
         public override Task LoadSelfAsync()
         {
-            throw new GhostedModuleException("An attempt was made to directly load a ghosted module reference.\nThis is a bug, please contact the developers so that the issue may be resolved.\n\"oh my god.... did I break it again?\" ~Yodadude2003");
+            throw new GhostedModuleException("An attempt was made to directly load a ghosted module reference.\nThis is a bug, please contact the developers so that the issue may be resolved.\n\"oh my god.... did I break it again?\" ~IsaMorphic");
         }
     }
 }
