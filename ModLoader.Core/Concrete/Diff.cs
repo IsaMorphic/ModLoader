@@ -228,7 +228,7 @@ namespace ModLoader.Core
 
                     line = await reader.ReadLineAsync();
 
-                    while (!line.StartsWith(": ") && !line.StartsWith("= "))
+                    while (line != null && !line.StartsWith(": ") && !line.StartsWith("= "))
                     {
                         if (line.StartsWith("+ "))
                         {
