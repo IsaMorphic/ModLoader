@@ -212,9 +212,9 @@ namespace ModLoader.Core
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
         }
 
-        public IPackBase ResolveSelf() => this;
-
         Pack IPotential<Pack>.ResolveSelf() => this;
+
+        public IPackBase ResolveSelf() => this;
 
         public async Task LoadSelfAsync()
         {
@@ -224,14 +224,14 @@ namespace ModLoader.Core
             }
         }
 
-        public override string ToString()
-        {
-            return MetaData.Name ?? Name;
-        }
-
         public Stream GetStream(string name)
         {
             return Archive.GetEntry(name)?.Open() ?? throw new FileNotFoundException($"The file '{name}' was not found in the pack '{this}'.");
+        }
+
+        public override string ToString()
+        {
+            return MetaData.Name ?? Name;
         }
     }
 }
