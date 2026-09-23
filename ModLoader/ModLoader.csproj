@@ -7,7 +7,7 @@
     <Authors>IsaMorphic</Authors>
     <Company>Chosen Few Software</Company>
     <PackageId>ModLoader</PackageId>
-    <Version>1.15</Version>
+    <Version>1.16</Version>
     <ApplicationIcon>Logo\Icon.ico</ApplicationIcon>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
