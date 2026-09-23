@@ -92,10 +92,11 @@ namespace ModLoader.Core
             foreach (var entry in entries)
             {
                 string name = entry.ToLowerInvariant();
-                Guid id = Graph.Table[name];
-
-                var module = new Module(this, name, id);
-                Members.Add(name, module);
+                if (Graph.Table.TryGetValue(name, out Guid id))
+                {
+                    var module = new Module(this, name, id);
+                    Members.Add(name, module);
+                }
             }
 
             Initialized = true;
