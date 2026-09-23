@@ -32,7 +32,7 @@ namespace ModLoader.Core
         public List<Line> Lines { get; }
 
         public override long Offset { get; }
-        public override long Length => Math.Max(0, Lines.Aggregate(-1, (c, l) => l.Op == Operation.Remove ? c + 1 : c));
+        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Remove ? c + 1 : c);
 
         public HashSet<Exception> Errors { get; }
 
@@ -179,9 +179,9 @@ namespace ModLoader.Core
             using (var data = GetDataStream())
             using (var reader = new StreamReader(data))
             {
-                string line = await reader.ReadLineAsync();
+                string? line = await reader.ReadLineAsync();
 
-                while (!reader.EndOfStream)
+                while (line != null)
                 {
                     if (string.IsNullOrWhiteSpace(line))
                     {
@@ -206,8 +206,7 @@ namespace ModLoader.Core
                             {
                                 offset = baseText
                                     .Select((s, i) => (s, i))
-                                    .Where(x => x.s.StartsWith(str))
-                                    .First().i;
+                                    .First(x => x.s.StartsWith(str)).i;
                             }
                             catch (InvalidOperationException)
                             {
@@ -263,7 +262,7 @@ namespace ModLoader.Core
                             errors.Add(new FormatException($"Expected line starting with \"+\", \"-\", \"|\", or \">\".\nOffending line: \"{line}\"\nOffending module: {this}"));
                         }
 
-                        if (reader.EndOfStream)
+                        if (line == null)
                             break;
 
                         line = await reader.ReadLineAsync();
