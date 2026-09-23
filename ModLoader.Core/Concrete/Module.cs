@@ -73,6 +73,8 @@ namespace ModLoader.Core
             var file = await Root.Files.StageFileAsync(Name);
             try
             {
+                await Root.BasePack.CopyModuleAsync(Name);
+
                 using (var data = GetDataStream())
                 {
                     await data.CopyToAsync(file.Stream);

@@ -77,7 +77,7 @@ namespace ModLoader.Core
                     await Graph.WriteToStreamAsync(stream);
                 }
             }
-            
+
 
             var packFiles = Directory.EnumerateFiles(
                 Path.Combine(Parent.ModPath, Name), "*.*", SearchOption.AllDirectories)
@@ -111,25 +111,24 @@ namespace ModLoader.Core
             }
         }
 
+        public Task CopyModuleAsync(string name) 
+        {
+            return Task.Run(() =>
+            {
+                string gameFilePath = Path.Combine(Parent.GamePath, name);
+                string packFilePath = Path.Combine(Parent.ModPath, Name, name);
+                if (!File.Exists(packFilePath) && File.Exists(gameFilePath))
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
+                    File.Copy(gameFilePath, packFilePath, true);
+                }
+            });
+        }
+
         public Stream GetStream(string name)
         {
             string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-            string gameFilePath = Path.Combine(Parent.GamePath, name);
-
-            if (File.Exists(packFilePath))
-            {
-                return File.OpenRead(packFilePath);
-            }
-            else if (File.Exists(gameFilePath))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
-                File.Copy(gameFilePath, packFilePath, true);
-                return File.OpenRead(packFilePath);
-            }
-            else
-            {
-                throw new FileNotFoundException($"The file '{name}' was not found in the base pack or the game directory.");
-            }
+            return File.OpenRead(packFilePath);
         }
 
         public override string ToString()

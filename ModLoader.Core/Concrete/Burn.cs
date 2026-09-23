@@ -13,6 +13,8 @@ namespace ModLoader.Core
         {
             if (Root.Graph.Table[Name] == Id) return;
 
+            await Root.BasePack.CopyModuleAsync(Name);
+
             await Root.Files.RemoveFileAsync(Name);
 
             Root.Graph.Table[Name] = Id;
