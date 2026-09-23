@@ -179,14 +179,14 @@ namespace ModLoader.Core
         {
             await UnloadAsync();
 
-            await RebuildTestPacksAsync();
-
-            await LoadGraphAsync();
-
             await LoadConfigEarlyAsync();
 
             BasePack = new BasePack(this);
             await BasePack.InitializeAsync();
+
+            await RebuildTestPacksAsync();
+
+            await LoadGraphAsync();
 
             foreach (var file in Directory.EnumerateFiles(ModPath, "*.zip"))
             {
