@@ -15,7 +15,7 @@ namespace ModLoader.Core.Utilities
         private string Name { get; }
 
         private Stream ImageStream { get; set; }
-        private Pack.Meta MetaData { get; set; }
+        private PackMeta MetaData { get; set; }
 
         public PackBuilder(string inputDir, string outputDir, string name)
         {
@@ -41,7 +41,7 @@ namespace ModLoader.Core.Utilities
             return this;
         }
 
-        public PackBuilder WithMetaData(Pack.Meta metaData)
+        public PackBuilder WithMetaData(PackMeta metaData)
         {
             if (MetaData != null)
                 throw new InvalidOperationException("This value has already been specified");

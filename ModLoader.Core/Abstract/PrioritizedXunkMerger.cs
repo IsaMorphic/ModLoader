@@ -9,11 +9,11 @@ namespace ModLoader.Core.Abstract
         where T : Xunk<T>
     {
         public Module Base { get; }
-        public Pack Parent { get; }
+        public IPackBase Parent { get; }
 
         public HashSet<Prioritized<Module, string>> Mergers { get; }
 
-        public PrioritizedXunkMerger(Pack parent, Module @base, HashSet<Prioritized<Module, string>> mergers)
+        public PrioritizedXunkMerger(IPackBase parent, Module @base, HashSet<Prioritized<Module, string>> mergers)
         {
             Base = @base;
             Parent = parent;

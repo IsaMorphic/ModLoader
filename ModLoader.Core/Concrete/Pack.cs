@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -11,39 +10,17 @@ namespace ModLoader.Core
     using Abstract;
     using Persistence;
 
-    public class Pack : IGroup<Module>, IGroup<Prioritized<Module, string>>, ILoadable<Pack>
+    public class Pack : IPackBase, IResolvable<Pack>, IGroup<Prioritized<Module, string>>
     {
-        public class Meta
-        {
-            public Guid Id { get; set; }
-            public Guid? Fallback { get; set; }
-
-            public string Name { get; set; }
-            public string Author { get; set; }
-            public string Notes { get; set; }
-
-            public async Task WriteToStreamAsync(Stream stream)
-            {
-                using (var writer = new StreamWriter(stream))
-                    await writer.WriteAsync(JsonConvert.SerializeObject(this));
-            }
-
-            public static async Task<Meta> LoadFromStreamAsync(Stream stream)
-            {
-                using (var reader = new StreamReader(stream))
-                    return JsonConvert.DeserializeObject<Meta>(await reader.ReadToEndAsync());
-            }
-        }
-
         public Game Parent { get; }
 
         public string Name { get; }
 
         public Guid Id => MetaData.Id;
 
-        public Meta MetaData { get; private set; }
+        public PackMeta MetaData { get; private set; }
 
-        public Dictionary<string, Module> Members { get; }
+        public IDictionary<string, Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members.Values;
 
         IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Values.Select(m => new PrioritizedModule(m, DependencyLevel));
@@ -52,7 +29,8 @@ namespace ModLoader.Core
 
         public ZipArchive Archive { get; private set; }
 
-        public IResolvable<Pack> Fallback { get; private set; }
+        public IResolvable<IPackBase> Fallback { get; private set; }
+        IResolvable<Pack> IResolvable<Pack>.Fallback => Fallback as IResolvable<Pack>;
 
         private bool _enabled;
         public bool Enabled
@@ -95,12 +73,12 @@ namespace ModLoader.Core
             {
                 using (var stream = Archive.GetEntry("_meta.json").Open())
                 {
-                    MetaData = await Meta.LoadFromStreamAsync(stream);
+                    MetaData = await PackMeta.LoadFromStreamAsync(stream);
                 }
             }
             else
             {
-                MetaData = new Meta
+                MetaData = new PackMeta
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,
@@ -147,29 +125,26 @@ namespace ModLoader.Core
                 }
             }
 
-            if (this != Parent.BasePack)
+            var fallbackEntry = Archive.GetEntry("_fallback.txt");
+            if (fallbackEntry != null)
             {
-                var fallbackEntry = Archive.GetEntry("_fallback.txt");
-                if (fallbackEntry != null)
-                {
-                    string fallback;
+                string fallback;
 
-                    using (var stream = fallbackEntry.Open())
-                    using (var reader = new StreamReader(stream))
-                        fallback = (await reader.ReadLineAsync()).ToLowerInvariant();
+                using (var stream = fallbackEntry.Open())
+                using (var reader = new StreamReader(stream))
+                    fallback = (await reader.ReadLineAsync()).ToLowerInvariant();
 
-                    Fallback = Parent.Packs.SingleOrDefault(p => p.Name == fallback) ?? Parent.BasePack;
-                }
-                else
-                {
-                    Fallback = MetaData.Fallback == null ? Parent.BasePack : Parent.Packs.SingleOrDefault(p => p.Id == MetaData.Fallback);
-                    if (Fallback == null) throw new InvalidOperationException($"{this} is missing a dependency.");
-                }
-
-                await (Fallback as Pack).InitializeAsync(DependencyLevel + 1);
-
-                MetaData.Fallback = (Fallback as Pack).Id;
+                Fallback = Parent.Packs.SingleOrDefault(p => p.Name == fallback) as IPackBase ?? Parent.BasePack;
             }
+            else
+            {
+                Fallback = MetaData.Fallback == null ? Parent.BasePack : Parent.Packs.SingleOrDefault(p => p.Id == MetaData.Fallback);
+                if (Fallback == null) throw new InvalidOperationException($"{this} is missing a dependency.");
+            }
+
+            await (Fallback as IPackBase).InitializeAsync(DependencyLevel + 1);
+
+            MetaData.Fallback = (Fallback as IPackBase).Id;
 
             HashSet<string> burnDirs = new HashSet<string>();
 
@@ -237,7 +212,9 @@ namespace ModLoader.Core
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
         }
 
-        public Pack ResolveSelf() => this;
+        public IPackBase ResolveSelf() => this;
+
+        Pack IPotential<Pack>.ResolveSelf() => this;
 
         public async Task LoadSelfAsync()
         {
@@ -250,6 +227,11 @@ namespace ModLoader.Core
         public override string ToString()
         {
             return MetaData.Name ?? Name;
+        }
+
+        public Stream GetStream(string name)
+        {
+            return Archive.GetEntry(name)?.Open() ?? throw new FileNotFoundException($"The file '{name}' was not found in the pack '{this}'.");
         }
     }
 }
