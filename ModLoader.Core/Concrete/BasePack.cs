@@ -15,7 +15,7 @@ namespace ModLoader.Core
 
         public string Name { get; }
 
-        public Guid Id => Guid.NewGuid();
+        public Guid Id { get; }
 
         public IResolvable<IPackBase> Fallback => null;
 
@@ -37,6 +37,8 @@ namespace ModLoader.Core
             Members = new Dictionary<string, Module>();
 
             Enabled = true;
+
+            Id = Guid.NewGuid();
         }
 
         public async Task InitializeAsync(int dependencyLevel = 0)
