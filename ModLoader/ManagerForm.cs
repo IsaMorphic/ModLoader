@@ -91,7 +91,7 @@ namespace ModLoader
                     $"{game.Name} was deleted successfully.\n" +
                     "Just a friendly reminder: The developer of ModLoader is not in any way responsible for any consequences that result from this action.\n" +
                     "If you fricked something up, you're on your own!\n" +
-                    "~Yodadude2003",
+                    "~IsaMorphic",
                     "Information", MessageBoxButtons.OK, MessageBoxIcon.Information
                     );
             }

@@ -15,11 +15,9 @@ namespace ModLoader.Core
 
         public string Name { get; }
 
-        public Guid Id => MetaData.Id;
+        public Guid Id => Guid.NewGuid();
 
         public IResolvable<IPackBase> Fallback => null;
-
-        public PackMeta MetaData { get; private set; }
 
         public IDictionary<string, Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members.Values;
@@ -41,42 +39,11 @@ namespace ModLoader.Core
             Enabled = true;
         }
 
-        public async Task ReadMetaDataAsync()
-        {
-            if (Initialized) return;
-
-            var path = Path.Combine(Parent.ModPath, Name, "_meta.json");
-
-            if (File.Exists(path))
-            {
-                using (var stream = File.OpenRead(path))
-                {
-                    MetaData = await PackMeta.LoadFromStreamAsync(stream);
-                }
-            }
-            else
-            {
-                MetaData = new PackMeta
-                {
-                    Id = Guid.NewGuid(),
-                    Fallback = null,
-                    Name = null,
-                    Author = null,
-                    Notes = "This pack is missing its _meta.json file. Please update this pack to add some."
-                };
-            }
-        }
-
         public async Task InitializeAsync(int dependencyLevel = 0)
         {
             if (Initialized) return;
 
             Directory.CreateDirectory(Path.Combine(Parent.ModPath, Name));
-
-            if (MetaData == null)
-            {
-                await ReadMetaDataAsync();
-            }
 
             if (File.Exists(Path.Combine(Parent.ModPath, Name, "_pack.json")))
             {
@@ -108,15 +75,7 @@ namespace ModLoader.Core
                     await Graph.WriteToStreamAsync(stream);
                 }
             }
-
-            if (File.Exists(Path.Combine(Parent.ModPath, Name, "_pack.txt")))
-            {
-                using (var stream = File.OpenRead(Path.Combine(Parent.ModPath, Name, "_pack.txt")))
-                using (var reader = new StreamReader(stream))
-                {
-                    MetaData.Notes = await reader.ReadToEndAsync();
-                }
-            }
+            
 
             var packFiles = Directory.EnumerateFiles(
                 Path.Combine(Parent.ModPath, Name), "*.*", SearchOption.AllDirectories)
@@ -150,11 +109,6 @@ namespace ModLoader.Core
             }
         }
 
-        public override string ToString()
-        {
-            return MetaData.Name ?? Name;
-        }
-
         public Stream GetStream(string name)
         {
             string packFilePath = Path.Combine(Parent.ModPath, Name, name);
@@ -176,9 +130,9 @@ namespace ModLoader.Core
             }
         }
 
-        public void Unload()
+        public override string ToString()
         {
-            Members.Clear();
+            return Name;
         }
     }
 }

@@ -183,7 +183,7 @@ namespace ModLoader.Core
 
             await LoadGraphAsync();
 
-            await LoadConfigAsync();
+            await LoadConfigEarlyAsync();
 
             BasePack = new BasePack(this);
             await BasePack.InitializeAsync();
@@ -206,6 +206,8 @@ namespace ModLoader.Core
             {
                 await pack.InitializeAsync();
             }
+
+            await LoadConfigAsync();
 
             ReloadPlugins();
 
@@ -242,13 +244,16 @@ namespace ModLoader.Core
             }
         }
 
-        public async Task LoadConfigAsync()
+        private async Task LoadConfigEarlyAsync() 
         {
             using (var stream = File.OpenRead(ConfigPath))
                 Config = await Config.LoadFromStreamAsync(stream);
 
             GamePath = Config.GamePath;
+        }
 
+        public async Task LoadConfigAsync()
+        {
             foreach (var packConfig in Config.Packs)
             {
                 var pack = Packs.SingleOrDefault(p => p.Name == packConfig.Key);
