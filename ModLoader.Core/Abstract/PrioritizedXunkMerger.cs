@@ -25,7 +25,7 @@ namespace ModLoader.Core.Abstract
         {
             var group = Mergers
                 .SelectMany(m => (m.ResolveSelf() as XunkGroup<T>).Xunks
-                    .Select(x => new Prioritized<T, XunkKey>(x.ResolveSelf(), m.Priority))
+                    .Select(x => new Prioritized<T, XunkKey>(x.ResolveSelf()))
                     );
 
             var resolver =

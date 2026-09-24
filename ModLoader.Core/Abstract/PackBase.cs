@@ -17,6 +17,6 @@ namespace ModLoader.Core.Abstract
 
         Stream GetStream(string name);
 
-        Task InitializeAsync(int dependencyLevel = 0);
+        Task InitializeAsync();
     }
 }

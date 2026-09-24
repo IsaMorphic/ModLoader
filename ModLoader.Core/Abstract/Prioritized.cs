@@ -7,16 +7,16 @@ namespace ModLoader.Core.Abstract
     public class Prioritized<T, U> : IMergeable<IResolvable<T>, U>
         where T : class
     {
-        public int Priority { get; }
+        public int Priority => Inner.ResolveFull(inclusive: false).Count - 1;
+
         public IMergeable<T, U> Inner { get; }
 
-        public Prioritized(IMergeable<T, U> inner, int priority)
+        public Prioritized(IMergeable<T, U> inner)
         {
-            Priority = priority;
             Inner = inner;
         }
 
-        public IResolvable<IResolvable<T>> Fallback => Inner.Fallback == null ? null : new Prioritized<T, U>(Inner.Fallback as IMergeable<T, U>, Priority + 1);
+        public IResolvable<IResolvable<T>> Fallback => Inner.Fallback == null ? null : new Prioritized<T, U>(Inner.Fallback as IMergeable<T, U>);
         public bool Enabled => Inner.Enabled;
 
         public U MergeKey => Inner.MergeKey;
@@ -36,7 +36,7 @@ namespace ModLoader.Core.Abstract
             others.Add(this);
             var resolved = others.Cast<Prioritized<T, U>>()
                 .GroupBy(o => o.Priority)
-                .OrderBy(g => g.Key)
+                .OrderByDescending(g => g.Key)
                 .First()
                 .Select(m => m.ResolveSelf());
 
