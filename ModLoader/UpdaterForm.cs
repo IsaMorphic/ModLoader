@@ -2,6 +2,7 @@
 using ModLoader.Core.Utilities;
 using ModLoader.Properties;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -184,7 +185,12 @@ namespace ModLoader
             if (FileDialog.ShowDialog() == DialogResult.OK)
             {
                 Updater.ImagePath = FileDialog.FileName;
-                PackImage.Image = Image.FromFile(Updater.ImagePath);
+                using (Stream stream = FileDialog.OpenFile())
+                {
+                    var image = PackImage.Image;
+                    PackImage.Image = Image.FromStream(stream);
+                    image?.Dispose();
+                }
             }
             FileDialog.Filter = filter;
         }
@@ -199,7 +205,7 @@ namespace ModLoader
                     "Abandon Changes?", MessageBoxButtons.YesNo, MessageBoxIcon.Warning
                 );
 
-                if (e.Cancel = result == DialogResult.No) 
+                if (e.Cancel = result == DialogResult.No)
                     return;
 
                 Abandoning = true;
@@ -222,6 +228,10 @@ namespace ModLoader
             Settings.Default.UpdaterDetailsPanelSplit = (double)DetailsPane.SplitterDistance / DetailsPane.Height;
 
             Settings.Default.Save();
+
+            var image = PackImage.Image;
+            PackImage.Image = null;
+            image?.Dispose();
 
             Updater.Dispose();
         }
