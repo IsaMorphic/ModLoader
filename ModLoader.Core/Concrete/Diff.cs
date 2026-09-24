@@ -257,7 +257,7 @@ namespace ModLoader.Core
                         else if (line.StartsWith("> "))
                         {
                             if (lines.Any())
-                                errors.Add(new FormatException($"If a hunk has a \">\" line present, it must be the only line in the hunk. Bogus? Maybe. Ask Yoda and Polly, but do so at your own risk...\nOffending line: \"{line}\"\nOffending module: {this}"));
+                                errors.Add(new FormatException($"If a hunk has a \">\" line present, it must be the only line in the hunk. Bogus? Maybe. Ask Izzy and Hexa, but do so at your own risk...\nOffending line: \"{line}\"\nOffending module: {this}"));
                             else
                             {
                                 lines.Add(new Line("", Operation.Remove));
