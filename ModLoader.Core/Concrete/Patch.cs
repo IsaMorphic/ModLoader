@@ -50,14 +50,14 @@ namespace ModLoader.Core
             {
                 if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
+                await group.Root.BasePack.CopyModuleAsync(group.Name);
+
                 var file = await group.Root.Files.StageFileAsync(group.Name);
 
                 await group.Base.GetDataStream().CopyToAsync(file.Stream);
 
                 try
                 {
-                    await group.Root.BasePack.CopyModuleAsync(group.Name);
-
                     foreach (var chunk in group.Xunks.Select(m => m.ResolveSelf()))
                     {
                         if (chunk.Offset > file.Stream.Length)

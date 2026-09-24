@@ -112,18 +112,40 @@ namespace ModLoader.Core
             }
         }
 
-        public Task CopyModuleAsync(string name) 
+        public Task<bool> CopyModuleAsync(string name)
         {
             return Task.Run(() =>
             {
                 string gameFilePath = Path.Combine(Parent.GamePath, name);
                 string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (!File.Exists(packFilePath) && 
-                    File.Exists(gameFilePath) && 
-                    Graph.Table.ContainsKey(name))
+                if (Graph.Table.ContainsKey(name) &&
+                    !File.Exists(packFilePath) &&
+                    File.Exists(gameFilePath))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
                     File.Copy(gameFilePath, packFilePath, true);
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            });
+        }
+
+        public Task<bool> RemoveModuleAsync(string name)
+        {
+            return Task.Run(() =>
+            {
+                string packFilePath = Path.Combine(Parent.ModPath, Name, name);
+                if (File.Exists(packFilePath))
+                {
+                    File.Delete(packFilePath);
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             });
         }
