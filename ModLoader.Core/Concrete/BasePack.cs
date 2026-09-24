@@ -118,7 +118,9 @@ namespace ModLoader.Core
             {
                 string gameFilePath = Path.Combine(Parent.GamePath, name);
                 string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (!File.Exists(packFilePath) && File.Exists(gameFilePath))
+                if (!File.Exists(packFilePath) && 
+                    File.Exists(gameFilePath) && 
+                    Graph.Table.ContainsKey(name))
                 {
                     Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
                     File.Copy(gameFilePath, packFilePath, true);
