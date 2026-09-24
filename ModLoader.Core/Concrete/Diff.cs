@@ -80,6 +80,8 @@ namespace ModLoader.Core
             {
                 if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
+                await group.Root.BasePack.CopyModuleAsync(group.Name);
+
                 List<string> lines = new List<string>();
                 List<long> indicies = new List<long>();
 
@@ -140,8 +142,6 @@ namespace ModLoader.Core
 
                 try
                 {
-                    await group.Root.BasePack.CopyModuleAsync(group.Name);
-
                     await group.Root.Files.CommitFileAsync(file);
 
                     if (group.Root.Graph.Table.ContainsKey(group.Name))
