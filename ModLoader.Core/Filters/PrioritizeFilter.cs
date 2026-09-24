@@ -14,7 +14,7 @@ namespace ModLoader.Core.Filters
 
         public override IGroup<Prioritized<T, U>> Apply(IGroup<IMergeable<T, U>> group)
         {
-            var filtered = group.Members.Select(m => new Prioritized<T, U>(m, 0));
+            var filtered = group.Members.Select(m => new Prioritized<T, U>(m));
             return new Group<Prioritized<T, U>>(filtered);
         }
     }

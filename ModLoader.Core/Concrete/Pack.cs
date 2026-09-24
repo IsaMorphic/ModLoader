@@ -23,7 +23,7 @@ namespace ModLoader.Core
         public IDictionary<string, Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members.Values;
 
-        IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Values.Select(m => new PrioritizedModule(m, DependencyLevel));
+        IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Values.Select(m => new PrioritizedModule(m));
 
         public Graph Graph { get; private set; }
 
@@ -50,7 +50,6 @@ namespace ModLoader.Core
         }
 
         public bool Initialized { get; private set; }
-        public int DependencyLevel { get; private set; }
 
         public Pack(Game parent, string name)
         {
@@ -89,10 +88,8 @@ namespace ModLoader.Core
             }
         }
 
-        public async Task InitializeAsync(int dependencyLevel = 0)
+        public async Task InitializeAsync()
         {
-            DependencyLevel = Math.Max(DependencyLevel, dependencyLevel);
-
             if (Initialized) return;
 
             if (MetaData == null)
@@ -142,7 +139,7 @@ namespace ModLoader.Core
                 if (Fallback == null) throw new InvalidOperationException($"{this} is missing a dependency.");
             }
 
-            await (Fallback as IPackBase).InitializeAsync(DependencyLevel + 1);
+            await (Fallback as IPackBase).InitializeAsync();
 
             MetaData.Fallback = (Fallback as IPackBase).Id;
 

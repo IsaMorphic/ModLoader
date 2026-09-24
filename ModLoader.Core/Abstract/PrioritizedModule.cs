@@ -2,7 +2,7 @@
 {
     public class PrioritizedModule : Prioritized<Module, string>
     {
-        public PrioritizedModule(IMergeable<Module, string> inner, int priority) : base(inner, priority)
+        public PrioritizedModule(IMergeable<Module, string> inner) : base(inner)
         {
         }
 

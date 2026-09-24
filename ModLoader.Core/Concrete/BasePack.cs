@@ -41,7 +41,7 @@ namespace ModLoader.Core
             Id = Guid.NewGuid();
         }
 
-        public async Task InitializeAsync(int dependencyLevel = 0)
+        public async Task InitializeAsync()
         {
             if (Initialized) return;
 
