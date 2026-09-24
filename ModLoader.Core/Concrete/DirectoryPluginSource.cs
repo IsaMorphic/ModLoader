@@ -17,7 +17,7 @@ namespace ModLoader.Core.Concrete
         {
             _directoryPath = directoryPath;
             _pluginSources = Directory
-                .EnumerateFiles(_directoryPath, "*.dll", SearchOption.AllDirectories)
+                .EnumerateFiles(_directoryPath, "*.dll")
                 .Select(asmPath => new AssemblyPluginSource(asmPath))
                 .ToArray();
         }
