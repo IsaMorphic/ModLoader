@@ -88,10 +88,12 @@ namespace ModLoader.Core
                 using (var stream = group.Base.GetDataStream())
                 using (var reader = new StreamReader(stream))
                 {
-                    while (!reader.EndOfStream)
+                    string line = await reader.ReadLineAsync();
+                    while (line != null)
                     {
-                        lines.Add(await reader.ReadLineAsync());
+                        lines.Add(line);
                         indicies.Add(i++);
+                        line = await reader.ReadLineAsync();
                     }
                     lines.Add("");
                     indicies.Add(i++);
@@ -171,9 +173,11 @@ namespace ModLoader.Core
             using (var stream = Base.GetDataStream())
             using (var reader = new StreamReader(stream))
             {
-                while (!reader.EndOfStream)
+                string line = await reader.ReadLineAsync();
+                while (line != null)
                 {
-                    baseText.Add(await reader.ReadLineAsync());
+                    baseText.Add(line);
+                    line = await reader.ReadLineAsync();
                 }
                 baseText.Add("");
             }
@@ -181,8 +185,7 @@ namespace ModLoader.Core
             using (var data = GetDataStream())
             using (var reader = new StreamReader(data))
             {
-                string? line = await reader.ReadLineAsync();
-
+                string line = await reader.ReadLineAsync();
                 while (line != null)
                 {
                     if (string.IsNullOrWhiteSpace(line))
