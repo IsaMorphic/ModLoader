@@ -92,10 +92,12 @@ namespace ModLoader.Core
 
         public Task InitializeAsync()
         {
-            return Task.Run(() =>
+            return Task.Run(async () =>
             {
                 try
                 {
+                    await Root.BasePack.CopyModuleAsync(Name);
+
                     using (var data = GetDataStream())
                     using (var reader = new BinaryReader(data))
                     {

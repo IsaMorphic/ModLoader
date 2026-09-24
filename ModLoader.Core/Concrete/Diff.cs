@@ -168,6 +168,8 @@ namespace ModLoader.Core
 
         public async Task InitializeAsync()
         {
+            await Root.BasePack.CopyModuleAsync(Name);
+
             List<string> baseText = new List<string>();
 
             using (var stream = Base.GetDataStream())
