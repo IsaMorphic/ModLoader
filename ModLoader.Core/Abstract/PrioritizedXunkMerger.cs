@@ -8,6 +8,25 @@ namespace ModLoader.Core.Abstract
     public class PrioritizedXunkMerger<T> : IPotential<Module>
         where T : Xunk<T>
     {
+        private class PrioritizedXunk : Prioritized<T, XunkKey>
+        {
+            public PrioritizedXunk(IMergeable<T, XunkKey> inner) : base(inner)
+            {
+            }
+
+            protected override Prioritized<T, XunkKey> GetFallbackCore()
+            {
+                return Inner.Fallback == null ? null : new PrioritizedXunk(Inner.Fallback.ResolveSelf());
+            }
+
+            public override int GetPriorityOver(Prioritized<T, XunkKey> other)
+            {
+                var thisParent = new PrioritizedModule(Inner.ResolveSelf().Parent);
+                var otherParent = new PrioritizedModule(other.Inner.ResolveSelf().Parent);
+                return thisParent.GetPriorityOver(otherParent);
+            }
+        }
+
         public Module Base { get; }
         public IPackBase Parent { get; }
 
@@ -25,7 +44,7 @@ namespace ModLoader.Core.Abstract
         {
             var group = Mergers
                 .SelectMany(m => (m.ResolveSelf() as XunkGroup<T>).Xunks
-                    .Select(x => new Prioritized<T, XunkKey>(x.ResolveSelf()))
+                    .Select(x => new PrioritizedXunk(x.ResolveSelf()))
                     );
 
             var resolver =
