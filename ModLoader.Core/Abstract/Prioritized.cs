@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace ModLoader.Core.Abstract
 {
-    public class Prioritized<T, U> : IMergeable<IResolvable<T>, U>
+    public abstract class Prioritized<T, U> : IMergeable<IResolvable<T>, U>
         where T : class
     {
-        public int Priority => Inner.ResolveFull(inclusive: false).Count - 1;
-
         public IMergeable<T, U> Inner { get; }
 
         public Prioritized(IMergeable<T, U> inner)
@@ -16,10 +13,12 @@ namespace ModLoader.Core.Abstract
             Inner = inner;
         }
 
-        public IResolvable<IResolvable<T>> Fallback => Inner.Fallback == null ? null : new Prioritized<T, U>(Inner.Fallback as IMergeable<T, U>);
+        public IResolvable<IResolvable<T>> Fallback => GetFallbackCore();
         public bool Enabled => Inner.Enabled;
 
         public U MergeKey => Inner.MergeKey;
+
+        protected abstract Prioritized<T, U> GetFallbackCore();
 
         public IResolvable<T> ResolveSelf()
         {
@@ -28,19 +27,22 @@ namespace ModLoader.Core.Abstract
 
         public virtual bool CanMergeWith(IResolvable<IResolvable<T>> other)
         {
-            return MergeKey.Equals((other as Prioritized<T, U>).MergeKey);
+            return other is Prioritized<T, U> prioritized && 
+                MergeKey.Equals(prioritized.MergeKey);
         }
 
         public IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
         {
             others.Add(this);
             var resolved = others.Cast<Prioritized<T, U>>()
-                .GroupBy(o => o.Priority)
-                .OrderByDescending(g => g.Key)
-                .First()
-                .Select(m => m.ResolveSelf());
+                .GroupBy(o => o.GetPriorityOver(this))
+                .MaxBy(g => g.Key);
 
-            return new PrioritizedConflict<T>(new HashSet<IResolvable<T>>(resolved), Priority);
+            return new PrioritizedConflict<T>(resolved
+                .Select(m => m.ResolveSelf())
+                .ToHashSet(), resolved.Key);
         }
+
+        public abstract int GetPriorityOver(Prioritized<T, U> other);
     }
 }

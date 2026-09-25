@@ -5,17 +5,16 @@ namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class PrioritizeFilter<T, U> : GroupFilter<IMergeable<T, U>, Prioritized<T, U>>
-        where T : class
+    public class PrioritizeFilter : GroupFilter<IMergeable<Module, string>, Prioritized<Module, string>>
     {
-        public PrioritizeFilter(IPotential<IGroup<IMergeable<T, U>>> input) : base(input)
+        public PrioritizeFilter(IPotential<IGroup<IMergeable<Module, string>>> input) : base(input)
         {
         }
 
-        public override IGroup<Prioritized<T, U>> Apply(IGroup<IMergeable<T, U>> group)
+        public override IGroup<Prioritized<Module, string>> Apply(IGroup<IMergeable<Module, string>> group)
         {
-            var filtered = group.Members.Select(m => new Prioritized<T, U>(m));
-            return new Group<Prioritized<T, U>>(filtered);
+            var filtered = group.Members.Select(m => new PrioritizedModule(m));
+            return new Group<Prioritized<Module, string>>(filtered);
         }
     }
 }
