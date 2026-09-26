@@ -35,7 +35,7 @@ namespace ModLoader.Core.Utilities
                 byte[] bufferMod = new byte[BLOCK_SIZE];
 
                 int bytesRead = await original.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
-                await modded.ReadAsync(bufferMod, 0, BLOCK_SIZE);
+                await modded.ReadExactlyAsync(bufferMod, 0, BLOCK_SIZE);
 
                 while (bytesRead > 0)
                 {
@@ -71,7 +71,7 @@ namespace ModLoader.Core.Utilities
                     filePos += bytesRead;
 
                     bytesRead = await original.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
-                    await modded.ReadAsync(bufferMod, 0, BLOCK_SIZE);
+                    await modded.ReadExactlyAsync(bufferMod, 0, BLOCK_SIZE);
                 }
             }
 

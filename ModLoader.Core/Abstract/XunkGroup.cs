@@ -29,7 +29,7 @@ namespace ModLoader.Core.Abstract
         private HashSet<Exception> Errors { get; }
 
         HashSet<Exception> IExceptional.Errors => Xunks
-            .SelectMany(m => (m as IExceptional)?.Errors ?? new HashSet<Exception>())
+            .SelectMany(m => (m as IExceptional)?.Errors ?? [])
             .Concat(Errors)
             .ToHashSet();
 
@@ -61,9 +61,7 @@ namespace ModLoader.Core.Abstract
         {
             if (others.All(m => m is XunkGroup<T>))
             {
-                var groups = new HashSet<IPotential<Module>>(others);
-                groups.Add(this);
-
+                var groups = new HashSet<IPotential<Module>>(others) { this };
                 return new XunkMerger<T>(Parent as Pack, Base, groups);
             }
             else

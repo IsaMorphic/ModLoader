@@ -3,7 +3,11 @@ using System.Collections.Generic;
 
 namespace ModLoader.Core.Abstract
 {
-    public struct XunkKey : IEquatable<XunkKey>
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
+    public readonly struct XunkKey : IEquatable<XunkKey>
+#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     {
         private long Offset { get; }
         private long Length { get; }

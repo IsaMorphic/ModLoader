@@ -46,11 +46,6 @@ namespace ModLoader.Core
 
         public virtual Module ResolveSelf() => this;
 
-        public virtual bool CanMergeWith(IResolvable<Module> other)
-        {
-            return Name == (other as Module).Name;
-        }
-
         public virtual IPotential<Module> MergeWith(HashSet<IResolvable<Module>> others)
         {
             return new Conflict<Module>(Name, this, others);
