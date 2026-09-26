@@ -5,7 +5,7 @@
     <Product>ModLoader</Product>
     <Company>Chosen Few Software</Company>
     <Authors>IsaMorphic</Authors>
-    <Version>1.20.2</Version>
+    <Version>1.20.3</Version>
   </PropertyGroup>
 
   <ItemGroup>
