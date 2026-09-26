@@ -277,8 +277,7 @@ namespace ModLoader.Core
 
                     var hunk = new Hunk(this, lines, offset, errors);
 
-                    if (Xunks.Select(h => h.ResolveSelf())
-                        .Any(h => h.CanMergeWith(hunk) || hunk.CanMergeWith(h)))
+                    if (Xunks.Select(h => h.ResolveSelf().MergeKey).Contains(hunk.MergeKey))
                         hunk.Errors.Add(new ConflictException<Hunk>($"This hunk conflicts with a hunk in this diff that was parsed prior.\nOffending module: {this}"));
 
                     Xunks.Add(hunk);

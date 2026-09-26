@@ -20,7 +20,7 @@ namespace ModLoader.Core.Abstract
 
         public bool Equals(XunkKey other)
         {
-            return (Length == 0 ^ other.Length == 0) && Offset >= other.Offset && other.Offset + other.Length >= Offset;
+            return Length > 0 && other.Length > 0 && Offset >= other.Offset && other.Offset + other.Length > Offset;
         }
 
         public override bool Equals(object obj)
@@ -61,12 +61,6 @@ namespace ModLoader.Core.Abstract
         public abstract long Length { get; }
 
         public XunkKey MergeKey => new XunkKey(Offset, Length);
-
-        public bool CanMergeWith(IResolvable<T> other)
-        {
-            var xunk = other as Xunk<T>;
-            return (Length == 0 ^ xunk.Length == 0) && Offset >= xunk.Offset && xunk.Offset + xunk.Length >= Offset;
-        }
 
         public IPotential<T> MergeWith(HashSet<IResolvable<T>> others)
         {
