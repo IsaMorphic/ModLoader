@@ -1,4 +1,6 @@
-﻿namespace ModLoader.Core.Abstract
+﻿using System;
+
+namespace ModLoader.Core.Abstract
 {
     public class PrioritizedModule : Prioritized<Module, string>
     {
@@ -11,15 +13,28 @@
             return Inner.Fallback == null ? null : new PrioritizedModule(Inner.Fallback.ResolveSelf());
         }
 
-        public override bool CanMergeWith(IResolvable<IResolvable<Module>> other)
-        {
-            return base.CanMergeWith(other) && Inner.ResolveFull().Contains((other as Prioritized<Module, string>).Inner);
-        }
-
         public override int GetPriorityOver(Prioritized<Module, string> other)
         {
-            return Inner.ResolveFull(inclusive: false)
-                .FindIndex(m => m.ResolveSelf().Id == other.Inner.ResolveSelf().Id);
+            Guid otherId = other.Inner.ResolveSelf().Id;
+            int thisPriority = Inner.ResolveFull()
+                .FindIndex(m => m.ResolveSelf().Id == otherId);
+
+            Guid thisId = Inner.ResolveSelf().Id;
+            int otherPriority = other.Inner.ResolveFull()
+                .FindIndex(m => m.ResolveSelf().Id == thisId);
+
+            if (thisPriority < 0 && otherPriority < 0)
+            {
+                return 0;
+            }
+            else if (thisPriority < 0)
+            {
+                return -otherPriority;
+            }
+            else 
+            {
+                return thisPriority;
+            }
         }
     }
 }
