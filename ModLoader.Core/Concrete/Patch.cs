@@ -7,18 +7,22 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using ModLoader.Core.Exceptions;
 
-    public class Chunk : Xunk<Chunk>
+    public class Chunk : Xunk<Chunk>, IExceptional
     {
         public override long Offset { get; }
         public override long Length => Data.Length - 1;
 
         public byte[] Data { get; }
 
+        public HashSet<Exception> Errors { get; }
+
         public Chunk(Patch parent, long offset, byte[] data) : base(parent)
         {
             Offset = offset;
             Data = data;
+            Errors = new();
         }
 
         public override Chunk ResolveSelf() => this;
@@ -107,6 +111,9 @@ namespace ModLoader.Core
                             byte[] bytes = reader.ReadBytes(reader.ReadInt32());
 
                             var chunk = new Chunk(this, offset, bytes);
+
+                            if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                                chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
 
                             Xunks.Add(chunk);
                         }
