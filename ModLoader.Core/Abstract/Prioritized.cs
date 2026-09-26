@@ -25,16 +25,14 @@ namespace ModLoader.Core.Abstract
             return Inner;
         }
 
-        public IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
+        public virtual IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
         {
-            others.Add(this);
             var resolved = others.Cast<Prioritized<T, U>>()
-                .GroupBy(o => o.GetPriorityOver(this))
-                .MaxBy(g => g.Key);
+                .Where(x => x.GetPriorityOver(this) >= 0);
 
             return new PrioritizedConflict<T>(resolved
                 .Select(m => m.ResolveSelf())
-                .ToHashSet(), resolved.Key);
+                .ToHashSet());
         }
 
         public abstract int GetPriorityOver(Prioritized<T, U> other);
