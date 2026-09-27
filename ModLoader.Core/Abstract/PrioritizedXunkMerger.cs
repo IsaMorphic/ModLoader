@@ -23,11 +23,27 @@ namespace ModLoader.Core.Abstract
         {
             var @base = new PrioritizedModule(Base);
 
-            var resolved = Mergers
+            var groups = Mergers
                 .Select(m => new { Priority = m.GetPriorityOver(@base), Group = (XunkGroup<T>)m.Inner })
                 .SelectMany(k => k.Group.Xunks.Select(x => new { Priority = k.Priority, Xunk = x.ResolveSelf() }))
                 .GroupBy(l => l.Xunk.MergeKey)
-                .Select(g => g.MaxBy(x => x.Priority).Xunk);
+                .Select(g => g.GroupBy(x => x.Priority).MaxBy(x => x.Key).Select(x => x.Xunk));
+
+            var resolved = new HashSet<IPotential<T>>();
+            foreach (var group in groups) 
+            {
+                var instigator = group.First();
+                var mergers = group.Skip(1);
+
+                if (mergers.Any())
+                {
+                    resolved.Add(new Conflict<T>(instigator.ToString(), instigator, new HashSet<IResolvable<T>>(mergers)));
+                }
+                else 
+                {
+                    resolved.Add(instigator);
+                }
+            }
 
             return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base, new HashSet<IPotential<T>>(resolved));
         }

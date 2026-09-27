@@ -90,21 +90,15 @@ namespace ModLoader.Core
                                     new HashSet<IPotential<IGroup<IPotential<Module>>>>
                                     {
                                         new XunkFallbackFilter<Hunk>(
-                                            new PrioritizeFilter(
-                                                new WhereFilter<Module>(
-                                                    priority,
-                                                    m => m.GetType() == typeof(Diff)
-                                                    )
+                                            new WhereFilter<Prioritized<Module, string>>(
+                                                Merger, m => m.Inner.GetType() == typeof(Diff)
                                                 )
                                             ),
                                         new XunkFallbackFilter<Chunk>(
-                                            new PrioritizeFilter(
-                                                new WhereFilter<Module>(
-                                                    priority,
-                                                    m => m.GetType() == typeof(Patch)
-                                                    )
+                                            new WhereFilter<Prioritized<Module, string>>(
+                                                Merger, m => m.Inner.GetType() == typeof(Patch)
                                                 )
-                                            )
+                                            ),
                                     })
                                 )
                     }));
