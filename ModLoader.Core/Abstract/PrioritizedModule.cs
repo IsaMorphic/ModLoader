@@ -25,7 +25,7 @@ namespace ModLoader.Core.Abstract
 
             if (thisPriority < 0 && otherPriority < 0)
             {
-                return 0;
+                return int.MaxValue;
             }
             else if (thisPriority < 0)
             {
