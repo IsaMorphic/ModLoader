@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace ModLoader.Core.Abstract
 {
@@ -14,16 +13,6 @@ namespace ModLoader.Core.Abstract
             return Inner.Fallback == null ? null : new PrioritizedModule(Inner.Fallback.ResolveSelf());
         }
 
-        public override IPotential<IResolvable<Module>> MergeWith(HashSet<IResolvable<IResolvable<Module>>> others)
-        {
-            if (Inner.ResolveSelf() is not Diff and not Patch)
-            {
-                others.Add(this);
-            }
-
-            return base.MergeWith(others);
-        }
-
         public override int GetPriorityOver(Prioritized<Module, string> other)
         {
             Guid otherId = other.Inner.ResolveSelf().Id;
@@ -36,7 +25,7 @@ namespace ModLoader.Core.Abstract
 
             if (thisPriority < 0 && otherPriority < 0)
             {
-                return 0;
+                return int.MaxValue;
             }
             else if (thisPriority < 0)
             {

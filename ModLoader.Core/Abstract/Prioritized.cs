@@ -27,10 +27,26 @@ namespace ModLoader.Core.Abstract
 
         public virtual IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
         {
-            var resolved = others.Cast<Prioritized<T, U>>()
-                .Where(x => x.GetPriorityOver(this) >= 0);
+            others.Add(this);
+            var resolved = new SortedList<int, HashSet<Prioritized<T, U>>>(
+                others.Cast<Prioritized<T, U>>()
+                .GroupBy(x => x.GetPriorityOver(this))
+                .ToDictionary(g => g.Key, g => g.ToHashSet())
+                );
 
-            return new PrioritizedConflict<T>(resolved
+            HashSet<Prioritized<T, U>> highest = resolved
+                .LastOrDefault(x => x.Key < int.MaxValue)
+                .Value;
+            if (highest != null && resolved.Remove(int.MaxValue, out HashSet<Prioritized<T, U>> group))
+            {
+                highest.UnionWith(group);
+            }
+            else
+            {
+                highest ??= resolved.GetValueAtIndex(0);
+            }
+
+            return new PrioritizedConflict<T>(highest
                 .Select(m => m.ResolveSelf())
                 .ToHashSet());
         }
