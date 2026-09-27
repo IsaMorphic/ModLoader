@@ -70,12 +70,13 @@ namespace ModLoader.Core
             Packs = Merger.Mergers.Cast<Pack>();
 
             var priority = new WhereFilter<Module>(
-                new ResolveFilter<Module>(
-                new PriorityFilter<Module>(
-                    new MergeFilter<IResolvable<Module>, string>(
-                        Merger
+                new PotentialFilter<Module>(
+                    new PriorityFilter<Module>(
+                        new MergeFilter<IResolvable<Module>, string>(
+                            Merger
+                            )
                         )
-                    )), m => m.Parent != BasePack);
+                    ), m => m.Parent != BasePack);
             Modules =
                 new MergeFilter<Module, string>(
                     new GroupMerger<Module>(
@@ -90,18 +91,25 @@ namespace ModLoader.Core
                                     new HashSet<IPotential<IGroup<IPotential<Module>>>>
                                     {
                                         new XunkFallbackFilter<Hunk>(
-                                            new WhereFilter<Prioritized<Module, string>>(
-                                                Merger, m => m.Inner.GetType() == typeof(Diff)
+                                            new PrioritizeFilter(
+                                                new WhereFilter<Module>(
+                                                    priority,
+                                                    m => m.GetType() == typeof(Diff)
+                                                    )
                                                 )
                                             ),
                                         new XunkFallbackFilter<Chunk>(
-                                            new WhereFilter<Prioritized<Module, string>>(
-                                                Merger, m => m.Inner.GetType() == typeof(Patch)
+                                            new PrioritizeFilter(
+                                                new WhereFilter<Module>(
+                                                    priority,
+                                                    m => m.GetType() == typeof(Patch)
+                                                    )
                                                 )
-                                            ),
+                                            )
                                     })
                                 )
-                    }));
+                        })
+                    );
         }
 
         public async Task InitializeAsync(string gamePath)
