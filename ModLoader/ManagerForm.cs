@@ -20,6 +20,9 @@ namespace ModLoader
             GameManager = new GameManager(Settings.Default.HomeDirectoryPath);
             await GameManager.InitializeAsync();
 
+            string homeDirPath = Path.GetDirectoryName(GameManager.BasePath);
+            folderBrowserDialog.SelectedPath = homeDirPath;
+
             GameList.Items.Clear();
             GameList.Items.AddRange(GameManager.Games.ToArray());
         }
