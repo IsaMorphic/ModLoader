@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
             tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             label1 = new System.Windows.Forms.Label();
@@ -219,7 +218,8 @@
             Controls.Add(tableLayoutPanel2);
             DoubleBuffered = true;
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            Icon = (System.Drawing.Icon)resources.GetObject("$this.Icon");
+            Icon = new System.Drawing.Icon(GetType().Assembly
+                .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
             MaximizeBox = false;
             Name = "AboutForm";
             StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

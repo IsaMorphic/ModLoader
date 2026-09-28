@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -11,10 +12,11 @@ namespace ModLoader.Core
 
         public HashSet<Game> Games { get; }
 
-        public GameManager()
+        public GameManager(string homeDirPath)
         {
-            var dir = Environment.GetEnvironmentVariable("MODLOADER_PATH") ??
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ModLoader");
+            var dir = string.IsNullOrEmpty(homeDirPath) ?
+                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ModLoader") :
+                homeDirPath;
             BasePath = Path.Combine(dir, "Games");
             Games = new HashSet<Game>();
         }
