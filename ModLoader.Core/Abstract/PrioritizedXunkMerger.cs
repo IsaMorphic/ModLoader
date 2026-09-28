@@ -27,7 +27,11 @@ namespace ModLoader.Core.Abstract
                 .Select(m => new { Priority = m.GetPriorityOver(@base), Group = (XunkGroup<T>)m.Inner })
                 .SelectMany(k => k.Group.Xunks.Select(x => new { Priority = k.Priority, Xunk = x.ResolveSelf() }))
                 .GroupBy(l => l.Xunk.MergeKey)
-                .Select(g => g.GroupBy(x => x.Priority).MaxBy(x => x.Key).Select(x => x.Xunk));
+                .Select(g => g
+                    .GroupBy(x => x.Priority)
+                    .MaxBy(x => x.Key)
+                    .Select(x => x.Xunk)
+                    );
 
             var resolved = new HashSet<IPotential<T>>();
             foreach (var group in groups) 
