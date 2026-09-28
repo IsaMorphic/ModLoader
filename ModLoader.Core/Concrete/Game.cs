@@ -55,7 +55,7 @@ namespace ModLoader.Core
 
             Name = name;
 
-            BasePath = Path.Combine(Parent.BasePath, Name);
+            BasePath = Path.Combine(Parent.GameDirPath, Name);
 
             ModPath = Path.Combine(BasePath, "Mods");
             PluginPath = Path.Combine(BasePath, "Plugins");
