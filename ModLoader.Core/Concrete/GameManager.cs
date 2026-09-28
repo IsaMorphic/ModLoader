@@ -10,14 +10,16 @@ namespace ModLoader.Core
     {
         public string BasePath { get; }
 
+        public string GameDirPath { get; }
+
         public HashSet<Game> Games { get; }
 
         public GameManager(string homeDirPath)
         {
-            var dir = string.IsNullOrEmpty(homeDirPath) ?
+            BasePath = string.IsNullOrEmpty(homeDirPath) ?
                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "ModLoader") :
                 homeDirPath;
-            BasePath = Path.Combine(dir, "Games");
+            GameDirPath = Path.Combine(BasePath, "Games");
             Games = new HashSet<Game>();
         }
 
@@ -25,8 +27,8 @@ namespace ModLoader.Core
         {
             return Task.Run(() =>
             {
-                Directory.CreateDirectory(BasePath);
-                foreach (var dir in Directory.EnumerateDirectories(BasePath))
+                Directory.CreateDirectory(GameDirPath);
+                foreach (var dir in Directory.EnumerateDirectories(GameDirPath))
                 {
                     var name = Path.GetFileName(dir);
                     Games.Add(new Game(this, name));
@@ -44,7 +46,7 @@ namespace ModLoader.Core
         public Task RemoveGameAsync(Game game)
         {
             Games.Remove(game);
-            var dir = Path.Combine(BasePath, game.Name);
+            var dir = Path.Combine(GameDirPath, game.Name);
             return Task.Run(() => Directory.Delete(dir, true));
         }
     }
