@@ -28,89 +28,83 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
-            this.Step1Label = new System.Windows.Forms.Label();
-            this.FolderBrowseButton = new System.Windows.Forms.Button();
-            this.AddButton = new System.Windows.Forms.Button();
-            this.Step33Label = new System.Windows.Forms.Label();
-            this.NameEntry = new System.Windows.Forms.TextBox();
-            this.SuspendLayout();
+            FolderDialog = new System.Windows.Forms.FolderBrowserDialog();
+            Step1Label = new System.Windows.Forms.Label();
+            FolderBrowseButton = new System.Windows.Forms.Button();
+            AddButton = new System.Windows.Forms.Button();
+            Step33Label = new System.Windows.Forms.Label();
+            NameEntry = new System.Windows.Forms.TextBox();
+            SuspendLayout();
             // 
             // Step1Label
             // 
-            this.Step1Label.Font = new System.Drawing.Font("Lucida Console", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.Step1Label.Location = new System.Drawing.Point(13, 9);
-            this.Step1Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Step1Label.Name = "Step1Label";
-            this.Step1Label.Size = new System.Drawing.Size(626, 43);
-            this.Step1Label.TabIndex = 0;
-            this.Step1Label.Text = "Step 1: Select Game Folder";
-            this.Step1Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            Step1Label.Font = new System.Drawing.Font("Lucida Console", 11F);
+            Step1Label.Location = new System.Drawing.Point(11, 8);
+            Step1Label.Name = "Step1Label";
+            Step1Label.Size = new System.Drawing.Size(543, 37);
+            Step1Label.TabIndex = 0;
+            Step1Label.Text = "Step 1: Select Game Folder";
+            Step1Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // FolderBrowseButton
             // 
-            this.FolderBrowseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.FolderBrowseButton.Location = new System.Drawing.Point(13, 56);
-            this.FolderBrowseButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.FolderBrowseButton.Name = "FolderBrowseButton";
-            this.FolderBrowseButton.Size = new System.Drawing.Size(621, 80);
-            this.FolderBrowseButton.TabIndex = 2;
-            this.FolderBrowseButton.Text = "Browse";
-            this.FolderBrowseButton.UseVisualStyleBackColor = true;
-            this.FolderBrowseButton.Click += new System.EventHandler(this.FolderBrowseButton_Click);
+            FolderBrowseButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            FolderBrowseButton.Location = new System.Drawing.Point(11, 48);
+            FolderBrowseButton.Name = "FolderBrowseButton";
+            FolderBrowseButton.Size = new System.Drawing.Size(538, 69);
+            FolderBrowseButton.TabIndex = 2;
+            FolderBrowseButton.Text = "Browse";
+            FolderBrowseButton.UseVisualStyleBackColor = true;
+            FolderBrowseButton.Click += FolderBrowseButton_Click;
             // 
             // AddButton
             // 
-            this.AddButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.AddButton.Location = new System.Drawing.Point(13, 320);
-            this.AddButton.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.AddButton.Name = "AddButton";
-            this.AddButton.Size = new System.Drawing.Size(621, 80);
-            this.AddButton.TabIndex = 7;
-            this.AddButton.Text = "Add Game";
-            this.AddButton.UseVisualStyleBackColor = true;
-            this.AddButton.Click += new System.EventHandler(this.AddButton_Click);
+            AddButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
+            AddButton.Location = new System.Drawing.Point(11, 277);
+            AddButton.Name = "AddButton";
+            AddButton.Size = new System.Drawing.Size(538, 69);
+            AddButton.TabIndex = 7;
+            AddButton.Text = "Add Game";
+            AddButton.UseVisualStyleBackColor = true;
+            AddButton.Click += AddButton_Click;
             // 
             // Step33Label
             // 
-            this.Step33Label.Font = new System.Drawing.Font("Lucida Console", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.Step33Label.Location = new System.Drawing.Point(13, 163);
-            this.Step33Label.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
-            this.Step33Label.Name = "Step33Label";
-            this.Step33Label.Size = new System.Drawing.Size(621, 52);
-            this.Step33Label.TabIndex = 8;
-            this.Step33Label.Text = "Step 2: Name your game";
-            this.Step33Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            Step33Label.Font = new System.Drawing.Font("Lucida Console", 11F);
+            Step33Label.Location = new System.Drawing.Point(11, 141);
+            Step33Label.Name = "Step33Label";
+            Step33Label.Size = new System.Drawing.Size(538, 45);
+            Step33Label.TabIndex = 8;
+            Step33Label.Text = "Step 2: Name your game";
+            Step33Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // NameEntry
             // 
-            this.NameEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.NameEntry.Location = new System.Drawing.Point(13, 218);
-            this.NameEntry.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.NameEntry.Name = "NameEntry";
-            this.NameEntry.Size = new System.Drawing.Size(619, 41);
-            this.NameEntry.TabIndex = 9;
+            NameEntry.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F);
+            NameEntry.Location = new System.Drawing.Point(11, 189);
+            NameEntry.Name = "NameEntry";
+            NameEntry.Size = new System.Drawing.Size(537, 38);
+            NameEntry.TabIndex = 9;
             // 
             // GameForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(15F, 37F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(645, 435);
-            this.Controls.Add(this.NameEntry);
-            this.Controls.Add(this.Step33Label);
-            this.Controls.Add(this.AddButton);
-            this.Controls.Add(this.FolderBrowseButton);
-            this.Controls.Add(this.Step1Label);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
-            this.Icon = new System.Drawing.Icon(GetType().Assembly
+            AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(559, 376);
+            Controls.Add(NameEntry);
+            Controls.Add(Step33Label);
+            Controls.Add(AddButton);
+            Controls.Add(FolderBrowseButton);
+            Controls.Add(Step1Label);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            Icon = new System.Drawing.Icon(GetType().Assembly
                 .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
-            this.MaximizeBox = false;
-            this.Name = "GameForm";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Add Game";
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            MaximizeBox = false;
+            Name = "GameForm";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "Add Game";
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 

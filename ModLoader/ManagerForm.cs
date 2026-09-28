@@ -1,4 +1,6 @@
 ﻿using ModLoader.Core;
+using ModLoader.Properties;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -6,17 +8,19 @@ namespace ModLoader
 {
     public partial class ManagerForm : Form
     {
-        public GameManager GameManager { get; }
+        public GameManager GameManager { get; private set; }
 
         public ManagerForm()
         {
             InitializeComponent();
-            GameManager = new GameManager();
         }
 
         private async void ManagerForm_Load(object sender, System.EventArgs e)
         {
+            GameManager = new GameManager(Settings.Default.HomeDirectoryPath);
             await GameManager.InitializeAsync();
+
+            GameList.Items.Clear();
             GameList.Items.AddRange(GameManager.Games.ToArray());
         }
 
@@ -94,6 +98,17 @@ namespace ModLoader
                     "~IsaMorphic",
                     "Information", MessageBoxButtons.OK, MessageBoxIcon.Information
                     );
+            }
+        }
+
+        private void setHomeDirectoryToolStripMenuItem_Click(object sender, System.EventArgs e)
+        {
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK) 
+            {
+                Settings.Default.HomeDirectoryPath = Path.Combine(folderBrowserDialog.SelectedPath, "ModLoader");
+                Settings.Default.Save();
+
+                OnLoad(e);
             }
         }
     }
