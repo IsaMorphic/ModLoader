@@ -93,7 +93,7 @@ namespace ModLoader.Core
                                             new HashSet<IPotential<IGroup<IPotential<Module>>>>
                                             {
                                                 new XunkFallbackFilter<Hunk>(
-                                                    new PrioritizeFilter(
+                                                    new PrioritizeModuleFilter(
                                                         new WhereFilter<Module>(
                                                             priority,
                                                             m => m.GetType() == typeof(Diff)
@@ -101,7 +101,7 @@ namespace ModLoader.Core
                                                         )
                                                     ),
                                                 new XunkFallbackFilter<Chunk>(
-                                                    new PrioritizeFilter(
+                                                    new PrioritizeModuleFilter(
                                                         new WhereFilter<Module>(
                                                             priority,
                                                             m => m.GetType() == typeof(Patch)
