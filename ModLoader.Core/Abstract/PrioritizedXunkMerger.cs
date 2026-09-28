@@ -3,6 +3,8 @@ using System.Linq;
 
 namespace ModLoader.Core.Abstract
 {
+    using Filters;
+
     public class PrioritizedXunkMerger<T> : IPotential<Module>
         where T : Xunk<T>
     {
@@ -21,35 +23,21 @@ namespace ModLoader.Core.Abstract
 
         public Module ResolveSelf()
         {
-            var @base = new PrioritizedModule(Base);
+            var resolved = new PriorityFilter<T>(
+                new MergeFilter<IResolvable<T>, XunkKey>(
+                        new PrioritizeXunkFilter<T>(
+                            new PotentialFilter<T>(
+                                new TrivialPotential<IGroup<IPotential<T>>>(
+                                    new Group<IPotential<T>>(Mergers.SelectMany(m => (m.Inner as XunkGroup<T>)?.Xunks ?? [])
+                                    )
+                                )
+                            )
+                        )
+                    )
+                );
 
-            var groups = Mergers
-                .Select(m => new { Priority = m.GetPriorityOver(@base), Group = (XunkGroup<T>)m.Inner })
-                .SelectMany(k => k.Group.Xunks.Select(x => new { Priority = k.Priority, Xunk = x.ResolveSelf() }))
-                .GroupBy(l => l.Xunk.MergeKey)
-                .Select(g => g
-                    .GroupBy(x => x.Priority)
-                    .MaxBy(x => x.Key)
-                    .Select(x => x.Xunk)
-                    );
-
-            var resolved = new HashSet<IPotential<T>>();
-            foreach (var group in groups) 
-            {
-                var instigator = group.First();
-                var mergers = group.Skip(1);
-
-                if (mergers.Any())
-                {
-                    resolved.Add(new Conflict<T>(instigator.ToString(), instigator, new HashSet<IResolvable<T>>(mergers)));
-                }
-                else 
-                {
-                    resolved.Add(instigator);
-                }
-            }
-
-            return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base, new HashSet<IPotential<T>>(resolved));
+            return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base, 
+                resolved.ResolveSelf().Members.ToHashSet<IPotential<T>>());
         }
     }
 }

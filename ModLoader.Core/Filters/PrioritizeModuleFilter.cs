@@ -1,13 +1,12 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 
 namespace ModLoader.Core.Filters
 {
     using Abstract;
 
-    public class PrioritizeFilter : GroupFilter<IMergeable<Module, string>, Prioritized<Module, string>>
+    public class PrioritizeModuleFilter : GroupFilter<IMergeable<Module, string>, Prioritized<Module, string>>
     {
-        public PrioritizeFilter(IPotential<IGroup<IMergeable<Module, string>>> input) : base(input)
+        public PrioritizeModuleFilter(IPotential<IGroup<IMergeable<Module, string>>> input) : base(input)
         {
         }
 
