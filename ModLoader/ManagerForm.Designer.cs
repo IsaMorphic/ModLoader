@@ -52,6 +52,7 @@
             GameList.Size = new System.Drawing.Size(1039, 375);
             GameList.TabIndex = 1;
             GameList.SelectedIndexChanged += GameList_SelectedIndexChanged;
+            GameList.DoubleClick += GameList_DoubleClick;
             // 
             // ModuleGroup
             // 
