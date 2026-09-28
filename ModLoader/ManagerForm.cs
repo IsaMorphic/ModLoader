@@ -106,13 +106,18 @@ namespace ModLoader
 
         private void setHomeDirectoryToolStripMenuItem_Click(object sender, System.EventArgs e)
         {
-            if (folderBrowserDialog.ShowDialog() == DialogResult.OK) 
+            if (folderBrowserDialog.ShowDialog() == DialogResult.OK)
             {
                 Settings.Default.HomeDirectoryPath = Path.Combine(folderBrowserDialog.SelectedPath, "ModLoader");
                 Settings.Default.Save();
 
                 OnLoad(e);
             }
+        }
+
+        private void GameList_DoubleClick(object sender, System.EventArgs e)
+        {
+            LoadGameButton.PerformClick();
         }
     }
 }
