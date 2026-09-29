@@ -7,9 +7,12 @@ namespace ModLoader.Core.Abstract
     {
         public IEnumerable<IResolvable<T>> Members { get; }
 
-        public PrioritizedConflict(HashSet<IResolvable<T>> members)
+        public int Priority { get; }
+
+        public PrioritizedConflict(HashSet<IResolvable<T>> members, int priority)
         {
             Members = members;
+            Priority = priority;
         }
 
         public IResolvable<T> ResolveSelf() => null;

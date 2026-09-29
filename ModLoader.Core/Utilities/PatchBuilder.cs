@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
@@ -35,7 +34,7 @@ namespace ModLoader.Core.Utilities
                 byte[] bufferMod = new byte[BLOCK_SIZE];
 
                 int bytesRead = await original.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
-                await modded.ReadExactlyAsync(bufferMod, 0, BLOCK_SIZE);
+                await modded.ReadExactlyAsync(bufferMod, 0, bytesRead);
 
                 while (bytesRead > 0)
                 {
@@ -47,31 +46,26 @@ namespace ModLoader.Core.Utilities
                             if (diffStart < 0)
                             {
                                 diffStart = i;
-                                diffCount++;
                             }
-                            else diffCount++;
+
+                            ++diffCount;
                         }
-                        else
+                        else if (diffStart >= 0)
                         {
-                            if (diffStart >= 0)
-                            {
-                                byte[] bytes = bufferMod
-                                    .Skip(diffStart)
-                                    .Take(diffCount)
-                                    .ToArray();
+                            byte[] bytes = new byte[diffCount];
+                            
+                            Array.Copy(bufferMod, diffStart, bytes, 0, diffCount);
+                            patches.Add((filePos + diffStart, bytes));
 
-                                patches.Add((filePos + diffStart, bytes));
-
-                                diffStart = -1;
-                                diffCount = 0;
-                            }
+                            diffStart = -1;
+                            diffCount = 0;
                         }
                     }
 
                     filePos += bytesRead;
 
                     bytesRead = await original.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
-                    await modded.ReadExactlyAsync(bufferMod, 0, BLOCK_SIZE);
+                    await modded.ReadExactlyAsync(bufferMod, 0, bytesRead);
                 }
             }
 

@@ -25,7 +25,7 @@ namespace ModLoader.Core.Abstract
             return Inner;
         }
 
-        public virtual IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
+        public IPotential<IResolvable<T>> MergeWith(HashSet<IResolvable<IResolvable<T>>> others)
         {
             others.Add(this);
             var resolved = new SortedList<int, HashSet<Prioritized<T, U>>>(
@@ -34,12 +34,11 @@ namespace ModLoader.Core.Abstract
                 .ToDictionary(g => g.Key, g => g.ToHashSet())
                 );
 
-            HashSet<Prioritized<T, U>> highest = resolved
-                .LastOrDefault(x => x.Key < int.MaxValue)
-                .Value;
-            if (highest != null && resolved.Remove(int.MaxValue, out HashSet<Prioritized<T, U>> group))
+            (int priority, HashSet<Prioritized<T, U>> highest) = resolved
+                .LastOrDefault(x => x.Key < int.MaxValue);
+            if (highest != null && resolved.Remove(int.MaxValue, out HashSet<Prioritized<T, U>> unrelated))
             {
-                highest.UnionWith(group);
+                highest.UnionWith(unrelated);
             }
             else
             {
@@ -48,7 +47,7 @@ namespace ModLoader.Core.Abstract
 
             return new PrioritizedConflict<T>(highest
                 .Select(m => m.ResolveSelf())
-                .ToHashSet());
+                .ToHashSet(), priority);
         }
 
         public abstract int GetPriorityOver(Prioritized<T, U> other);

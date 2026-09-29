@@ -41,8 +41,7 @@ namespace ModLoader.Core.Abstract
                 return Conflictors
                     .Union(new HashSet<IResolvable<T>> { Instigator })
                     .Select(m => m.Resolve())
-                    .Where(m => m != null)
-                    .Single();
+                    .Single(m => m != null);
             }
             catch (InvalidOperationException)
             {
