@@ -11,8 +11,8 @@ namespace ModLoader.Core
     using Concrete;
     using Exceptions;
     using Filters;
-    using ModLoader.Core.Plugins;
     using Persistence;
+    using Plugins;
     using Plugins.Interfaces;
     using Utilities;
 

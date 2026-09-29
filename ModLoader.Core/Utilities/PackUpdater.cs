@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,6 @@ using System.Threading.Tasks;
 namespace ModLoader.Core.Utilities
 {
     using Persistence;
-    using System.IO;
 
     public class PackUpdater : IDisposable
     {

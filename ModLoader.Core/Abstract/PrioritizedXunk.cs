@@ -7,16 +7,16 @@
         {
         }
 
+        protected override Prioritized<T, XunkKey> GetFallbackCore()
+        {
+            return Inner.Fallback == null ? null : new PrioritizedXunk<T>(Inner.Fallback.ResolveSelf());
+        }
+
         public override int GetPriorityOver(Prioritized<T, XunkKey> other)
         {
             PrioritizedModule thisParent = new PrioritizedModule(Inner.ResolveSelf().Parent);
             PrioritizedModule otherParent = new PrioritizedModule(other.Inner.ResolveSelf().Parent);
             return thisParent.GetPriorityOver(otherParent);
-        }
-
-        protected override Prioritized<T, XunkKey> GetFallbackCore()
-        {
-            return Inner.Fallback == null ? null : new PrioritizedXunk<T>(Inner.Fallback.ResolveSelf());
         }
     }
 }
