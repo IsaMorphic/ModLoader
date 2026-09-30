@@ -413,5 +413,15 @@ namespace ModLoader
 
             if (!updater.Abandoning) RebuildButton.PerformClick();
         }
+
+        private void DiffBuilderButton_Click(object sender, EventArgs e)
+        {
+            new DiffBuilderForm().ShowDialog();
+        }
+
+        private void PatchBuilderButton_Click(object sender, EventArgs e)
+        {
+            new PatchBuilderForm().ShowDialog();
+        }
     }
 }
