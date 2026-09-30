@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
-    using ModLoader.Core.Exceptions;
+    using Exceptions;
 
     public class Chunk : Xunk<Chunk>, IExceptional
     {
@@ -87,7 +87,7 @@ namespace ModLoader.Core
 
         static Patch()
         {
-            XunkLoader.Loaders.Add(typeof(Chunk), new PatchLoader());
+            XunkLoader.Register(new PatchLoader());
         }
 
         public Patch(Pack parent, string name, Guid id) : base(parent, name, id)

@@ -32,7 +32,7 @@ namespace ModLoader.Core
         public List<Line> Lines { get; }
 
         public override long Offset { get; }
-        public override long Length => Lines.Aggregate(0, (c, l) => l.Op == Operation.Remove ? c + 1 : c);
+        public override long Length => Lines.Count(l => l.Op == Operation.Remove);
 
         public HashSet<Exception> Errors { get; }
 
@@ -78,7 +78,8 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Hunk> group)
             {
-                if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
+                if (group.Root.Graph.Table.ContainsKey(group.Name) && 
+                    group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 await group.Root.BasePack.CopyModuleAsync(group.Name);
 
@@ -159,7 +160,7 @@ namespace ModLoader.Core
 
         static Diff()
         {
-            XunkLoader.Loaders.Add(typeof(Hunk), new DiffLoader());
+            XunkLoader.Register(new DiffLoader());
         }
 
         public Diff(Pack parent, string name, Guid id) : base(parent, name, id)

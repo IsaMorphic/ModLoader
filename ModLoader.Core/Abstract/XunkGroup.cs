@@ -13,10 +13,24 @@ namespace ModLoader.Core.Abstract
 
     public static class XunkLoader
     {
-        public static Dictionary<Type, object> Loaders { get; }
+        private static Dictionary<Type, object> _loaders;
+
         static XunkLoader()
         {
-            Loaders = new Dictionary<Type, object>();
+            _loaders = new Dictionary<Type, object>();
+        }
+
+        public static bool Register<T>(IXunkLoader<T> loader) 
+            where T : Xunk<T>
+        {
+            return _loaders.TryAdd(typeof(T), loader);
+        }
+
+        public static IXunkLoader<T> Get<T>()
+            where T : Xunk<T>
+        {
+            _loaders.TryGetValue(typeof(T), out object loader);
+            return loader as IXunkLoader<T>;
         }
     }
 
@@ -62,7 +76,7 @@ namespace ModLoader.Core.Abstract
             if (others.All(m => m is XunkGroup<T>))
             {
                 var groups = new HashSet<IPotential<Module>>(others) { this };
-                return new XunkMerger<T>(Parent as Pack, Base, groups);
+                return new XunkMerger<T>(Parent, Base, groups);
             }
             else
             {
@@ -72,7 +86,7 @@ namespace ModLoader.Core.Abstract
 
         public override Task LoadSelfAsync()
         {
-            return (XunkLoader.Loaders[typeof(T)] as IXunkLoader<T>).LoadAsync(this);
+            return XunkLoader.Get<T>()?.LoadAsync(this) ?? Task.CompletedTask;
         }
 
         public override string ToString()
