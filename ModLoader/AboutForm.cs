@@ -14,14 +14,18 @@ namespace ModLoader
             label1.Text = $"ModLoader v{GetType().Assembly.GetName().Version}";
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private async void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             var info = new ProcessStartInfo
             {
                 FileName = "https://www.chosenfewsoftware.com/",
                 UseShellExecute = true
             };
-            Process.Start(info);
+
+            using (Process process = Process.Start(info)) 
+            {
+                await process.WaitForExitAsync();
+            }
         }
     }
 }
