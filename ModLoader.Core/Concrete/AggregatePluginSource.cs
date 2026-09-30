@@ -22,7 +22,7 @@ namespace ModLoader.Core.Concrete
             {
                 return Sources
                     .SelectMany(source => source.GetPluginsOfInterface<T>())
-                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                    .ToDictionary();
             }
             catch (ArgumentException ex) 
             {
