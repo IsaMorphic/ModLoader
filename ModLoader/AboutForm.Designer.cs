@@ -115,6 +115,7 @@
             linkLabel1.TabStop = true;
             linkLabel1.Text = "a Chosen Few Software tool";
             linkLabel1.TextAlign = System.Drawing.ContentAlignment.TopCenter;
+            linkLabel1.LinkClicked += linkLabel1_LinkClicked;
             // 
             // label7
             // 
