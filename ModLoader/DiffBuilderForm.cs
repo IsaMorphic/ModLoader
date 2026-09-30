@@ -1,13 +1,7 @@
 ﻿using ModLoader.Core.Utilities;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -58,18 +52,25 @@ namespace ModLoader
 
         private async void buildButton_Click(object sender, EventArgs e)
         {
-            var builder = new DiffBuilder(origFilePath, modFilePath);
-            await builder.BuildAsync(outFilePath);
-
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            try
             {
-                FileName = outFilePath,
-                UseShellExecute = true,
-            };
+                var builder = new DiffBuilder(origFilePath, modFilePath);
+                await builder.BuildAsync(outFilePath);
 
-            using (Process process = Process.Start(startInfo)) 
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    FileName = outFilePath,
+                    UseShellExecute = true,
+                };
+
+                using (Process process = Process.Start(startInfo))
+                {
+                    await process.WaitForExitAsync();
+                }
+            }
+            catch (Exception ex) 
             {
-                await process.WaitForExitAsync();
+                MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }
