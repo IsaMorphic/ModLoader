@@ -44,7 +44,7 @@
             // 
             // openFileDialog
             // 
-            openFileDialog.FileName = "openFileDialog";
+            openFileDialog.FileName = "";
             openFileDialog.Filter = "All files|*.*";
             // 
             // origFilePathBox
