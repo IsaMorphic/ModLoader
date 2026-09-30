@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModLoader
@@ -65,7 +66,7 @@ namespace ModLoader
 
                 using (Process process = Process.Start(startInfo))
                 {
-                    await process.WaitForExitAsync();
+                    await (process?.WaitForExitAsync() ?? Task.CompletedTask);
                 }
             }
             catch (Exception ex) 

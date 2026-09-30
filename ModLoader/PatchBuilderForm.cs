@@ -71,7 +71,7 @@ namespace ModLoader
 
                 using (Process process = Process.Start(startInfo))
                 {
-                    await process.WaitForExitAsync();
+                    await (process?.WaitForExitAsync() ?? Task.CompletedTask);
                 }
             }
             catch (Exception ex)
