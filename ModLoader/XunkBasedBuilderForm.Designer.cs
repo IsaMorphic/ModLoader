@@ -1,6 +1,6 @@
 ﻿namespace ModLoader
 {
-    partial class PatchBuilderForm
+    partial class XunkBasedBuilderForm<T>
     {
         /// <summary>
         /// Required designer variable.
@@ -141,8 +141,7 @@
             // 
             // saveFileDialog
             // 
-            saveFileDialog.DefaultExt = "patch";
-            saveFileDialog.Filter = "ModLoader Patch Files|*.patch";
+            saveFileDialog.AddExtension = true;
             // 
             // DiffBuilderForm
             // 
@@ -159,9 +158,10 @@
             Controls.Add(origFileButton);
             Controls.Add(label1);
             Controls.Add(origFilePathBox);
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            Name = "PatchBuilderForm";
-            Text = "Patch Builder";
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            Name = "DiffBuilderForm";
+            Text = "Diff Builder";
             Icon = new System.Drawing.Icon(GetType().Assembly
                 .GetManifestResourceStream("ModLoader.Logo.Icon.ico"));
             ResumeLayout(false);

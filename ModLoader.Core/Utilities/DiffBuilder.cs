@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
-    public class DiffBuilder
+    public class DiffBuilder : IXunkBasedBuilder<DiffBuilder>
     {
         private enum Operation
         {
@@ -16,14 +16,14 @@ namespace ModLoader.Core.Utilities
 
         private class Line
         {
-            public Operation Operation { get; }
+            public Operation Op { get; }
 
-            public string Content { get; }
+            public string Text { get; }
 
-            public Line(Operation operation, string content)
+            public Line(Operation op, string text)
             {
-                Operation = operation;
-                Content = content;
+                Op = op;
+                Text = text;
             }
         }
 
@@ -42,19 +42,14 @@ namespace ModLoader.Core.Utilities
             }
         }
 
-        private string PathToOriginal { get; }
-        private string PathToModded { get; }
+        public string Name => "Diff";
 
-        public DiffBuilder(string pathToOriginal, string pathToModded)
-        {
-            PathToOriginal = pathToOriginal;
-            PathToModded = pathToModded;
-        }
+        public string DefaultExt => ".diff";
 
-        public async Task BuildAsync(string outputPath)
+        public async Task BuildAsync(string originalFilePath, string moddedFilePath, string outputFilePath)
         {
-            string[] originalLines = await File.ReadAllLinesAsync(PathToOriginal);
-            string[] moddedLines = await File.ReadAllLinesAsync(PathToModded);
+            string[] originalLines = await File.ReadAllLinesAsync(originalFilePath);
+            string[] moddedLines = await File.ReadAllLinesAsync(moddedFilePath);
 
             List<Hunk> hunks = new(); Hunk currHunk = null;
 
@@ -91,23 +86,23 @@ namespace ModLoader.Core.Utilities
                 }
             }
 
-            using (StreamWriter writer = File.CreateText(outputPath))
+            using (StreamWriter writer = File.CreateText(outputFilePath))
             {
                 foreach (var hunk in hunks)
                 {
                     await writer.WriteLineAsync($": {hunk.Offset}");
                     foreach (var line in hunk.Lines)
                     {
-                        switch (line.Operation)
+                        switch (line.Op)
                         {
                             case Operation.Remove:
-                                await writer.WriteLineAsync($"- {line.Content}");
+                                await writer.WriteLineAsync($"- {line.Text}");
                                 break;
                             case Operation.Replace:
-                                await writer.WriteLineAsync($"| {line.Content}");
+                                await writer.WriteLineAsync($"| {line.Text}");
                                 break;
                             case Operation.Add:
-                                await writer.WriteLineAsync($"+ {line.Content}");
+                                await writer.WriteLineAsync($"+ {line.Text}");
                                 break;
                         }
                     }

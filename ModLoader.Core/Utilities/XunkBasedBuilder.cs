@@ -1,0 +1,13 @@
+﻿using System.Threading.Tasks;
+
+namespace ModLoader.Core.Utilities
+{
+    public interface IXunkBasedBuilder<T>
+    {
+        string Name { get; }
+
+        string DefaultExt { get; }
+
+        Task BuildAsync(string originalFilePath, string moddedFilePath, string outputFilePath);
+    }
+}

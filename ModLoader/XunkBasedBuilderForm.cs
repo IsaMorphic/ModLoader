@@ -1,24 +1,26 @@
 ﻿using ModLoader.Core.Utilities;
+
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Diagnostics;
-using System.Drawing;
 using System.IO;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ModLoader
 {
-    public partial class PatchBuilderForm : Form
+    public partial class XunkBasedBuilderForm<T> : Form
+        where T : IXunkBasedBuilder<T>, new()
     {
+        private readonly T builder = new();
+
         private string origFilePath, modFilePath, outFilePath;
 
-        public PatchBuilderForm()
+        public XunkBasedBuilderForm()
         {
             InitializeComponent();
+            Text = $"{builder.Name} Builder";
+            saveFileDialog.DefaultExt = builder.DefaultExt.TrimStart('.');
+            saveFileDialog.Filter = $"ModLoader {builder.Name} Files|*{builder.DefaultExt}";
         }
 
         private bool IsStateValid() 
@@ -41,7 +43,7 @@ namespace ModLoader
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 modFilePath = openFileDialog.FileName;
-                modFilePathBox.Text = origFilePath;
+                modFilePathBox.Text = modFilePath;
                 buildButton.Enabled = IsStateValid();
             }
         }
@@ -60,8 +62,7 @@ namespace ModLoader
         {
             try
             {
-                var builder = new PatchBuilder(origFilePath, modFilePath);
-                await builder.BuildAsync(outFilePath);
+                await builder.BuildAsync(origFilePath, modFilePath, outFilePath);
 
                 ProcessStartInfo startInfo = new ProcessStartInfo
                 {
@@ -74,7 +75,7 @@ namespace ModLoader
                     await (process?.WaitForExitAsync() ?? Task.CompletedTask);
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 MessageBox.Show($"{ex.Message}\n\n{ex.StackTrace}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
