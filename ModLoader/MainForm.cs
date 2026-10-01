@@ -417,12 +417,12 @@ namespace ModLoader
 
         private void DiffBuilderButton_Click(object sender, EventArgs e)
         {
-            new XunkBasedBuilderForm<DiffBuilder>().ShowDialog();
+            new XunkBasedBuilderForm(new DiffBuilder()).ShowDialog();
         }
 
         private void PatchBuilderButton_Click(object sender, EventArgs e)
         {
-            new XunkBasedBuilderForm<PatchBuilder>().ShowDialog();
+            new XunkBasedBuilderForm(new PatchBuilder()).ShowDialog();
         }
     }
 }

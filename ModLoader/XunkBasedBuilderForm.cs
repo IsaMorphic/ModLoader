@@ -8,16 +8,17 @@ using System.Windows.Forms;
 
 namespace ModLoader
 {
-    public partial class XunkBasedBuilderForm<T> : Form
-        where T : IXunkBasedBuilder<T>, new()
+    public partial class XunkBasedBuilderForm : Form
     {
-        private readonly T builder = new();
+        private readonly IXunkBasedBuilder builder;
 
         private string origFilePath, modFilePath, outFilePath;
 
-        public XunkBasedBuilderForm()
+        public XunkBasedBuilderForm(IXunkBasedBuilder builder)
         {
+            this.builder = builder;
             InitializeComponent();
+
             Text = $"{builder.Name} Builder";
             saveFileDialog.DefaultExt = builder.DefaultExt.TrimStart('.');
             saveFileDialog.Filter = $"ModLoader {builder.Name} Files|*{builder.DefaultExt}";

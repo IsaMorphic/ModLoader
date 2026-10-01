@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
-    public class DiffBuilder : IXunkBasedBuilder<DiffBuilder>
+    public class DiffBuilder : IXunkBasedBuilder
     {
         private enum Operation
         {

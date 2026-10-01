@@ -1,6 +1,6 @@
 ﻿namespace ModLoader
 {
-    partial class XunkBasedBuilderForm<T>
+    partial class XunkBasedBuilderForm
     {
         /// <summary>
         /// Required designer variable.
