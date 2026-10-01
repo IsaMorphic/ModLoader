@@ -165,7 +165,7 @@ namespace ModLoader.Core
                 string name = Path.GetFileName(dir);
                 if (name == "_base_") continue;
 
-                var meta = new PackMeta
+                var meta = new Pack.Meta
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,

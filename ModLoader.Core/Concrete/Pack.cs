@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -12,13 +13,35 @@ namespace ModLoader.Core
 
     public class Pack : IPackBase, IResolvable<Pack>, IGroup<Prioritized<Module, string>>
     {
+        public class Meta
+        {
+            public Guid Id { get; set; }
+            public Guid? Fallback { get; set; }
+
+            public string Name { get; set; }
+            public string Author { get; set; }
+            public string Notes { get; set; }
+
+            public async Task WriteToStreamAsync(Stream stream)
+            {
+                using (var writer = new StreamWriter(stream))
+                    await writer.WriteAsync(JsonConvert.SerializeObject(this));
+            }
+
+            public static async Task<Meta> LoadFromStreamAsync(Stream stream)
+            {
+                using (var reader = new StreamReader(stream))
+                    return JsonConvert.DeserializeObject<Meta>(await reader.ReadToEndAsync());
+            }
+        }
+
         public Game Parent { get; }
 
         public string Name { get; }
 
         public Guid Id => MetaData.Id;
 
-        public PackMeta MetaData { get; private set; }
+        public Meta MetaData { get; private set; }
 
         public IDictionary<string, Module> Members { get; }
         IEnumerable<Module> IGroup<Module>.Members => Members.Values;
@@ -72,12 +95,12 @@ namespace ModLoader.Core
             {
                 using (var stream = Archive.GetEntry("_meta.json").Open())
                 {
-                    MetaData = await PackMeta.LoadFromStreamAsync(stream);
+                    MetaData = await Meta.LoadFromStreamAsync(stream);
                 }
             }
             else
             {
-                MetaData = new PackMeta
+                MetaData = new Meta
                 {
                     Id = Guid.NewGuid(),
                     Fallback = null,
