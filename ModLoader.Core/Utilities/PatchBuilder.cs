@@ -5,27 +5,22 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
-    public class PatchBuilder
+    public class PatchBuilder : IXunkBasedBuilder<PatchBuilder>
     {
         private const int BLOCK_SIZE = 4 * 1024 * 1024;
 
-        private string PathToOriginal { get; }
-        private string PathToModded { get; }
+        public string Name => "Patch";
 
-        public PatchBuilder(string pathToOriginal, string pathToModded)
-        {
-            PathToOriginal = pathToOriginal;
-            PathToModded = pathToModded;
-        }
+        public string DefaultExt => ".patch";
 
-        public async Task BuildAsync(string outputPath)
+        public async Task BuildAsync(string originalFilePath, string moddedFilePath, string outputFilePath)
         {
             List<(long pos, byte[] data)> patches = new List<(long, byte[])>();
 
-            using (var original = File.OpenRead(PathToOriginal))
-            using (var modded = File.OpenRead(PathToModded))
+            using (var originalFileStream = File.OpenRead(originalFilePath))
+            using (var moddedFileStream = File.OpenRead(moddedFilePath))
             {
-                if (modded.Length != original.Length)
+                if (moddedFileStream.Length != originalFileStream.Length)
                     throw new InvalidOperationException("Patch could not be created. The modified file is a different size than the original.");
 
                 long filePos = 0;
@@ -33,8 +28,8 @@ namespace ModLoader.Core.Utilities
                 byte[] bufferOrig = new byte[BLOCK_SIZE];
                 byte[] bufferMod = new byte[BLOCK_SIZE];
 
-                int bytesRead = await original.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
-                await modded.ReadExactlyAsync(bufferMod, 0, bytesRead);
+                int bytesRead = await originalFileStream.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
+                await moddedFileStream.ReadExactlyAsync(bufferMod, 0, bytesRead);
 
                 while (bytesRead > 0)
                 {
@@ -64,13 +59,13 @@ namespace ModLoader.Core.Utilities
 
                     filePos += bytesRead;
 
-                    bytesRead = await original.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
-                    await modded.ReadExactlyAsync(bufferMod, 0, bytesRead);
+                    bytesRead = await originalFileStream.ReadAsync(bufferOrig, 0, BLOCK_SIZE);
+                    await moddedFileStream.ReadExactlyAsync(bufferMod, 0, bytesRead);
                 }
             }
 
-            using (var output = File.Create(outputPath))
-            using (var writer = new BinaryWriter(output))
+            using (var outputFileStream = File.Create(outputFilePath))
+            using (var writer = new BinaryWriter(outputFileStream))
             {
                 foreach (var patch in patches)
                 {
