@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
-    public class PatchBuilder : IXunkBasedBuilder<PatchBuilder>
+    public class PatchBuilder : IXunkBasedBuilder
     {
         private const int BLOCK_SIZE = 4 * 1024 * 1024;
 

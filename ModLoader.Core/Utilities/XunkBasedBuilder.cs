@@ -2,7 +2,7 @@
 
 namespace ModLoader.Core.Utilities
 {
-    public interface IXunkBasedBuilder<T>
+    public interface IXunkBasedBuilder
     {
         string Name { get; }
 
