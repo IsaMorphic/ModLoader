@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using ModLoader.Core.Persistence.Mutable;
     using Persistence;
 
     public class Pack : IPackBase, IResolvable<Pack>, IGroup<Prioritized<Module, string>>
@@ -172,7 +173,7 @@ namespace ModLoader.Core
             foreach (var entry in entries)
             {
                 string name = entry.FullName.ToLowerInvariant();
-                Guid id = Graph.Table[name];
+                Guid id = Graph.Entries[name];
 
                 if (name.EndsWith(".diff"))
                 {

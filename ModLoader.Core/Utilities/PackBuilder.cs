@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
+    using ModLoader.Core.Persistence.Mutable;
     using Persistence;
 
     public class PackBuilder
@@ -70,7 +71,7 @@ namespace ModLoader.Core.Utilities
                     }
 
                     if (name != "_fallback.txt")
-                        graph.Table.Add(name, Guid.NewGuid());
+                        graph.Entries.Add(name, Guid.NewGuid());
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())

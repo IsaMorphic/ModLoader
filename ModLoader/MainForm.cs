@@ -350,14 +350,34 @@ namespace ModLoader
             RefreshPackMeta(pack);
         }
 
-        private void OpenGameButton_Click(object sender, EventArgs e)
+        private async void OpenGameButton_Click(object sender, EventArgs e)
         {
-            Process.Start("explorer.exe", Game.GamePath);
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = Game.GamePath,
+                UseShellExecute = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                await process.WaitForExitAsync();
+            }
         }
 
-        private void OpenModsButton_Click(object sender, EventArgs e)
+        private async void OpenModsButton_Click(object sender, EventArgs e)
         {
-            Process.Start("explorer.exe", Game.ModPath);
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                FileName = "explorer.exe",
+                Arguments = Game.ModPath,
+                UseShellExecute = true
+            };
+
+            using (Process process = Process.Start(startInfo))
+            {
+                await process.WaitForExitAsync();
+            }
         }
 
         private async void ImportModButton_Click(object sender, EventArgs e)
@@ -367,7 +387,7 @@ namespace ModLoader
                 string fileName = Path.GetFileName(ImportFileDialog.FileName);
                 string destPath = Path.Combine(Game.ModPath, fileName);
 
-                await Task.Run(() => File.Move(ImportFileDialog.FileName, destPath));
+                await Task.Run(() => File.Copy(ImportFileDialog.FileName, destPath));
 
                 await Game.ReloadAsync();
 

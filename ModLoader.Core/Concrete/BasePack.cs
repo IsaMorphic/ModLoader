@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace ModLoader.Core
 {
     using Abstract;
+    using ModLoader.Core.Persistence.Mutable;
     using Persistence;
 
     public class BasePack : IPackBase
@@ -69,7 +70,7 @@ namespace ModLoader.Core
                 Graph = new Graph();
                 foreach (string filePath in Directory.EnumerateFiles(Parent.GamePath, "*.*", SearchOption.AllDirectories))
                 {
-                    Graph.Table.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), Guid.NewGuid());
+                    Graph.Entries.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), Guid.NewGuid());
                 }
 
                 using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.json")))
@@ -92,7 +93,7 @@ namespace ModLoader.Core
             foreach (var entry in entries)
             {
                 string name = entry.ToLowerInvariant();
-                if (Graph.Table.TryGetValue(name, out Guid id))
+                if (Graph.Entries.TryGetValue(name, out Guid id))
                 {
                     var module = new Module(this, name, id);
                     Members.Add(name, module);
@@ -118,7 +119,7 @@ namespace ModLoader.Core
             {
                 string gameFilePath = Path.Combine(Parent.GamePath, name);
                 string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (Graph.Table.ContainsKey(name) &&
+                if (Graph.Entries.ContainsKey(name) &&
                     !File.Exists(packFilePath) &&
                     File.Exists(gameFilePath))
                 {

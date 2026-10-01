@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace ModLoader.Core.Utilities
 {
+    using ModLoader.Core.Persistence.Mutable;
     using Persistence;
 
     public class PackUpdater : IDisposable
@@ -142,18 +143,18 @@ namespace ModLoader.Core.Utilities
                 {
                     case UpdateType.Remove:
                         Archive.GetEntry(module.Name).Delete();
-                        Graph.Table.Remove(module.Name);
+                        Graph.Entries.Remove(module.Name);
                         break;
 
                     case UpdateType.Add:
                         Archive.CreateEntryFromFile(update.FilePath, module.Name);
-                        Graph.Table.Add(module.Name, Guid.NewGuid());
+                        Graph.Entries.Add(module.Name, Guid.NewGuid());
                         break;
 
                     case UpdateType.Replace:
                         Archive.GetEntry(module.Name).Delete();
                         Archive.CreateEntryFromFile(update.FilePath, module.Name);
-                        Graph.Table[module.Name] = Guid.NewGuid();
+                        Graph.Entries[module.Name] = Guid.NewGuid();
                         break;
                 }
             }

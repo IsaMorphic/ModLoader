@@ -77,7 +77,7 @@ namespace ModLoader.Core
 
                 await Root.Files.CommitFileAsync(file);
 
-                if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id) 
+                if (Root.BasePack.Graph.Entries.TryGetValue(Name, out Guid id) && id == Id) 
                 {
                     await Root.BasePack.RemoveModuleAsync(Name);
                 }

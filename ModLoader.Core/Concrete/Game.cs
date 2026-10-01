@@ -11,7 +11,6 @@ namespace ModLoader.Core
     using Concrete;
     using Exceptions;
     using Filters;
-    using Persistence;
     using Plugins;
     using Plugins.Interfaces;
     using Utilities;
@@ -36,8 +35,8 @@ namespace ModLoader.Core
 
         public GameManager Parent { get; }
 
-        public Graph Graph { get; private set; }
-        public Config Config { get; private set; }
+        public Persistence.Mutable.Graph Graph { get; private set; }
+        public Persistence.Mutable.Config Config { get; private set; }
 
         public IEnumerable<Pack> Packs { get; }
         public BasePack BasePack { get; private set; }
@@ -122,8 +121,11 @@ namespace ModLoader.Core
 
             GamePath = gamePath;
 
-            Config = new Config(GamePath);
-            Config.Handlers.Add(typeof(IFileSystem).FullName, typeof(LocalFileSystem).FullName);
+            using (var stream = File.OpenRead(ConfigPath))
+                Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
+            Config.Handlers.Add(
+                typeof(IFileSystem).FullName, 
+                new Persistence.Mutable.Config.Handler() { Name = typeof(IFileSystem).FullName, Type = typeof(LocalFileSystem).FullName });
 
             await SaveConfigAsync();
 
