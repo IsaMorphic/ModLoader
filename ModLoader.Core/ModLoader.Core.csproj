@@ -6,13 +6,13 @@
     <Company>Chosen Few Software</Company>
     <Authors>IsaMorphic</Authors>
     <Version>1.20.15</Version>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ChosenFewSoftware.SnabNet" Version="1.0.6" />
-    <PackageReference Include="ChosenFewSoftware.SnabNet.SourceGenerators" Version="1.0.6" />
+    <PackageReference Include="ChosenFewSoftware.SnabNet" Version="1.0.11" />
+    <PackageReference Include="ChosenFewSoftware.SnabNet.SourceGenerators" Version="1.0.11" />
     <PackageReference Include="FluentFTP" Version="55.0.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,19 +1,21 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core.Persistence.Mutable
+﻿namespace ModLoader.Core.Persistence.Mutable
 {
     public class Config
     {
         public class Pack
         {
+            public string Name { get; set; }
             public bool Enabled { get; set; }
             public string Fallback { get; set; }
 
             public Dictionary<string, Module> Modules { get; }
 
-            private Pack(Stored.Config.Pack pack)
+            public Pack()
+            {
+                Modules = new();
+            }
+
+            internal Pack(Stored.Config.Pack pack)
             {
                 Modules = new();
 
@@ -51,7 +53,12 @@ namespace ModLoader.Core.Persistence.Mutable
             public bool Enabled { get; set; }
             public Dictionary<long, Xunk> Xunks { get; }
 
-            public Module(Stored.Config.Module module)
+            public Module()
+            {
+                Xunks = new();
+            }
+
+            internal Module(Stored.Config.Module module)
             {
                 Xunks = new();
 
@@ -63,7 +70,7 @@ namespace ModLoader.Core.Persistence.Mutable
                 }
             }
 
-            public Stored.Config.Module Store()
+            internal Stored.Config.Module Store()
             {
                 var module = new Stored.Config.Module
                 {
@@ -85,12 +92,14 @@ namespace ModLoader.Core.Persistence.Mutable
         {
             public bool Enabled { get; set; }
 
-            public Xunk(Stored.Config.Xunk xunk)
+            public Xunk() { }
+
+            internal Xunk(Stored.Config.Xunk xunk)
             {
                 Enabled = xunk.Enabled;
             }
 
-            public Stored.Config.Xunk Store()
+            internal Stored.Config.Xunk Store()
             {
                 return new Stored.Config.Xunk
                 {
@@ -105,13 +114,15 @@ namespace ModLoader.Core.Persistence.Mutable
 
             public string Type { get; set; }
 
-            public Handler(Stored.Config.Handler handler)
+            public Handler() { }
+
+            internal Handler(Stored.Config.Handler handler)
             {
                 Name = handler.Name;
                 Type = handler.Type;
             }
 
-            public Stored.Config.Handler Store()
+            internal Stored.Config.Handler Store()
             {
                 return new Stored.Config.Handler
                 {
@@ -127,7 +138,12 @@ namespace ModLoader.Core.Persistence.Mutable
 
             public Dictionary<string, string> Items { get; }
 
-            public Plugin(Stored.Config.Plugin plugin)
+            public Plugin()
+            {
+                Items = new();
+            }
+
+            internal Plugin(Stored.Config.Plugin plugin)
             {
                 Name = plugin.Name;
 
@@ -138,7 +154,7 @@ namespace ModLoader.Core.Persistence.Mutable
                 }
             }
 
-            public Stored.Config.Plugin Store()
+            internal Stored.Config.Plugin Store()
             {
                 var plugin = new Stored.Config.Plugin
                 {
@@ -156,7 +172,7 @@ namespace ModLoader.Core.Persistence.Mutable
             }
         }
 
-        public string GamePath { get; }
+        public string GamePath { get; set; }
 
         public Dictionary<string, Pack> Packs { get; }
 
@@ -164,7 +180,7 @@ namespace ModLoader.Core.Persistence.Mutable
 
         public Dictionary<string, Plugin> Plugins { get; }
 
-        private Config(Stored.Config config) 
+        internal Config(Stored.Config config) 
         {
             Packs = new();
             Handlers = new();
@@ -193,7 +209,7 @@ namespace ModLoader.Core.Persistence.Mutable
             Plugins = new();
         }
 
-        private Stored.Config Store()
+        internal Stored.Config Store()
         {
             var config = new Stored.Config() 
             { 
@@ -219,6 +235,21 @@ namespace ModLoader.Core.Persistence.Mutable
             }
 
             return config;
+        }
+
+        public bool TryAddHandler(Handler handler) 
+        {
+            return Handlers.TryAdd(handler.Name, handler);
+        }
+
+        public bool TryAddPlugin(Plugin plugin)
+        {
+            return Plugins.TryAdd(plugin.Name, plugin);
+        }
+
+        public bool TryAddPack(Pack pack)
+        {
+            return Packs.TryAdd(pack.Name, pack);
         }
 
         public Task WriteToStreamAsync(Stream stream) 

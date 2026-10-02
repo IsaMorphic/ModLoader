@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core
+﻿namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;

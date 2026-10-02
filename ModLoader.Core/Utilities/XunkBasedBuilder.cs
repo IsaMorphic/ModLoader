@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace ModLoader.Core.Utilities
+﻿namespace ModLoader.Core.Utilities
 {
     public interface IXunkBasedBuilder
     {

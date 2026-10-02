@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public class PrioritizedConflict<T> : IPotential<IResolvable<T>>, IGroup<IResolvable<T>>
         where T : class

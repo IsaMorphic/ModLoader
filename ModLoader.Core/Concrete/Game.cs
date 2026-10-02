@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace ModLoader.Core
 {
@@ -60,8 +55,8 @@ namespace ModLoader.Core
             PluginPath = Path.Combine(BasePath, "Plugins");
             TempPath = Path.Combine(BasePath, "_tmp");
 
-            GraphPath = Path.Combine(BasePath, "_pack.json");
-            ConfigPath = Path.Combine(BasePath, "_config.json");
+            GraphPath = Path.Combine(BasePath, "_pack.snab");
+            ConfigPath = Path.Combine(BasePath, "_config.snab");
             ScriptPath = Path.Combine(BasePath, "_script.bat");
 
             Merger = new GroupMerger<Prioritized<Module, string>>();
@@ -123,9 +118,12 @@ namespace ModLoader.Core
 
             using (var stream = File.OpenRead(ConfigPath))
                 Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
-            Config.Handlers.Add(
-                typeof(IFileSystem).FullName, 
-                new Persistence.Mutable.Config.Handler() { Name = typeof(IFileSystem).FullName, Type = typeof(LocalFileSystem).FullName });
+            Config.TryAddHandler(
+                new Persistence.Mutable.Config.Handler()
+                {
+                    Name = typeof(IFileSystem).FullName,
+                    Type = typeof(LocalFileSystem).FullName
+                });
 
             await SaveConfigAsync();
 
@@ -235,27 +233,27 @@ namespace ModLoader.Core
 
             Plugins = plugins;
 
-            var fsHandlerName = Config.Handlers[typeof(IFileSystem).FullName];
+            var fsHandler = Config.Handlers[typeof(IFileSystem).FullName];
             var validPlugins = Plugins.GetPluginsOfInterface<IFileSystem>();
 
-            if (validPlugins.TryGetValue(fsHandlerName, out var plugin))
+            if (validPlugins.TryGetValue(fsHandler.Type, out var plugin))
             {
-                if (!Config.Plugins.TryGetValue(fsHandlerName, out var pluginConfig))
+                if (!Config.Plugins.TryGetValue(fsHandler.Type, out var pluginConfig))
                 {
-                    pluginConfig = new();
+                    pluginConfig = new() { Name = fsHandler.Type };
                 }
 
-                pluginConfig.TryAdd("LocalDir", GamePath);
-                pluginConfig.TryAdd("TempDir", TempPath);
+                pluginConfig.Items.TryAdd("LocalDir", GamePath);
+                pluginConfig.Items.TryAdd("TempDir", TempPath);
 
-                Files = plugin.CreateInstance(pluginConfig);
+                Files = plugin.CreateInstance(pluginConfig.Items);
             }
         }
 
         private async Task LoadConfigEarlyAsync()
         {
             using (var stream = File.OpenRead(ConfigPath))
-                Config = await Config.LoadFromStreamAsync(stream);
+                Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
 
             GamePath = Config.GamePath;
         }
@@ -306,8 +304,9 @@ namespace ModLoader.Core
         {
             foreach (var pack in Packs)
             {
-                var packConfig = new Config.Pack()
+                var packConfig = new Persistence.Mutable.Config.Pack()
                 {
+                    Name = pack.Name,
                     Enabled = pack.Enabled,
                     Fallback = null
                 };
@@ -317,17 +316,19 @@ namespace ModLoader.Core
                     if (!packConfig.Modules.ContainsKey(module.Name))
                         packConfig.Modules.Add(module.Name, null);
 
-                    Dictionary<long, Config.Xunk> xunks = null;
+                    var moduleConfig = new Persistence.Mutable.Config.Module()
+                    {
+                        Enabled = module.Enabled
+                    };
 
                     void SaveXunks<T>()
                         where T : Xunk<T>
                     {
                         var group = module as XunkGroup<T>;
 
-                        xunks = new Dictionary<long, Config.Xunk>();
                         foreach (var member in group.Xunks.Select(m => m.ResolveSelf()))
                         {
-                            xunks.Add(member.Offset, new Config.Xunk
+                            moduleConfig.Xunks.Add(member.Offset, new Persistence.Mutable.Config.Xunk
                             {
                                 Enabled = member.Enabled
                             });
@@ -339,10 +340,7 @@ namespace ModLoader.Core
                     else if (module is Patch)
                         SaveXunks<Chunk>();
 
-                    packConfig.Modules[module.Name] = new Config.Module(xunks)
-                    {
-                        Enabled = module.Enabled
-                    };
+                    packConfig.Modules[module.Name] = moduleConfig;
                 }
 
                 if (!Config.Packs.ContainsKey(pack.Name))
@@ -356,21 +354,10 @@ namespace ModLoader.Core
 
         public async Task LoadGraphAsync()
         {
-            try
+            using (var stream = File.OpenRead(GraphPath))
             {
-                using (var stream = File.OpenRead(GraphPath))
-                {
-                    Graph = await Graph.LoadFromStreamAsync(stream);
-                }
+                Graph = await Persistence.Mutable.Graph.LoadFromStreamAsync(stream);
             }
-            catch
-            {
-                using (var stream = File.OpenRead(GraphPath))
-                {
-                    Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
-                }
-            }
-
         }
 
         public async Task SaveGraphAsync()
@@ -448,7 +435,7 @@ namespace ModLoader.Core
                 .Distinct();
 
             var toRemove = inactive
-                .Where(m => !@base.Any(b => b.Name == m.Name) && Graph.Table.ContainsKey(m.Name))
+                .Where(m => !@base.Any(b => b.Name == m.Name) && Graph.Entries.ContainsKey(m.Name))
                 .Distinct();
 
             foreach (var module in toLoad)
@@ -458,7 +445,7 @@ namespace ModLoader.Core
 
             foreach (var module in toRemove)
             {
-                Graph.Table.Remove(module.Name);
+                Graph.Entries.Remove(module.Name);
                 await Files.RemoveFileAsync(module.Name);
             }
         }

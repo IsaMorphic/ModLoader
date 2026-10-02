@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public abstract class Prioritized<T, U> : IMergeable<IResolvable<T>, U>
         where T : class

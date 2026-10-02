@@ -1,0 +1,50 @@
+﻿using CFS.SnabNet;
+
+namespace ModLoader.Core
+{
+    using Persistence.Types;
+
+    public partial class Pack
+    {
+        [SnabStruct]
+        public partial class Meta
+        {
+            [SnabField("Id", SnabGuid.TypeId)]
+            public Guid Id { get; set; }
+
+            [SnabField("Fallback", SnabGuid.TypeId)]
+            public Guid? Fallback { get; set; }
+
+            [SnabField]
+            public string Name { get; set; }
+
+            [SnabField]
+            public string Author { get; set; }
+
+            [SnabField]
+            public string Notes { get; set; }
+
+            public async Task WriteToStreamAsync(Stream stream)
+            {
+                SnabInstance instance = new();
+                instance.RegisterType<SnabGuid>();
+
+                using (var writer = instance.CreateWriter(stream, SnabFlags.User | SnabFlags.Compressed))
+                {
+                    writer.Serialize(this);
+                }
+            }
+
+            public static async Task<Meta> LoadFromStreamAsync(Stream stream)
+            {
+                SnabInstance instance = new();
+                instance.RegisterType<SnabGuid>();
+
+                using (var reader = instance.CreateReader(stream))
+                {
+                    return reader.Deserialize<Meta>();
+                }
+            }
+        }
+    }
+}

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core
+﻿namespace ModLoader.Core
 {
     using Abstract;
 
@@ -58,12 +53,12 @@ namespace ModLoader.Core
 
         public virtual async Task LoadSelfAsync()
         {
-            if (!Root.Graph.Table.ContainsKey(Name))
+            if (!Root.Graph.Entries.ContainsKey(Name))
             {
-                Root.Graph.Table.Add(Name, Guid.Empty);
+                Root.Graph.Entries.Add(Name, Guid.Empty);
             }
 
-            if (Root.Graph.Table[Name] == Id) return;
+            if (Root.Graph.Entries[Name] == Id) return;
 
             var file = await Root.Files.StageFileAsync(Name);
             try
@@ -82,7 +77,7 @@ namespace ModLoader.Core
                     await Root.BasePack.RemoveModuleAsync(Name);
                 }
 
-                Root.Graph.Table[Name] = Id;
+                Root.Graph.Entries[Name] = Id;
             }
             catch (Exception)
             {

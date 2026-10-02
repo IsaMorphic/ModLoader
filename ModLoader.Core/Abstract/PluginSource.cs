@@ -1,8 +1,7 @@
-﻿using ModLoader.Core.Plugins.Interfaces;
-using System.Collections.Generic;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
+    using Plugins.Interfaces;
+
     public interface IPluginSource
     {
         IReadOnlyDictionary<string, IPlugin<T>> GetPluginsOfInterface<T>();

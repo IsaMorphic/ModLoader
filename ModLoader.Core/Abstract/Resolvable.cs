@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public interface IResolvable<out T> : IPotential<T>
         where T : class

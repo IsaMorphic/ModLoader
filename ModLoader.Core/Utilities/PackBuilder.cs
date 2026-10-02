@@ -1,12 +1,8 @@
-﻿using System;
-using System.IO;
-using System.IO.Compression;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 
 namespace ModLoader.Core.Utilities
 {
-    using ModLoader.Core.Persistence.Mutable;
-    using Persistence;
+    using Persistence.Mutable;
 
     public class PackBuilder
     {
@@ -80,10 +76,10 @@ namespace ModLoader.Core.Utilities
                     await ImageStream.CopyToAsync(entryStream);
                 }
 
-                using (var entryStream = archive.CreateEntry("_meta.json").Open())
+                using (var entryStream = archive.CreateEntry("_meta.snab").Open())
                     await MetaData.WriteToStreamAsync(entryStream);
 
-                using (var entryStream = archive.CreateEntry("_pack.json").Open())
+                using (var entryStream = archive.CreateEntry("_pack.snab").Open())
                     await graph.WriteToStreamAsync(entryStream);
             }
         }

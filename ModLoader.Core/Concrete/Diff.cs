@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core
+﻿namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
@@ -78,8 +72,8 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Hunk> group)
             {
-                if (group.Root.Graph.Table.ContainsKey(group.Name) && 
-                    group.Root.Graph.Table[group.Name] == group.Id) return;
+                if (group.Root.Graph.Entries.ContainsKey(group.Name) && 
+                    group.Root.Graph.Entries[group.Name] == group.Id) return;
 
                 await group.Root.BasePack.CopyModuleAsync(group.Name);
 
@@ -145,10 +139,10 @@ namespace ModLoader.Core
                 {
                     await group.Root.Files.CommitFileAsync(file);
 
-                    if (group.Root.Graph.Table.ContainsKey(group.Name))
-                        group.Root.Graph.Table[group.Name] = group.Id;
+                    if (group.Root.Graph.Entries.ContainsKey(group.Name))
+                        group.Root.Graph.Entries[group.Name] = group.Id;
                     else
-                        group.Root.Graph.Table.Add(group.Name, group.Id);
+                        group.Root.Graph.Entries.Add(group.Name, group.Id);
                 }
                 catch (Exception)
                 {

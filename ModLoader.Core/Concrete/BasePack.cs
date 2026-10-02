@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core
+﻿namespace ModLoader.Core
 {
     using Abstract;
-    using ModLoader.Core.Persistence.Mutable;
-    using Persistence;
+    using Persistence.Mutable;
 
     public class BasePack : IPackBase
     {
@@ -48,21 +41,11 @@ namespace ModLoader.Core
 
             Directory.CreateDirectory(Path.Combine(Parent.ModPath, Name));
 
-            if (File.Exists(Path.Combine(Parent.ModPath, Name, "_pack.json")))
+            if (File.Exists(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
             {
-                try
+                using (var stream = File.OpenRead(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
                 {
-                    using (var stream = File.OpenRead(Path.Combine(Parent.ModPath, Name, "_pack.json")))
-                    {
-                        Graph = await Graph.LoadFromStreamAsync(stream);
-                    }
-                }
-                catch
-                {
-                    using (var stream = File.OpenRead(Path.Combine(Parent.ModPath, Name, "_pack.json")))
-                    {
-                        Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
-                    }
+                    Graph = await Graph.LoadFromStreamAsync(stream);
                 }
             }
             else
@@ -73,7 +56,7 @@ namespace ModLoader.Core
                     Graph.Entries.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), Guid.NewGuid());
                 }
 
-                using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.json")))
+                using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
                 {
                     await Graph.WriteToStreamAsync(stream);
                 }

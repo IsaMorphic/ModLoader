@@ -1,27 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CFS.SnabNet;
 
 namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
 
-    public class Chunk : Xunk<Chunk>, IExceptional
+    public partial class Chunk : Xunk<Chunk>, IExceptional
     {
-        public override long Offset { get; }
-        public override long Length => Data.Length - 1;
+        [SnabStruct]
+        public partial class Data
+        {
+            [SnabField]
+            public long Offset { get; set; }
 
-        public byte[] Data { get; }
+            [SnabField]
+            public byte[] Buffer { get; set; }
+        }
+
+        private readonly Data _data;
+
+        public override long Offset => _data.Offset;
+        public override long Length => _data.Buffer.Length - 1;
+
+        public byte[] Buffer => _data.Buffer;
 
         public HashSet<Exception> Errors { get; }
 
-        public Chunk(Patch parent, long offset, byte[] data) : base(parent)
+        public Chunk(Patch parent, Data data) : base(parent)
         {
-            Offset = offset;
-            Data = data;
+            _data = data;
             Errors = new();
         }
 
@@ -31,7 +38,7 @@ namespace ModLoader.Core
         {
             List<string> lines = new List<string>();
             lines.Add($"Starting at offset 0x{Offset:X}:");
-            lines.AddRange(Data
+            lines.AddRange(_data.Buffer
                 .Select((n, idx) => new { idx, n })
                 .GroupBy(x => x.idx / 8)
                 .Select(g => g
@@ -46,13 +53,13 @@ namespace ModLoader.Core
         }
     }
 
-    public class Patch : XunkGroup<Chunk>
+    public partial class Patch : XunkGroup<Chunk>
     {
         public class PatchLoader : IXunkLoader<Chunk>
         {
             public async Task LoadAsync(XunkGroup<Chunk> group)
             {
-                if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
+                if (group.Root.Graph.Entries.ContainsKey(group.Name) && group.Root.Graph.Entries[group.Name] == group.Id) return;
 
                 await group.Root.BasePack.CopyModuleAsync(group.Name);
 
@@ -67,15 +74,15 @@ namespace ModLoader.Core
                         if (chunk.Offset > file.Stream.Length)
                             throw new InvalidOperationException($"An attempt was made by a patch module to modify data outside of the base module's bounds.\nOffending module: {group.Name}");
                         file.Stream.Seek(chunk.Offset, SeekOrigin.Begin);
-                        await file.Stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
+                        await file.Stream.WriteAsync(chunk.Buffer, 0, chunk.Buffer.Length);
                     }
 
                     await group.Root.Files.CommitFileAsync(file);
 
-                    if (group.Root.Graph.Table.ContainsKey(group.Name))
-                        group.Root.Graph.Table[group.Name] = group.Id;
+                    if (group.Root.Graph.Entries.ContainsKey(group.Name))
+                        group.Root.Graph.Entries[group.Name] = group.Id;
                     else
-                        group.Root.Graph.Table.Add(group.Name, group.Id);
+                        group.Root.Graph.Entries.Add(group.Name, group.Id);
                 }
                 catch (Exception)
                 {
@@ -83,6 +90,13 @@ namespace ModLoader.Core
                     throw;
                 }
             }
+        }
+
+        [SnabStruct]
+        public partial class Data
+        {
+            [SnabField("Chunks", SnabType.Array)]
+            public Chunk.Data[] Chunks { get; set; }
         }
 
         static Patch()
@@ -98,28 +112,20 @@ namespace ModLoader.Core
         {
             return Task.Run(async () =>
             {
-                try
+                await Root.BasePack.CopyModuleAsync(Name);
+
+                SnabInstance instance = new SnabInstance();
+                using (var reader = instance.CreateReader(GetDataStream()))
                 {
-                    await Root.BasePack.CopyModuleAsync(Name);
-
-                    using (var data = GetDataStream())
-                    using (var reader = new BinaryReader(data))
+                    Chunk.Data[] chunks = reader.Deserialize<Data>().Chunks;
+                    foreach (var chunkData in chunks)
                     {
-                        while (true)
-                        {
-                            long offset = reader.ReadInt64();
-                            byte[] bytes = reader.ReadBytes(reader.ReadInt32());
-
-                            var chunk = new Chunk(this, offset, bytes);
-
-                            if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
-                                chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
-
-                            Xunks.Add(chunk);
-                        }
+                        var chunk = new Chunk(this, chunkData);
+                        if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                            chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
+                        Xunks.Add(chunk);
                     }
                 }
-                catch (EndOfStreamException) { }
             });
         }
 

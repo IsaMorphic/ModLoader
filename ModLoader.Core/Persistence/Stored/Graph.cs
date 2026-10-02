@@ -1,11 +1,8 @@
 ﻿using CFS.SnabNet;
-using System;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace ModLoader.Core.Persistence.Stored
 {
-    using Types;
+    using Persistence.Types;
 
     [SnabStruct]
     public partial class Graph
@@ -16,7 +13,7 @@ namespace ModLoader.Core.Persistence.Stored
             [SnabField]
             public string Name { get; set; }
 
-            [SnabField("Id", SnabGuid.TYPE_ID)]
+            [SnabField("Id", SnabGuid.TypeId)]
             public Guid Id { get; set; }
         }
 

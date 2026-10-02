@@ -1,7 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core
+﻿namespace ModLoader.Core
 {
     public class Burn : Module
     {
@@ -11,13 +8,13 @@ namespace ModLoader.Core
 
         public override async Task LoadSelfAsync()
         {
-            if (Root.Graph.Table[Name] == Id) return;
+            if (Root.Graph.Entries[Name] == Id) return;
 
             await Root.BasePack.CopyModuleAsync(Name);
 
             await Root.Files.RemoveFileAsync(Name);
 
-            Root.Graph.Table[Name] = Id;
+            Root.Graph.Entries[Name] = Id;
         }
 
         public override string ToString()

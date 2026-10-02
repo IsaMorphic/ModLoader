@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public class PrioritizedModule : Prioritized<Module, string>
     {

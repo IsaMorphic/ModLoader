@@ -1,14 +1,12 @@
 ﻿using CFS.SnabNet;
-using System;
-using System.Collections.Generic;
 
 namespace ModLoader.Core.Persistence.Types
 {
     public class SnabGuid : ISnabType<Guid>
     {
-        public const byte TYPE_ID = 0x80;
+        public const byte TypeId = 0x80;
         
-        public HashSet<byte> TypeIds { get; } = [TYPE_ID];
+        public HashSet<byte> TypeIds { get; } = [TypeId];
 
         public Guid ReadFromInstance(SnabReader instance, byte typeId)
         {

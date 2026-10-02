@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core.Utilities
+﻿namespace ModLoader.Core.Utilities
 {
     public class PatchBuilder : IXunkBasedBuilder
     {

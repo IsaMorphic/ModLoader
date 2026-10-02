@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ModLoader.Core.Persistence.Mutable
+﻿namespace ModLoader.Core.Persistence.Mutable
 {
     public class Graph
     {
         public Dictionary<string, Guid> Entries { get; }
 
-        public Graph(Stored.Graph graph)
+        public Graph() 
+        {
+            Entries = new();
+        }
+
+        internal Graph(Stored.Graph graph)
         {
             Entries = new();
 
@@ -17,7 +19,7 @@ namespace ModLoader.Core.Persistence.Mutable
             }
         }
 
-        public Stored.Graph Store()
+        internal Stored.Graph Store()
         {
             var graph = new Stored.Graph();
 
@@ -33,6 +35,16 @@ namespace ModLoader.Core.Persistence.Mutable
 
             graph.Entries = entries.ToArray();
             return graph;
+        }
+
+        public static async Task<Graph> LoadFromStreamAsync(Stream stream) 
+        {
+            return new Graph(await Stored.Graph.LoadFromStreamAsync(stream));
+        }
+
+        public async Task WriteToStreamAsync(Stream stream)
+        {
+            await Store().WriteToStreamAsync(stream);
         }
     }
 }

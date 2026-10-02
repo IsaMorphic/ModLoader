@@ -1,6 +1,4 @@
 ﻿using CFS.SnabNet;
-using System.IO;
-using System.Threading.Tasks;
 
 namespace ModLoader.Core.Persistence.Stored
 {
@@ -77,7 +75,7 @@ namespace ModLoader.Core.Persistence.Stored
         }
 
         [SnabField]
-        public string GamePath { get; init; }
+        public string GamePath { get; set; }
 
         [SnabField("Packs", SnabType.Array)]
         public Pack[] Packs { get; set; }
@@ -91,7 +89,7 @@ namespace ModLoader.Core.Persistence.Stored
         public async Task WriteToStreamAsync(Stream stream)
         {
             SnabInstance instance = new();
-            using (var writer = instance.CreateWriter(stream, SnabFlags.Compressed))
+            using (var writer = instance.CreateWriter(stream, SnabFlags.User | SnabFlags.Compressed))
             {
                 writer.Serialize(this);
             }   

@@ -1,11 +1,7 @@
-﻿using System.Collections.Generic;
-
-namespace ModLoader.Core.Concrete
+﻿namespace ModLoader.Core.Concrete
 {
     using Abstract;
     using Plugins.Interfaces;
-    using System.IO;
-    using System.Linq;
 
     public class DirectoryPluginSource : IPluginSource
     {
