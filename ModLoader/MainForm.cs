@@ -161,7 +161,7 @@ namespace ModLoader
             WindowState = Settings.Default.LoaderMaximized ? FormWindowState.Maximized : FormWindowState.Normal;
 
             var waiter = new WaitingForm();
-            waiter.Show();
+            await InvokeAsync(waiter.Show);
 
             try
             {
@@ -175,7 +175,7 @@ namespace ModLoader
             }
             finally
             {
-                waiter.Hide();
+                await InvokeAsync(waiter.Hide);
             }
 
             await InvokeAsync(Show);
@@ -272,8 +272,8 @@ namespace ModLoader
             {
                 var modules = Game.ResolveModules();
 
-                Hide();
-                waiter.Show();
+                await InvokeAsync(Hide);
+                await InvokeAsync(waiter.Show);
 
                 await Game.ReloadBaseModulesAsync();
                 await Game.LoadModulesAsync(modules);
@@ -290,8 +290,8 @@ namespace ModLoader
             }
             finally
             {
-                waiter.Hide();
-                Show();
+                await InvokeAsync(waiter.Hide);
+                await InvokeAsync(Show);
             }
         }
 
