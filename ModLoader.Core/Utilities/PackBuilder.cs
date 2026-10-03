@@ -67,7 +67,7 @@ namespace ModLoader.Core.Utilities
                     }
 
                     if (name != "_fallback.txt")
-                        graph.Entries.Add(name, Guid.NewGuid());
+                        graph.Table.Add(name, Guid.NewGuid());
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())

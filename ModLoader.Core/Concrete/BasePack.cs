@@ -48,12 +48,26 @@
                     Graph = await Graph.LoadFromStreamAsync(stream);
                 }
             }
-            else
+            else if (File.Exists(Path.Combine(Parent.ModPath, Name, "_pack.json")))
+            {
+                using (var stream = File.OpenRead(Path.Combine(Parent.ModPath, Name, "_pack.json")))
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream, useJson: true);
+                }
+
+                using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
+                {
+                    await Graph.WriteToStreamAsync(stream, compressed: true);
+                }
+
+                File.Delete(Path.Combine(Parent.ModPath, Name, "_pack.json"));
+            }
+            else 
             {
                 Graph = new Graph();
                 foreach (string filePath in Directory.EnumerateFiles(Parent.GamePath, "*.*", SearchOption.AllDirectories))
                 {
-                    Graph.Entries.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), Guid.NewGuid());
+                    Graph.Table.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), Guid.NewGuid());
                 }
 
                 using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
@@ -61,7 +75,6 @@
                     await Graph.WriteToStreamAsync(stream);
                 }
             }
-
 
             var packFiles = Directory.EnumerateFiles(
                 Path.Combine(Parent.ModPath, Name), "*.*", SearchOption.AllDirectories)
@@ -76,7 +89,7 @@
             foreach (var entry in entries)
             {
                 string name = entry.ToLowerInvariant();
-                if (Graph.Entries.TryGetValue(name, out Guid id))
+                if (Graph.Table.TryGetValue(name, out Guid id))
                 {
                     var module = new Module(this, name, id);
                     Members.Add(name, module);
@@ -102,7 +115,7 @@
             {
                 string gameFilePath = Path.Combine(Parent.GamePath, name);
                 string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (Graph.Entries.ContainsKey(name) &&
+                if (Graph.Table.ContainsKey(name) &&
                     !File.Exists(packFilePath) &&
                     File.Exists(gameFilePath))
                 {

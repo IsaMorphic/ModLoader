@@ -1,4 +1,6 @@
-﻿namespace ModLoader.Core.Persistence.Mutable
+﻿using Newtonsoft.Json;
+
+namespace ModLoader.Core.Persistence.Mutable
 {
     public class Config
     {
@@ -19,11 +21,13 @@
             {
                 Modules = new();
 
+                Name = pack.Name;
+
                 Enabled = pack.Enabled;
 
                 Fallback = pack.Fallback;
 
-                foreach(var module in pack.Modules)
+                foreach (var module in pack.Modules)
                 {
                     Modules.Add(module.Name, new Module(module));
                 }
@@ -33,6 +37,7 @@
             {
                 var pack = new Stored.Config.Pack
                 {
+                    Name = Name,
                     Enabled = Enabled,
                     Fallback = Fallback,
                 };
@@ -40,7 +45,9 @@
                 List<Stored.Config.Module> modules = new();
                 foreach ((string name, Module module) in Modules)
                 {
-                    modules.Add(module.Store());
+                    Stored.Config.Module toStore = module.Store();
+                    toStore.Name ??= name;
+                    modules.Add(toStore);
                 }
 
                 pack.Modules = modules.ToArray();
@@ -50,6 +57,7 @@
 
         public class Module
         {
+            public string Name { get; set; }
             public bool Enabled { get; set; }
             public Dictionary<long, Xunk> Xunks { get; }
 
@@ -64,7 +72,7 @@
 
                 Enabled = module.Enabled;
 
-                foreach(var xunk in module.Xunks)
+                foreach (var xunk in module.Xunks)
                 {
                     Xunks.Add(xunk.Offset, new Xunk(xunk));
                 }
@@ -74,13 +82,16 @@
             {
                 var module = new Stored.Config.Module
                 {
+                    Name = Name,
                     Enabled = Enabled,
                 };
 
                 List<Stored.Config.Xunk> xunks = new();
                 foreach ((long offset, Xunk xunk) in Xunks)
                 {
-                    xunks.Add(xunk.Store());
+                    Stored.Config.Xunk toStore = xunk.Store();
+                    toStore.Offset = offset;
+                    xunks.Add(toStore);
                 }
 
                 module.Xunks = xunks.ToArray();
@@ -132,7 +143,7 @@
             }
         }
 
-        public class Plugin 
+        public class Plugin
         {
             public string Name { get; set; }
 
@@ -176,11 +187,11 @@
 
         public Dictionary<string, Pack> Packs { get; }
 
-        public Dictionary<string, Handler> Handlers { get; }
+        public Dictionary<string, object> Handlers { get; }
 
-        public Dictionary<string, Plugin> Plugins { get; }
+        public Dictionary<string, object> Plugins { get; }
 
-        internal Config(Stored.Config config) 
+        internal Config(Stored.Config config)
         {
             Packs = new();
             Handlers = new();
@@ -188,23 +199,23 @@
 
             GamePath = config.GamePath;
 
-            foreach(var pack in config.Packs)
+            foreach (var pack in config.Packs)
             {
                 Packs.Add(pack.Name, new Pack(pack));
             }
 
-            foreach(var handler in config.Handlers)
+            foreach (var handler in config.Handlers)
             {
                 Handlers.Add(handler.Name, new Handler(handler));
             }
 
-            foreach(var plugin in config.Plugins)
+            foreach (var plugin in config.Plugins)
             {
                 Plugins.Add(plugin.Name, new Plugin(plugin));
-            } 
+            }
         }
 
-        public Config() 
+        public Config()
         {
             Packs = new();
             Handlers = new();
@@ -213,36 +224,58 @@
 
         internal Stored.Config Store()
         {
-            var config = new Stored.Config() 
-            { 
+            var config = new Stored.Config()
+            {
                 GamePath = GamePath,
             };
 
             List<Stored.Config.Pack> packs = new();
             foreach ((string name, Pack pack) in Packs)
             {
-                packs.Add(pack.Store());
+                Stored.Config.Pack toStore = pack.Store();
+                toStore.Name ??= name;
+                packs.Add(toStore);
             }
             config.Packs = packs.ToArray();
 
             List<Stored.Config.Handler> handlers = new();
-            foreach ((string name, Handler handler) in Handlers)
+            foreach ((string name, object handler) in Handlers)
             {
-                handlers.Add(handler.Store());
+                if (handler is Handler concreteHandler)
+                {
+                    handlers.Add(concreteHandler.Store());
+                }
+                else if (handler is string handlerType)
+                {
+                    handlers.Add(new Stored.Config.Handler()
+                    { Name = name, Type = handlerType });
+                }
             }
             config.Handlers = handlers.ToArray();
 
             List<Stored.Config.Plugin> plugins = new();
-            foreach ((string name, Plugin plugin) in Plugins)
+            foreach ((string name, object plugin) in Plugins)
             {
-                plugins.Add(plugin.Store());
+                if (plugin is Plugin concretePlugin)
+                {
+                    plugins.Add(concretePlugin.Store());
+                }
+                else if (plugin is IReadOnlyDictionary<string, string> items)
+                {
+                    plugins.Add(new Stored.Config.Plugin()
+                    {
+                        Name = name,
+                        Items = items.Select(x => new Stored.Config.Plugin.Item()
+                        { Name = x.Key, Value = x.Value }).ToArray()
+                    });
+                }
             }
             config.Plugins = plugins.ToArray();
 
             return config;
         }
 
-        public bool TryAddHandler(Handler handler) 
+        public bool TryAddHandler(Handler handler)
         {
             return Handlers.TryAdd(handler.Name, handler);
         }
@@ -257,15 +290,65 @@
             return Packs.TryAdd(pack.Name, pack);
         }
 
-        public Task WriteToStreamAsync(Stream stream) 
+        public bool TryGetHandler(string name, out Handler handler)
         {
-            return Store().WriteToStreamAsync(stream);
+            if (Handlers.TryGetValue(name, out object obj) && obj is Handler concreteHandler)
+            {
+                handler = concreteHandler;
+                return true;
+            }
+            else if (obj is string handlerType)
+            {
+                handler = new Handler() { Name = name, Type = handlerType };
+                return true;
+            }
+
+            handler = null;
+            return false;
         }
 
-        public static async Task<Config> LoadFromStreamAsync(Stream stream) 
+        public bool TryGetPlugin(string name, out Plugin plugin)
         {
-            var config = await Stored.Config.LoadFromStreamAsync(stream);
-            return new Config(config);
+            if (Plugins.TryGetValue(name, out object obj) && obj is Plugin concretePlugin)
+            {
+                plugin = concretePlugin;
+                return true;
+            }
+            else if (obj is IReadOnlyDictionary<string, string> items)
+            {
+                plugin = new Plugin() { Name = name };
+                foreach (var item in items)
+                {
+                    plugin.Items.Add(item.Key, item.Value);
+                }
+                return true;
+            }
+
+            plugin = null;
+            return false;
+        }
+
+        public Task WriteToStreamAsync(Stream stream, bool compressed = false)
+        {
+            return Store().WriteToStreamAsync(stream, compressed);
+        }
+
+        public static async Task<Config> LoadFromStreamAsync(Stream stream, bool useJson = false)
+        {
+            if (useJson)
+            {
+                using (var reader = new StreamReader(stream))
+                using (var json = new JsonTextReader(reader))
+                {
+                    var serializer = new JsonSerializer();
+                    return serializer.Deserialize<Config>(json);
+                }
+            }
+            else
+            {
+                var config = await Stored.Config.LoadFromStreamAsync(stream);
+                return new Config(config);
+            }
         }
     }
 }

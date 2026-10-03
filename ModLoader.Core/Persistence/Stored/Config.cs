@@ -86,16 +86,17 @@ namespace ModLoader.Core.Persistence.Stored
         [SnabField("Plugins", SnabType.Array)]
         public Plugin[] Plugins { get; set; }
 
-        public async Task WriteToStreamAsync(Stream stream)
+        internal async Task WriteToStreamAsync(Stream stream, bool compressed)
         {
             SnabInstance instance = new();
-            using (var writer = instance.CreateWriter(stream, SnabFlags.User | SnabFlags.Compressed))
+            using (var writer = instance.CreateWriter(stream, compressed ? 
+                SnabFlags.User | SnabFlags.Compressed : SnabFlags.User))
             {
                 writer.Serialize(this);
             }   
         }
 
-        public static async Task<Config> LoadFromStreamAsync(Stream stream)
+        internal static async Task<Config> LoadFromStreamAsync(Stream stream)
         {
             SnabInstance instance = new();
             using (var reader = instance.CreateReader(stream))

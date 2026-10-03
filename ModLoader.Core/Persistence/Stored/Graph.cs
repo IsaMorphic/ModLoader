@@ -17,21 +17,22 @@ namespace ModLoader.Core.Persistence.Stored
             public Guid Id { get; set; }
         }
 
-        [SnabField("Entries", SnabType.Array)]
-        public Entry[] Entries { get; set; }
+        [SnabField("Table", SnabType.Array)]
+        public Entry[] Table { get; set; }
 
-        public async Task WriteToStreamAsync(Stream stream)
+        internal async Task WriteToStreamAsync(Stream stream, bool compressed)
         {
             SnabInstance instance = new();
             instance.RegisterType<SnabGuid>();
 
-            using (var writer = instance.CreateWriter(stream, SnabFlags.User | SnabFlags.Compressed))
+            using (var writer = instance.CreateWriter(stream, compressed ? 
+                SnabFlags.User | SnabFlags.Compressed : SnabFlags.User))
             {
                 writer.Serialize(this);
             }
         }
 
-        public static async Task<Graph> LoadFromStreamAsync(Stream stream)
+        internal static async Task<Graph> LoadFromStreamAsync(Stream stream)
         {
             SnabInstance instance = new();
             instance.RegisterType<SnabGuid>();

@@ -127,18 +127,18 @@ namespace ModLoader.Core.Utilities
                 {
                     case UpdateType.Remove:
                         Archive.GetEntry(module.Name).Delete();
-                        Graph.Entries.Remove(module.Name);
+                        Graph.Table.Remove(module.Name);
                         break;
 
                     case UpdateType.Add:
                         Archive.CreateEntryFromFile(update.FilePath, module.Name);
-                        Graph.Entries.Add(module.Name, Guid.NewGuid());
+                        Graph.Table.Add(module.Name, Guid.NewGuid());
                         break;
 
                     case UpdateType.Replace:
                         Archive.GetEntry(module.Name).Delete();
                         Archive.CreateEntryFromFile(update.FilePath, module.Name);
-                        Graph.Entries[module.Name] = Guid.NewGuid();
+                        Graph.Table[module.Name] = Guid.NewGuid();
                         break;
                 }
             }

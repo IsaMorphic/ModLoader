@@ -1,5 +1,4 @@
-﻿using CFS.SnabNet;
-using System.IO.Compression;
+﻿using System.IO.Compression;
 
 namespace ModLoader.Core
 {
@@ -64,14 +63,21 @@ namespace ModLoader.Core
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
 
-            if (Archive.GetEntry("_meta.snab") != null)
+            if (Archive.GetEntry("_meta.snab") is ZipArchiveEntry snabEntry)
             {
-                using (var stream = Archive.GetEntry("_meta.snab").Open())
+                using (var stream = snabEntry.Open())
                 {
                     MetaData = await Meta.LoadFromStreamAsync(stream);
                 }
             }
-            else
+            else if (Archive.GetEntry("_meta.json") is ZipArchiveEntry jsonEntry)
+            {
+                using (var stream = jsonEntry.Open())
+                {
+                    MetaData = await Meta.LoadFromStreamAsync(stream, useJson: true);
+                }
+            }
+            else 
             {
                 MetaData = new Meta
                 {
@@ -93,9 +99,19 @@ namespace ModLoader.Core
                 await ReadMetaDataAsync();
             }
 
-            using (var stream = Archive.GetEntry("_pack.snab").Open())
+            if (Archive.GetEntry("_pack.snab") is ZipArchiveEntry snabEntry)
             {
-                Graph = await Graph.LoadFromStreamAsync(stream);
+                using (var stream = snabEntry.Open())
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream);
+                }
+            }
+            else if (Archive.GetEntry("_pack.json") is ZipArchiveEntry jsonEntry)
+            {
+                using (var stream = jsonEntry.Open())
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream, useJson: true);
+                }
             }
 
             var noteEntry = Archive.GetEntry("_pack.txt");
@@ -135,7 +151,7 @@ namespace ModLoader.Core
             foreach (var entry in entries)
             {
                 string name = entry.FullName.ToLowerInvariant();
-                Guid id = Graph.Entries[name];
+                Guid id = Graph.Table[name];
 
                 if (name.EndsWith(".diff"))
                 {

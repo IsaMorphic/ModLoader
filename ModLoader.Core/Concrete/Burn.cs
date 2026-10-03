@@ -8,13 +8,13 @@
 
         public override async Task LoadSelfAsync()
         {
-            if (Root.Graph.Entries[Name] == Id) return;
+            if (Root.Graph.Table[Name] == Id) return;
 
             await Root.BasePack.CopyModuleAsync(Name);
 
             await Root.Files.RemoveFileAsync(Name);
 
-            Root.Graph.Entries[Name] = Id;
+            Root.Graph.Table[Name] = Id;
         }
 
         public override string ToString()

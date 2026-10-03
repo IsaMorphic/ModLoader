@@ -53,12 +53,12 @@
 
         public virtual async Task LoadSelfAsync()
         {
-            if (!Root.Graph.Entries.ContainsKey(Name))
+            if (!Root.Graph.Table.ContainsKey(Name))
             {
-                Root.Graph.Entries.Add(Name, Guid.Empty);
+                Root.Graph.Table.Add(Name, Guid.Empty);
             }
 
-            if (Root.Graph.Entries[Name] == Id) return;
+            if (Root.Graph.Table[Name] == Id) return;
 
             var file = await Root.Files.StageFileAsync(Name);
             try
@@ -72,12 +72,12 @@
 
                 await Root.Files.CommitFileAsync(file);
 
-                if (Root.BasePack.Graph.Entries.TryGetValue(Name, out Guid id) && id == Id) 
+                if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id) 
                 {
                     await Root.BasePack.RemoveModuleAsync(Name);
                 }
 
-                Root.Graph.Entries[Name] = Id;
+                Root.Graph.Table[Name] = Id;
             }
             catch (Exception)
             {

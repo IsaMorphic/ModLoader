@@ -1,21 +1,23 @@
-﻿namespace ModLoader.Core.Persistence.Mutable
+﻿using Newtonsoft.Json;
+
+namespace ModLoader.Core.Persistence.Mutable
 {
     public class Graph
     {
-        public Dictionary<string, Guid> Entries { get; }
+        public Dictionary<string, Guid> Table { get; }
 
         public Graph() 
         {
-            Entries = new();
+            Table = new();
         }
 
         internal Graph(Stored.Graph graph)
         {
-            Entries = new();
+            Table = new();
 
-            foreach (var entry in graph.Entries)
+            foreach (var entry in graph.Table)
             {
-                Entries.Add(entry.Name, entry.Id);
+                Table.Add(entry.Name, entry.Id);
             }
         }
 
@@ -23,28 +25,40 @@
         {
             var graph = new Stored.Graph();
 
-            List<Stored.Graph.Entry> entries = new();
-            foreach ((string name, Guid id) in Entries)
+            List<Stored.Graph.Entry> table = new();
+            foreach ((string name, Guid id) in Table)
             {
-                entries.Add(new Stored.Graph.Entry
+                table.Add(new Stored.Graph.Entry
                 {
                     Name = name,
                     Id = id
                 });
             }
 
-            graph.Entries = entries.ToArray();
+            graph.Table = table.ToArray();
             return graph;
         }
 
-        public static async Task<Graph> LoadFromStreamAsync(Stream stream) 
+        public static async Task<Graph> LoadFromStreamAsync(Stream stream, bool useJson = false) 
         {
-            return new Graph(await Stored.Graph.LoadFromStreamAsync(stream));
+            if (useJson)
+            {
+                using (var reader = new StreamReader(stream))
+                using (var json = new JsonTextReader(reader))
+                {
+                    var serializer = new JsonSerializer();
+                    return serializer.Deserialize<Graph>(json);
+                }
+            }
+            else
+            {
+                return new Graph(await Stored.Graph.LoadFromStreamAsync(stream));
+            }
         }
 
-        public async Task WriteToStreamAsync(Stream stream)
+        public async Task WriteToStreamAsync(Stream stream, bool compressed = false)
         {
-            await Store().WriteToStreamAsync(stream);
+            await Store().WriteToStreamAsync(stream, compressed);
         }
     }
 }

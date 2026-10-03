@@ -1,4 +1,5 @@
 ﻿using CFS.SnabNet;
+using Newtonsoft.Json;
 
 namespace ModLoader.Core
 {
@@ -24,25 +25,38 @@ namespace ModLoader.Core
             [SnabField]
             public string Notes { get; set; }
 
-            public async Task WriteToStreamAsync(Stream stream)
+            public async Task WriteToStreamAsync(Stream stream, bool compressed = false)
             {
                 SnabInstance instance = new();
                 instance.RegisterType<SnabGuid>();
 
-                using (var writer = instance.CreateWriter(stream, SnabFlags.User | SnabFlags.Compressed))
+                using (var writer = instance.CreateWriter(stream, compressed ? 
+                    SnabFlags.User | SnabFlags.Compressed : SnabFlags.User))
                 {
                     writer.Serialize(this);
                 }
             }
 
-            public static async Task<Meta> LoadFromStreamAsync(Stream stream)
+            public static async Task<Meta> LoadFromStreamAsync(Stream stream, bool useJson = false)
             {
-                SnabInstance instance = new();
-                instance.RegisterType<SnabGuid>();
-
-                using (var reader = instance.CreateReader(stream))
+                if (useJson)
                 {
-                    return reader.Deserialize<Meta>();
+                    using (var reader = new StreamReader(stream))
+                    using (var json = new JsonTextReader(reader))
+                    {
+                        var serializer = new JsonSerializer();
+                        return serializer.Deserialize<Meta>(json);
+                    }
+                }
+                else
+                {
+                    SnabInstance instance = new();
+                    instance.RegisterType<SnabGuid>();
+
+                    using (var reader = instance.CreateReader(stream))
+                    {
+                        return reader.Deserialize<Meta>();
+                    }
                 }
             }
         }

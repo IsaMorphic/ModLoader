@@ -59,7 +59,7 @@ namespace ModLoader.Core
         {
             public async Task LoadAsync(XunkGroup<Chunk> group)
             {
-                if (group.Root.Graph.Entries.ContainsKey(group.Name) && group.Root.Graph.Entries[group.Name] == group.Id) return;
+                if (group.Root.Graph.Table.ContainsKey(group.Name) && group.Root.Graph.Table[group.Name] == group.Id) return;
 
                 await group.Root.BasePack.CopyModuleAsync(group.Name);
 
@@ -79,10 +79,10 @@ namespace ModLoader.Core
 
                     await group.Root.Files.CommitFileAsync(file);
 
-                    if (group.Root.Graph.Entries.ContainsKey(group.Name))
-                        group.Root.Graph.Entries[group.Name] = group.Id;
+                    if (group.Root.Graph.Table.ContainsKey(group.Name))
+                        group.Root.Graph.Table[group.Name] = group.Id;
                     else
-                        group.Root.Graph.Entries.Add(group.Name, group.Id);
+                        group.Root.Graph.Table.Add(group.Name, group.Id);
                 }
                 catch (Exception)
                 {
@@ -114,17 +114,43 @@ namespace ModLoader.Core
             {
                 await Root.BasePack.CopyModuleAsync(Name);
 
-                SnabInstance instance = new SnabInstance();
-                using (var reader = instance.CreateReader(GetDataStream()))
+                try
                 {
-                    Chunk.Data[] chunks = reader.Deserialize<Data>().Chunks;
-                    foreach (var chunkData in chunks)
+                    SnabInstance instance = new SnabInstance();
+                    using (var reader = instance.CreateReader(GetDataStream()))
                     {
-                        var chunk = new Chunk(this, chunkData);
-                        if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
-                            chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
-                        Xunks.Add(chunk);
+                        Chunk.Data[] chunks = reader.Deserialize<Data>().Chunks;
+                        foreach (var chunkData in chunks)
+                        {
+                            var chunk = new Chunk(this, chunkData);
+                            if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                                chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
+                            Xunks.Add(chunk);
+                        }
                     }
+                }
+                catch (EndOfStreamException)
+                {
+                    try
+                    {
+                        using (var data = GetDataStream())
+                        using (var reader = new BinaryReader(data))
+                        {
+                            while (true)
+                            {
+                                long offset = reader.ReadInt64();
+                                byte[] bytes = reader.ReadBytes(reader.ReadInt32());
+
+                                var chunk = new Chunk(this, new Chunk.Data() { Offset = offset, Buffer = bytes });
+
+                                if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                                    chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
+
+                                Xunks.Add(chunk);
+                            }
+                        }
+                    }
+                    catch (EndOfStreamException) { }
                 }
             });
         }

@@ -231,12 +231,11 @@ namespace ModLoader.Core
 
             Plugins = plugins;
 
-            var fsHandler = Config.Handlers[typeof(IFileSystem).FullName];
             var validPlugins = Plugins.GetPluginsOfInterface<IFileSystem>();
-
-            if (validPlugins.TryGetValue(fsHandler.Type, out var plugin))
+            if (Config.TryGetHandler(typeof(IFileSystem).FullName, out var fsHandler) && 
+                validPlugins.TryGetValue(fsHandler.Type, out var plugin))
             {
-                if (!Config.Plugins.TryGetValue(fsHandler.Type, out var pluginConfig))
+                if (!Config.TryGetPlugin(fsHandler.Type, out var pluginConfig))
                 {
                     pluginConfig = new() { Name = fsHandler.Type };
                 }
@@ -250,8 +249,23 @@ namespace ModLoader.Core
 
         private async Task LoadConfigEarlyAsync()
         {
-            using (var stream = File.OpenRead(ConfigPath))
-                Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
+            try
+            {
+                using (var stream = File.OpenRead(ConfigPath))
+                    Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
+            }
+            catch (FileNotFoundException)
+            {
+                using (var stream = File.OpenRead(Path.ChangeExtension(ConfigPath, ".json")))
+                {
+                    Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream, useJson: true);
+                }
+
+                using (var stream = File.Create(ConfigPath))
+                    await Config.WriteToStreamAsync(stream, compressed: true);
+
+                File.Delete(Path.ChangeExtension(ConfigPath, ".json"));
+            }
 
             GamePath = Config.GamePath;
         }
@@ -347,21 +361,36 @@ namespace ModLoader.Core
             }
 
             using (var stream = File.Create(ConfigPath))
-                await Config.WriteToStreamAsync(stream);
+                await Config.WriteToStreamAsync(stream, compressed: true);
         }
 
         public async Task LoadGraphAsync()
         {
-            using (var stream = File.OpenRead(GraphPath))
+            try
             {
-                Graph = await Persistence.Mutable.Graph.LoadFromStreamAsync(stream);
+                using (var stream = File.OpenRead(GraphPath))
+                {
+                    Graph = await Persistence.Mutable.Graph.LoadFromStreamAsync(stream);
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                using (var stream = File.OpenRead(Path.ChangeExtension(GraphPath, ".json")))
+                {
+                    Graph = await Persistence.Mutable.Graph.LoadFromStreamAsync(stream, useJson: true);
+                }
+
+                using (var stream = File.Create(GraphPath))
+                    await Graph.WriteToStreamAsync(stream, compressed: true);
+
+                File.Delete(Path.ChangeExtension(GraphPath, ".json"));
             }
         }
 
         public async Task SaveGraphAsync()
         {
             using (var stream = File.Create(GraphPath))
-                await Graph.WriteToStreamAsync(stream);
+                await Graph.WriteToStreamAsync(stream, compressed: true);
         }
 
         public async Task ExecuteLoadScript()
@@ -433,7 +462,7 @@ namespace ModLoader.Core
                 .Distinct();
 
             var toRemove = inactive
-                .Where(m => !@base.Any(b => b.Name == m.Name) && Graph.Entries.ContainsKey(m.Name))
+                .Where(m => !@base.Any(b => b.Name == m.Name) && Graph.Table.ContainsKey(m.Name))
                 .Distinct();
 
             foreach (var module in toLoad)
@@ -443,7 +472,7 @@ namespace ModLoader.Core
 
             foreach (var module in toRemove)
             {
-                Graph.Entries.Remove(module.Name);
+                Graph.Table.Remove(module.Name);
                 await Files.RemoveFileAsync(module.Name);
             }
         }
