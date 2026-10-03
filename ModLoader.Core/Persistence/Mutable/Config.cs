@@ -186,6 +186,8 @@
             Handlers = new();
             Plugins = new();
 
+            GamePath = config.GamePath;
+
             foreach(var pack in config.Packs)
             {
                 Packs.Add(pack.Name, new Pack(pack));
@@ -221,18 +223,21 @@
             {
                 packs.Add(pack.Store());
             }
+            config.Packs = packs.ToArray();
 
             List<Stored.Config.Handler> handlers = new();
             foreach ((string name, Handler handler) in Handlers)
             {
                 handlers.Add(handler.Store());
             }
+            config.Handlers = handlers.ToArray();
 
             List<Stored.Config.Plugin> plugins = new();
             foreach ((string name, Plugin plugin) in Plugins)
             {
                 plugins.Add(plugin.Store());
             }
+            config.Plugins = plugins.ToArray();
 
             return config;
         }

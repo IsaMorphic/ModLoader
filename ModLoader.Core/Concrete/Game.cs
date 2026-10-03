@@ -116,8 +116,7 @@ namespace ModLoader.Core
 
             GamePath = gamePath;
 
-            using (var stream = File.OpenRead(ConfigPath))
-                Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
+            Config = new() { GamePath = gamePath };
             Config.TryAddHandler(
                 new Persistence.Mutable.Config.Handler()
                 {
@@ -126,7 +125,6 @@ namespace ModLoader.Core
                 });
 
             await SaveConfigAsync();
-
 
             BasePack = new BasePack(this);
             await BasePack.InitializeAsync();

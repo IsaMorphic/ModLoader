@@ -143,7 +143,7 @@ namespace ModLoader
 
         private async void MainForm_Load(object sender, EventArgs e)
         {
-            BeginInvoke((Action)Hide);
+            await InvokeAsync(Hide);
 
             Width = (int)(Settings.Default.LoaderAppWidth * Screen.PrimaryScreen.Bounds.Width);
             Height = (int)(Settings.Default.LoaderAppHeight * Screen.PrimaryScreen.Bounds.Height);
@@ -178,7 +178,7 @@ namespace ModLoader
                 waiter.Hide();
             }
 
-            Show();
+            await InvokeAsync(Show);
 
             RefreshPackList();
             RefreshChangeList();
