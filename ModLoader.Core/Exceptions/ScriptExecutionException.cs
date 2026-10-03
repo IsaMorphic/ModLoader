@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ModLoader.Core.Exceptions
+﻿namespace ModLoader.Core.Exceptions
 {
     public class ScriptExecutionException : Exception
     {

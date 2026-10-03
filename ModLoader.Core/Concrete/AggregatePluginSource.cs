@@ -1,12 +1,9 @@
-﻿using ModLoader.Core.Abstract;
-using ModLoader.Core.Exceptions;
-using ModLoader.Core.Plugins.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace ModLoader.Core.Concrete
+﻿namespace ModLoader.Core.Concrete
 {
+    using Abstract;
+    using Exceptions;
+    using Plugins.Interfaces;
+
     public class AggregatePluginSource : IPluginSource
     {
         public HashSet<IPluginSource> Sources { get; }

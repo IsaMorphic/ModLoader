@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public interface IXunkLoader<T>
         where T : Xunk<T>

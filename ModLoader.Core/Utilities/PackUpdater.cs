@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 
 namespace ModLoader.Core.Utilities
 {
-    using Persistence;
+    using Persistence.Mutable;
 
     public class PackUpdater : IDisposable
     {
@@ -44,8 +39,8 @@ namespace ModLoader.Core.Utilities
             }
         }
 
-        public Pack Pack { get; }     
-        
+        public Pack Pack { get; }
+
         public string PackPath { get; }
 
         public ZipArchive Archive { get; private set; }
@@ -68,14 +63,21 @@ namespace ModLoader.Core.Utilities
             Archive?.Dispose();
             Archive = ZipFile.Open(PackPath, ZipArchiveMode.Update);
 
-            if (Archive.GetEntry("_meta.json") != null)
+            if (Archive.GetEntry("_meta.snab") is ZipArchiveEntry metaSnabEntry)
             {
-                using (var stream = Archive.GetEntry("_meta.json").Open())
+                using (var stream = metaSnabEntry.Open())
                 {
                     MetaData = await Pack.Meta.LoadFromStreamAsync(stream);
                 }
             }
-            else
+            else if (Archive.GetEntry("_meta.json") is ZipArchiveEntry metaJsonEntry)
+            {
+                using (var stream = metaJsonEntry.Open())
+                {
+                    MetaData = await Pack.Meta.LoadFromStreamAsync(stream, useJson: true);
+                }
+            }
+            else 
             {
                 MetaData = new Pack.Meta
                 {
@@ -83,22 +85,23 @@ namespace ModLoader.Core.Utilities
                     Fallback = null,
                     Name = null,
                     Author = null,
-                    Notes = "This pack is missing its _meta.json file. Please update this pack to add some."
+                    Notes = "This pack is missing its _meta.snab file. Please update this pack to add some."
                 };
             }
 
-            try
+            var packEntry = Archive.GetEntry("_pack.snab");
+            if (packEntry != null)
             {
-                using (var stream = Archive.GetEntry("_pack.json").Open())
+                using (var stream = packEntry.Open())
                 {
                     Graph = await Graph.LoadFromStreamAsync(stream);
                 }
             }
-            catch
+            else
             {
                 using (var stream = Archive.GetEntry("_pack.json").Open())
                 {
-                    Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
+                    Graph = await Graph.LoadFromStreamAsync(stream, useJson: true);
                 }
             }
 
@@ -120,7 +123,7 @@ namespace ModLoader.Core.Utilities
                 using (var stream = fallbackEntry.Open())
                 using (var reader = new StreamReader(stream))
                     fallback = (await reader.ReadLineAsync()).ToLowerInvariant();
-                
+
                 MetaData.Fallback = Pack.Parent.Packs.SingleOrDefault(p => p.Name == fallback)?.Id;
             }
 
@@ -167,13 +170,21 @@ namespace ModLoader.Core.Utilities
                 Archive.CreateEntryFromFile(ImagePath, "_pack.png");
             }
 
-            Archive.GetEntry("_pack.json").Delete();
-            using (var stream = Archive.CreateEntry("_pack.json").Open())
+            Archive.GetEntry("_pack.json")?.Delete();
+            Archive.GetEntry("_pack.snab")?.Delete();
+            using (var stream = Archive.CreateEntry("_pack.snab").Open())
                 await Graph.WriteToStreamAsync(stream);
 
             Archive.GetEntry("_meta.json")?.Delete();
-            using (var stream = Archive.CreateEntry("_meta.json").Open())
-                await MetaData.WriteToStreamAsync(stream);
+            Archive.GetEntry("_meta.snab")?.Delete();
+            using (var memStream = new MemoryStream())
+            using (var arcStream = Archive.CreateEntry("_meta.snab").Open())
+            {
+                await MetaData.WriteToStreamAsync(memStream);
+                
+                memStream.Position = 0;
+                await memStream.CopyToAsync(arcStream);
+            }
 
             Archive.Dispose();
         }

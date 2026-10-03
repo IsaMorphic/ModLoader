@@ -1,6 +1,4 @@
-﻿using System.Threading.Tasks;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public interface ILoadable<T> : IResolvable<T>
         where T : class

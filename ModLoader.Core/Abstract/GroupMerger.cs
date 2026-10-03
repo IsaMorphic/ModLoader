@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public class GroupMerger<T> : IPotential<IGroup<T>>
         where T : class

@@ -1,27 +1,35 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using CFS.SnabNet;
 
 namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
+    using Persistence.Types;
 
-    public class Chunk : Xunk<Chunk>, IExceptional
+    public partial class Chunk : Xunk<Chunk>, IExceptional
     {
-        public override long Offset { get; }
-        public override long Length => Data.Length - 1;
+        [SnabStruct]
+        public partial class Data
+        {
+            [SnabField]
+            public long Offset { get; set; }
 
-        public byte[] Data { get; }
+            [SnabField("Buffer", SnabType.Buffer)]
+            public byte[] Buffer { get; set; }
+        }
+
+        private readonly Data _data;
+
+        public override long Offset => _data.Offset;
+        public override long Length => _data.Buffer.Length - 1;
+
+        public byte[] Buffer => _data.Buffer;
 
         public HashSet<Exception> Errors { get; }
 
-        public Chunk(Patch parent, long offset, byte[] data) : base(parent)
+        public Chunk(Patch parent, Data data) : base(parent)
         {
-            Offset = offset;
-            Data = data;
+            _data = data;
             Errors = new();
         }
 
@@ -31,7 +39,7 @@ namespace ModLoader.Core
         {
             List<string> lines = new List<string>();
             lines.Add($"Starting at offset 0x{Offset:X}:");
-            lines.AddRange(Data
+            lines.AddRange(_data.Buffer
                 .Select((n, idx) => new { idx, n })
                 .GroupBy(x => x.idx / 8)
                 .Select(g => g
@@ -46,7 +54,7 @@ namespace ModLoader.Core
         }
     }
 
-    public class Patch : XunkGroup<Chunk>
+    public partial class Patch : XunkGroup<Chunk>
     {
         public class PatchLoader : IXunkLoader<Chunk>
         {
@@ -67,7 +75,7 @@ namespace ModLoader.Core
                         if (chunk.Offset > file.Stream.Length)
                             throw new InvalidOperationException($"An attempt was made by a patch module to modify data outside of the base module's bounds.\nOffending module: {group.Name}");
                         file.Stream.Seek(chunk.Offset, SeekOrigin.Begin);
-                        await file.Stream.WriteAsync(chunk.Data, 0, chunk.Data.Length);
+                        await file.Stream.WriteAsync(chunk.Buffer, 0, chunk.Buffer.Length);
                     }
 
                     await group.Root.Files.CommitFileAsync(file);
@@ -85,6 +93,13 @@ namespace ModLoader.Core
             }
         }
 
+        [SnabStruct]
+        public partial class Data
+        {
+            [SnabField("Chunks", SnabType.Array)]
+            public Chunk.Data[] Chunks { get; set; }
+        }
+
         static Patch()
         {
             XunkLoader.Register(new PatchLoader());
@@ -98,28 +113,55 @@ namespace ModLoader.Core
         {
             return Task.Run(async () =>
             {
+                await Root.BasePack.CopyModuleAsync(Name);
+
                 try
                 {
-                    await Root.BasePack.CopyModuleAsync(Name);
+                    SnabInstance instance = new SnabInstance();
+                    instance.RegisterType<SnabGuid>();
 
-                    using (var data = GetDataStream())
-                    using (var reader = new BinaryReader(data))
+                    using (var stream = GetDataStream())
+                    using (var memStream = new MemoryStream())
                     {
-                        while (true)
+                        await stream.CopyToAsync(memStream);
+                        memStream.Position = 0;
+
+                        using (var reader = instance.CreateReader(memStream))
                         {
-                            long offset = reader.ReadInt64();
-                            byte[] bytes = reader.ReadBytes(reader.ReadInt32());
-
-                            var chunk = new Chunk(this, offset, bytes);
-
-                            if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
-                                chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
-
-                            Xunks.Add(chunk);
+                            Chunk.Data[] chunks = reader.Deserialize<Data>().Chunks;
+                            foreach (var chunkData in chunks)
+                            {
+                                var chunk = new Chunk(this, chunkData);
+                                if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                                    chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
+                                Xunks.Add(chunk);
+                            }
                         }
                     }
                 }
-                catch (EndOfStreamException) { }
+                catch (EndOfStreamException)
+                {
+                    try
+                    {
+                        using (var data = GetDataStream())
+                        using (var reader = new BinaryReader(data))
+                        {
+                            while (true)
+                            {
+                                long offset = reader.ReadInt64();
+                                byte[] bytes = reader.ReadBytes(reader.ReadInt32());
+
+                                var chunk = new Chunk(this, new Chunk.Data() { Offset = offset, Buffer = bytes });
+
+                                if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                                    chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
+
+                                Xunks.Add(chunk);
+                            }
+                        }
+                    }
+                    catch (EndOfStreamException) { }
+                }
             });
         }
 

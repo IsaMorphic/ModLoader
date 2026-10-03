@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
+﻿using CFS.SnabNet;
 
 namespace ModLoader.Core.Utilities
 {
+    using Persistence.Types;
+
     public class PatchBuilder : IXunkBasedBuilder
     {
         private const int BLOCK_SIZE = 4 * 1024 * 1024;
@@ -15,7 +14,7 @@ namespace ModLoader.Core.Utilities
 
         public async Task BuildAsync(string originalFilePath, string moddedFilePath, string outputFilePath)
         {
-            List<(long pos, byte[] data)> patches = new List<(long, byte[])>();
+            List<Chunk.Data> chunks = new List<Chunk.Data>();
 
             using (var originalFileStream = File.OpenRead(originalFilePath))
             using (var moddedFileStream = File.OpenRead(moddedFilePath))
@@ -50,7 +49,7 @@ namespace ModLoader.Core.Utilities
                             byte[] bytes = new byte[diffCount];
                             
                             Array.Copy(bufferMod, diffStart, bytes, 0, diffCount);
-                            patches.Add((filePos + diffStart, bytes));
+                            chunks.Add(new() { Offset = filePos + diffStart, Buffer = bytes });
 
                             diffStart = -1;
                             diffCount = 0;
@@ -64,15 +63,14 @@ namespace ModLoader.Core.Utilities
                 }
             }
 
+            SnabInstance instance = new();
+            instance.RegisterType<SnabGuid>();
+
             using (var outputFileStream = File.Create(outputFilePath))
-            using (var writer = new BinaryWriter(outputFileStream))
+            using (var writer = instance.CreateWriter(outputFileStream, SnabFlags.User))
             {
-                foreach (var patch in patches)
-                {
-                    writer.Write(patch.pos);
-                    writer.Write(patch.data.Length);
-                    writer.Write(patch.data);
-                }
+                Patch.Data patch = new() { Chunks = chunks.ToArray() };
+                writer.Serialize(patch);
             }
         }
     }

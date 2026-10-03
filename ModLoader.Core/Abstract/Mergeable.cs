@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ModLoader.Core.Abstract
+﻿namespace ModLoader.Core.Abstract
 {
     public interface IMergeable<T, U> : IResolvable<T>
         where T : class

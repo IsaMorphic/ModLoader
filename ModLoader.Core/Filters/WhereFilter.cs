@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace ModLoader.Core.Filters
+﻿namespace ModLoader.Core.Filters
 {
     using Abstract;
 

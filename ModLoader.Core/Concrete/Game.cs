@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 
 namespace ModLoader.Core
 {
@@ -11,7 +6,6 @@ namespace ModLoader.Core
     using Concrete;
     using Exceptions;
     using Filters;
-    using Persistence;
     using Plugins;
     using Plugins.Interfaces;
     using Utilities;
@@ -36,8 +30,8 @@ namespace ModLoader.Core
 
         public GameManager Parent { get; }
 
-        public Graph Graph { get; private set; }
-        public Config Config { get; private set; }
+        public Persistence.Mutable.Graph Graph { get; private set; }
+        public Persistence.Mutable.Config Config { get; private set; }
 
         public IEnumerable<Pack> Packs { get; }
         public BasePack BasePack { get; private set; }
@@ -61,8 +55,8 @@ namespace ModLoader.Core
             PluginPath = Path.Combine(BasePath, "Plugins");
             TempPath = Path.Combine(BasePath, "_tmp");
 
-            GraphPath = Path.Combine(BasePath, "_pack.json");
-            ConfigPath = Path.Combine(BasePath, "_config.json");
+            GraphPath = Path.Combine(BasePath, "_pack.snab");
+            ConfigPath = Path.Combine(BasePath, "_config.snab");
             ScriptPath = Path.Combine(BasePath, "_script.bat");
 
             Merger = new GroupMerger<Prioritized<Module, string>>();
@@ -122,11 +116,15 @@ namespace ModLoader.Core
 
             GamePath = gamePath;
 
-            Config = new Config(GamePath);
-            Config.Handlers.Add(typeof(IFileSystem).FullName, typeof(LocalFileSystem).FullName);
+            Config = new() { GamePath = gamePath };
+            Config.TryAddHandler(
+                new Persistence.Mutable.Config.Handler()
+                {
+                    Name = typeof(IFileSystem).FullName,
+                    Type = typeof(LocalFileSystem).FullName
+                });
 
             await SaveConfigAsync();
-
 
             BasePack = new BasePack(this);
             await BasePack.InitializeAsync();
@@ -233,27 +231,41 @@ namespace ModLoader.Core
 
             Plugins = plugins;
 
-            var fsHandlerName = Config.Handlers[typeof(IFileSystem).FullName];
             var validPlugins = Plugins.GetPluginsOfInterface<IFileSystem>();
-
-            if (validPlugins.TryGetValue(fsHandlerName, out var plugin))
+            if (Config.TryGetHandler(typeof(IFileSystem).FullName, out var fsHandler) && 
+                validPlugins.TryGetValue(fsHandler.Type, out var plugin))
             {
-                if (!Config.Plugins.TryGetValue(fsHandlerName, out var pluginConfig))
+                if (!Config.TryGetPlugin(fsHandler.Type, out var pluginConfig))
                 {
-                    pluginConfig = new();
+                    pluginConfig = new() { Name = fsHandler.Type };
                 }
 
-                pluginConfig.TryAdd("LocalDir", GamePath);
-                pluginConfig.TryAdd("TempDir", TempPath);
+                pluginConfig.Items.TryAdd("LocalDir", GamePath);
+                pluginConfig.Items.TryAdd("TempDir", TempPath);
 
-                Files = plugin.CreateInstance(pluginConfig);
+                Files = plugin.CreateInstance(pluginConfig.Items);
             }
         }
 
         private async Task LoadConfigEarlyAsync()
         {
-            using (var stream = File.OpenRead(ConfigPath))
-                Config = await Config.LoadFromStreamAsync(stream);
+            try
+            {
+                using (var stream = File.OpenRead(ConfigPath))
+                    Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream);
+            }
+            catch (FileNotFoundException)
+            {
+                using (var stream = File.OpenRead(Path.ChangeExtension(ConfigPath, ".json")))
+                {
+                    Config = await Persistence.Mutable.Config.LoadFromStreamAsync(stream, useJson: true);
+                }
+
+                using (var stream = File.Create(ConfigPath))
+                    await Config.WriteToStreamAsync(stream, compressed: true);
+
+                File.Delete(Path.ChangeExtension(ConfigPath, ".json"));
+            }
 
             GamePath = Config.GamePath;
         }
@@ -304,8 +316,9 @@ namespace ModLoader.Core
         {
             foreach (var pack in Packs)
             {
-                var packConfig = new Config.Pack()
+                var packConfig = new Persistence.Mutable.Config.Pack()
                 {
+                    Name = pack.Name,
                     Enabled = pack.Enabled,
                     Fallback = null
                 };
@@ -315,17 +328,19 @@ namespace ModLoader.Core
                     if (!packConfig.Modules.ContainsKey(module.Name))
                         packConfig.Modules.Add(module.Name, null);
 
-                    Dictionary<long, Config.Xunk> xunks = null;
+                    var moduleConfig = new Persistence.Mutable.Config.Module()
+                    {
+                        Enabled = module.Enabled
+                    };
 
                     void SaveXunks<T>()
                         where T : Xunk<T>
                     {
                         var group = module as XunkGroup<T>;
 
-                        xunks = new Dictionary<long, Config.Xunk>();
                         foreach (var member in group.Xunks.Select(m => m.ResolveSelf()))
                         {
-                            xunks.Add(member.Offset, new Config.Xunk
+                            moduleConfig.Xunks.Add(member.Offset, new Persistence.Mutable.Config.Xunk
                             {
                                 Enabled = member.Enabled
                             });
@@ -337,10 +352,7 @@ namespace ModLoader.Core
                     else if (module is Patch)
                         SaveXunks<Chunk>();
 
-                    packConfig.Modules[module.Name] = new Config.Module(xunks)
-                    {
-                        Enabled = module.Enabled
-                    };
+                    packConfig.Modules[module.Name] = moduleConfig;
                 }
 
                 if (!Config.Packs.ContainsKey(pack.Name))
@@ -349,7 +361,7 @@ namespace ModLoader.Core
             }
 
             using (var stream = File.Create(ConfigPath))
-                await Config.WriteToStreamAsync(stream);
+                await Config.WriteToStreamAsync(stream, compressed: true);
         }
 
         public async Task LoadGraphAsync()
@@ -358,23 +370,27 @@ namespace ModLoader.Core
             {
                 using (var stream = File.OpenRead(GraphPath))
                 {
-                    Graph = await Graph.LoadFromStreamAsync(stream);
+                    Graph = await Persistence.Mutable.Graph.LoadFromStreamAsync(stream);
                 }
             }
-            catch
+            catch (FileNotFoundException)
             {
-                using (var stream = File.OpenRead(GraphPath))
+                using (var stream = File.OpenRead(Path.ChangeExtension(GraphPath, ".json")))
                 {
-                    Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
+                    Graph = await Persistence.Mutable.Graph.LoadFromStreamAsync(stream, useJson: true);
                 }
-            }
 
+                using (var stream = File.Create(GraphPath))
+                    await Graph.WriteToStreamAsync(stream, compressed: true);
+
+                File.Delete(Path.ChangeExtension(GraphPath, ".json"));
+            }
         }
 
         public async Task SaveGraphAsync()
         {
             using (var stream = File.Create(GraphPath))
-                await Graph.WriteToStreamAsync(stream);
+                await Graph.WriteToStreamAsync(stream, compressed: true);
         }
 
         public async Task ExecuteLoadScript()

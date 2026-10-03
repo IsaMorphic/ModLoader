@@ -1,40 +1,12 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.IO.Compression;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO.Compression;
 
 namespace ModLoader.Core
 {
     using Abstract;
-    using Persistence;
+    using Persistence.Mutable;
 
-    public class Pack : IPackBase, IResolvable<Pack>, IGroup<Prioritized<Module, string>>
+    public partial class Pack : IPackBase, IResolvable<Pack>, IGroup<Prioritized<Module, string>>
     {
-        public class Meta
-        {
-            public Guid Id { get; set; }
-            public Guid? Fallback { get; set; }
-
-            public string Name { get; set; }
-            public string Author { get; set; }
-            public string Notes { get; set; }
-
-            public async Task WriteToStreamAsync(Stream stream)
-            {
-                using (var writer = new StreamWriter(stream))
-                    await writer.WriteAsync(JsonConvert.SerializeObject(this));
-            }
-
-            public static async Task<Meta> LoadFromStreamAsync(Stream stream)
-            {
-                using (var reader = new StreamReader(stream))
-                    return JsonConvert.DeserializeObject<Meta>(await reader.ReadToEndAsync());
-            }
-        }
-
         public Game Parent { get; }
 
         public string Name { get; }
@@ -91,14 +63,21 @@ namespace ModLoader.Core
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
             Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
 
-            if (Archive.GetEntry("_meta.json") != null)
+            if (Archive.GetEntry("_meta.snab") is ZipArchiveEntry snabEntry)
             {
-                using (var stream = Archive.GetEntry("_meta.json").Open())
+                using (var stream = snabEntry.Open())
                 {
                     MetaData = await Meta.LoadFromStreamAsync(stream);
                 }
             }
-            else
+            else if (Archive.GetEntry("_meta.json") is ZipArchiveEntry jsonEntry)
+            {
+                using (var stream = jsonEntry.Open())
+                {
+                    MetaData = await Meta.LoadFromStreamAsync(stream, useJson: true);
+                }
+            }
+            else 
             {
                 MetaData = new Meta
                 {
@@ -106,7 +85,7 @@ namespace ModLoader.Core
                     Fallback = null,
                     Name = null,
                     Author = null,
-                    Notes = "This pack is missing its _meta.json file. Please update this pack to add some."
+                    Notes = "This pack is missing its _meta.snab file. Please update this pack to add some."
                 };
             }
         }
@@ -120,18 +99,18 @@ namespace ModLoader.Core
                 await ReadMetaDataAsync();
             }
 
-            try
+            if (Archive.GetEntry("_pack.snab") is ZipArchiveEntry snabEntry)
             {
-                using (var stream = Archive.GetEntry("_pack.json").Open())
+                using (var stream = snabEntry.Open())
                 {
                     Graph = await Graph.LoadFromStreamAsync(stream);
                 }
             }
-            catch
+            else if (Archive.GetEntry("_pack.json") is ZipArchiveEntry jsonEntry)
             {
-                using (var stream = Archive.GetEntry("_pack.json").Open())
+                using (var stream = jsonEntry.Open())
                 {
-                    Graph = new Graph(await GraphCompat.LoadFromStreamAsync(stream));
+                    Graph = await Graph.LoadFromStreamAsync(stream, useJson: true);
                 }
             }
 
