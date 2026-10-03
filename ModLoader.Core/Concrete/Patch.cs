@@ -4,6 +4,7 @@ namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
+    using Persistence.Types;
 
     public partial class Chunk : Xunk<Chunk>, IExceptional
     {
@@ -13,7 +14,7 @@ namespace ModLoader.Core
             [SnabField]
             public long Offset { get; set; }
 
-            [SnabField]
+            [SnabField("Buffer", SnabType.Buffer)]
             public byte[] Buffer { get; set; }
         }
 
@@ -117,15 +118,24 @@ namespace ModLoader.Core
                 try
                 {
                     SnabInstance instance = new SnabInstance();
-                    using (var reader = instance.CreateReader(GetDataStream()))
+                    instance.RegisterType<SnabGuid>();
+
+                    using (var stream = GetDataStream())
+                    using (var memStream = new MemoryStream())
                     {
-                        Chunk.Data[] chunks = reader.Deserialize<Data>().Chunks;
-                        foreach (var chunkData in chunks)
+                        await stream.CopyToAsync(memStream);
+                        memStream.Position = 0;
+
+                        using (var reader = instance.CreateReader(memStream))
                         {
-                            var chunk = new Chunk(this, chunkData);
-                            if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
-                                chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
-                            Xunks.Add(chunk);
+                            Chunk.Data[] chunks = reader.Deserialize<Data>().Chunks;
+                            foreach (var chunkData in chunks)
+                            {
+                                var chunk = new Chunk(this, chunkData);
+                                if (Xunks.Select(c => c.ResolveSelf().MergeKey).Contains(chunk.MergeKey))
+                                    chunk.Errors.Add(new ConflictException<Chunk>($"This chunk conflicts with a chunk in this patch that was parsed prior.\nOffending module: {this}"));
+                                Xunks.Add(chunk);
+                            }
                         }
                     }
                 }

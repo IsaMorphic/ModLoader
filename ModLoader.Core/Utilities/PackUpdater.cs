@@ -63,14 +63,21 @@ namespace ModLoader.Core.Utilities
             Archive?.Dispose();
             Archive = ZipFile.Open(PackPath, ZipArchiveMode.Update);
 
-            if (Archive.GetEntry("_meta.snab") != null)
+            if (Archive.GetEntry("_meta.snab") is ZipArchiveEntry metaSnabEntry)
             {
-                using (var stream = Archive.GetEntry("_meta.snab").Open())
+                using (var stream = metaSnabEntry.Open())
                 {
                     MetaData = await Pack.Meta.LoadFromStreamAsync(stream);
                 }
             }
-            else
+            else if (Archive.GetEntry("_meta.json") is ZipArchiveEntry metaJsonEntry)
+            {
+                using (var stream = metaJsonEntry.Open())
+                {
+                    MetaData = await Pack.Meta.LoadFromStreamAsync(stream, useJson: true);
+                }
+            }
+            else 
             {
                 MetaData = new Pack.Meta
                 {
@@ -82,9 +89,20 @@ namespace ModLoader.Core.Utilities
                 };
             }
 
-            using (var stream = Archive.GetEntry("_pack.snab").Open())
+            var packEntry = Archive.GetEntry("_pack.snab");
+            if (packEntry != null)
             {
-                Graph = await Graph.LoadFromStreamAsync(stream);
+                using (var stream = packEntry.Open())
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream);
+                }
+            }
+            else
+            {
+                using (var stream = Archive.GetEntry("_pack.json").Open())
+                {
+                    Graph = await Graph.LoadFromStreamAsync(stream, useJson: true);
+                }
             }
 
             var noteEntry = Archive.GetEntry("_pack.txt");
@@ -152,13 +170,21 @@ namespace ModLoader.Core.Utilities
                 Archive.CreateEntryFromFile(ImagePath, "_pack.png");
             }
 
-            Archive.GetEntry("_pack.snab").Delete();
+            Archive.GetEntry("_pack.json")?.Delete();
+            Archive.GetEntry("_pack.snab")?.Delete();
             using (var stream = Archive.CreateEntry("_pack.snab").Open())
                 await Graph.WriteToStreamAsync(stream);
 
+            Archive.GetEntry("_meta.json")?.Delete();
             Archive.GetEntry("_meta.snab")?.Delete();
-            using (var stream = Archive.CreateEntry("_meta.snab").Open())
-                await MetaData.WriteToStreamAsync(stream);
+            using (var memStream = new MemoryStream())
+            using (var arcStream = Archive.CreateEntry("_meta.snab").Open())
+            {
+                await MetaData.WriteToStreamAsync(memStream);
+                
+                memStream.Position = 0;
+                await memStream.CopyToAsync(arcStream);
+            }
 
             Archive.Dispose();
         }

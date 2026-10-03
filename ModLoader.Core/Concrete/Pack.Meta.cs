@@ -31,7 +31,8 @@ namespace ModLoader.Core
                 instance.RegisterType<SnabGuid>();
 
                 using (var writer = instance.CreateWriter(stream, compressed ? 
-                    SnabFlags.User | SnabFlags.Compressed : SnabFlags.User))
+                    SnabFlags.User | SnabFlags.Compressed : SnabFlags.User, 
+                    leaveOpen: true))
                 {
                     writer.Serialize(this);
                 }
@@ -53,9 +54,15 @@ namespace ModLoader.Core
                     SnabInstance instance = new();
                     instance.RegisterType<SnabGuid>();
 
-                    using (var reader = instance.CreateReader(stream))
+                    using (var memStream = new MemoryStream())
                     {
-                        return reader.Deserialize<Meta>();
+                        await stream.CopyToAsync(memStream);
+                        memStream.Position = 0;
+
+                        using (var reader = instance.CreateReader(memStream))
+                        {
+                            return reader.Deserialize<Meta>();
+                        }
                     }
                 }
             }

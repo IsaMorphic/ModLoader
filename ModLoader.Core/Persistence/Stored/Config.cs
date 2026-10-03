@@ -2,6 +2,8 @@
 
 namespace ModLoader.Core.Persistence.Stored
 {
+    using Persistence.Types;
+
     [SnabStruct]
     public partial class Config
     {
@@ -89,8 +91,11 @@ namespace ModLoader.Core.Persistence.Stored
         internal async Task WriteToStreamAsync(Stream stream, bool compressed)
         {
             SnabInstance instance = new();
+            instance.RegisterType<SnabGuid>();
+
             using (var writer = instance.CreateWriter(stream, compressed ? 
-                SnabFlags.User | SnabFlags.Compressed : SnabFlags.User))
+                SnabFlags.User | SnabFlags.Compressed : SnabFlags.User, 
+                leaveOpen: true))
             {
                 writer.Serialize(this);
             }   
@@ -99,9 +104,17 @@ namespace ModLoader.Core.Persistence.Stored
         internal static async Task<Config> LoadFromStreamAsync(Stream stream)
         {
             SnabInstance instance = new();
-            using (var reader = instance.CreateReader(stream))
+            instance.RegisterType<SnabGuid>();
+
+            using (var memStream = new MemoryStream())
             {
-                return reader.Deserialize<Config>();
+                await stream.CopyToAsync(memStream);
+                memStream.Position = 0;
+
+                using (var reader = instance.CreateReader(memStream))
+                {
+                    return reader.Deserialize<Config>();
+                }
             }
         }
     }
