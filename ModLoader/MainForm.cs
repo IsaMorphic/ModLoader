@@ -210,6 +210,8 @@ namespace ModLoader
             {
                 if (Refreshing) return;
 
+                RefreshConflictPane(null);
+
                 if (ChangeList.SelectedItem is XunkGroup<Hunk> || ChangeList.SelectedItem is XunkMerger<Hunk>)
                 {
                     var merger = ChangeList.SelectedItem as XunkMerger<Hunk>;
@@ -246,6 +248,7 @@ namespace ModLoader
                 MessageBox.Show("An unexpected error occured while toggling this pack. Please verify that the pack file still exists.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
+            RefreshConflictPane(null);
             RefreshChangeList();
             RefreshModuleList();
 
@@ -259,8 +262,14 @@ namespace ModLoader
             {
                 RefreshChangeList();
 
-                if (sender != ModuleList)
+                if (sender == ModuleList)
+                {
+                    RefreshConflictPane(null);
+                }
+                else
+                {
                     RefreshModuleList();
+                }
             }
         }
 
