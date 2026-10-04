@@ -12,13 +12,13 @@ namespace ModLoader.Core.Persistence.Types
         {
             Span<byte> bytes = stackalloc byte[16];
             instance.BaseStream.ReadExactly(bytes);
-            return new Guid(bytes);
+            return new Guid(bytes, instance.Flags.HasFlag(SnabFlags.BigEndian));
         }
 
         public void WriteToInstance(SnabWriter instance, byte typeId, object obj)
         {
             Span<byte> bytes = stackalloc byte[16];
-            ((Guid)obj).TryWriteBytes(bytes);
+            ((Guid)obj).TryWriteBytes(bytes, instance.Flags.HasFlag(SnabFlags.BigEndian), out int _);
             instance.BaseStream.Write(bytes);
         }
     }

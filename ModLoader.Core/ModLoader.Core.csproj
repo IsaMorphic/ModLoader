@@ -10,8 +10,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ChosenFewSoftware.SnabNet" Version="1.1.8" />
-		<PackageReference Include="ChosenFewSoftware.SnabNet.SourceGenerators" Version="1.1.8" />
+		<PackageReference Include="ChosenFewSoftware.SnabNet" Version="1.1.9" />
+		<PackageReference Include="ChosenFewSoftware.SnabNet.SourceGenerators" Version="1.1.9" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 
