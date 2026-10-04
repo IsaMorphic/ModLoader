@@ -12,7 +12,6 @@
         public override IGroup<IPotential<Module>> Apply(IGroup<IResolvable<IResolvable<Module>>> group)
         {
             var resolved = group.Members
-                .Where(m => m.Enabled)
                 .Select(m => m.ResolveFull()
                     .Cast<Prioritized<Module, string>>()
                     );
