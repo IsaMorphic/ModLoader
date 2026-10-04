@@ -4,7 +4,6 @@ namespace ModLoader.Core
 {
     using Abstract;
     using Exceptions;
-    using Persistence.Types;
 
     public partial class Chunk : Xunk<Chunk>, IExceptional
     {
@@ -117,8 +116,7 @@ namespace ModLoader.Core
 
                 try
                 {
-                    SnabInstance instance = new SnabInstance();
-                    instance.RegisterType<SnabGuid>();
+                    SnabInstance instance = new(includeExtTypes: true);
 
                     using (var stream = GetDataStream())
                     using (var memStream = new MemoryStream())
