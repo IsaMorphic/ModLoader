@@ -20,20 +20,27 @@
 
         public Module ResolveSelf()
         {
-            var groups = Mergers
-                .Select(m => m.ResolveSelf() as XunkGroup<T>)
-                .Select(m => new TrivialPotential<IGroup<IPotential<T>>>(m));
+            if (Mergers.Count <= 1)
+            {
+                return Mergers.SingleOrDefault()?.ResolveSelf();
+            }
+            else
+            {
+                var groups = Mergers
+                    .Select(m => m.ResolveSelf() as XunkGroup<T>)
+                    .Select(m => new TrivialPotential<IGroup<IPotential<T>>>(m));
 
-            var resolver = new MergeFilter<T, XunkKey>(
-                new ResolveFilter<T>(
-                    new CastFilter<IPotential<T>, IMergeable<T, XunkKey>>(
-                        new GroupMerger<IPotential<T>>(new HashSet<IPotential<IGroup<IPotential<T>>>>(groups))
+                var resolver = new MergeFilter<T, XunkKey>(
+                    new ResolveFilter<T>(
+                        new CastFilter<IPotential<T>, IMergeable<T, XunkKey>>(
+                            new GroupMerger<IPotential<T>>(new HashSet<IPotential<IGroup<IPotential<T>>>>(groups))
+                            )
                         )
-                    )
-                );
-            var resolved = resolver.ResolveSelf().Members;
+                    );
+                var resolved = resolver.ResolveSelf().Members;
 
-            return new XunkGroup<T>(Parent, Base?.Name, Base, new HashSet<IPotential<T>>(resolved));
+                return new XunkGroup<T>(Parent, Base?.Name, Base, new HashSet<IPotential<T>>(resolved));
+            }
         }
 
         public override string ToString()
