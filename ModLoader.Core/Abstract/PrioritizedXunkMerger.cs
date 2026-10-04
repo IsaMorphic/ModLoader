@@ -20,21 +20,28 @@
 
         public Module ResolveSelf()
         {
-            var resolved = new PriorityFilter<T>(
-                new MergeFilter<IResolvable<T>, XunkKey>(
-                        new PrioritizeXunkFilter<T>(
-                            new PotentialFilter<T>(
-                                new TrivialPotential<IGroup<IPotential<T>>>(
-                                    new Group<IPotential<T>>(Mergers.SelectMany(m => (m.Inner as XunkGroup<T>)?.Xunks ?? [])
+            if (Mergers.Count <= 1)
+            {
+                return Mergers.SingleOrDefault()?.ResolveSelf() as Module;
+            }
+            else
+            {
+                var resolved = new PriorityFilter<T>(
+                    new MergeFilter<IResolvable<T>, XunkKey>(
+                            new PrioritizeXunkFilter<T>(
+                                new PotentialFilter<T>(
+                                    new TrivialPotential<IGroup<IPotential<T>>>(
+                                        new Group<IPotential<T>>(Mergers.SelectMany(m => (m.Inner as XunkGroup<T>)?.Xunks ?? [])
+                                        )
                                     )
                                 )
                             )
                         )
-                    )
-                );
+                    );
 
-            return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base, 
-                resolved.ResolveSelf().Members.ToHashSet<IPotential<T>>());
+                return new XunkGroup<T>(Parent, Base?.Name ?? "[ERROR: UNRESOLVED]", Base,
+                    resolved.ResolveSelf().Members.ToHashSet<IPotential<T>>());
+            }
         }
     }
 }
