@@ -3,17 +3,15 @@ using Newtonsoft.Json;
 
 namespace ModLoader.Core
 {
-    using Persistence.Types;
-
     public partial class Pack
     {
         [SnabStruct]
         public partial class Meta
         {
-            [SnabField("Id", SnabGuid.TypeId)]
+            [SnabField]
             public Guid Id { get; set; }
 
-            [SnabField("Fallback", SnabGuid.TypeId)]
+            [SnabField]
             public Guid? Fallback { get; set; }
 
             [SnabField]
@@ -27,11 +25,10 @@ namespace ModLoader.Core
 
             public async Task WriteToStreamAsync(Stream stream, bool compressed = false)
             {
-                SnabInstance instance = new();
-                instance.RegisterType<SnabGuid>();
+                SnabInstance instance = new(includeExtTypes: true);
 
                 using (var writer = instance.CreateWriter(stream, compressed ? 
-                    SnabFlags.User | SnabFlags.Compressed : SnabFlags.User, 
+                    SnabFlags.Extended | SnabFlags.Compressed : SnabFlags.Extended, 
                     leaveOpen: true))
                 {
                     writer.Serialize(this);
@@ -51,8 +48,7 @@ namespace ModLoader.Core
                 }
                 else
                 {
-                    SnabInstance instance = new();
-                    instance.RegisterType<SnabGuid>();
+                    SnabInstance instance = new(includeExtTypes: true);
 
                     using (var memStream = new MemoryStream())
                     {

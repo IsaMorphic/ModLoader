@@ -2,8 +2,6 @@
 
 namespace ModLoader.Core.Utilities
 {
-    using Persistence.Types;
-
     public class PatchBuilder : IXunkBasedBuilder
     {
         private const int BLOCK_SIZE = 4 * 1024 * 1024;
@@ -63,11 +61,10 @@ namespace ModLoader.Core.Utilities
                 }
             }
 
-            SnabInstance instance = new();
-            instance.RegisterType<SnabGuid>();
+            SnabInstance instance = new(includeExtTypes: true);
 
             using (var outputFileStream = File.Create(outputFilePath))
-            using (var writer = instance.CreateWriter(outputFileStream, SnabFlags.User))
+            using (var writer = instance.CreateWriter(outputFileStream, SnabFlags.Extended))
             {
                 Patch.Data patch = new() { Chunks = chunks.ToArray() };
                 writer.Serialize(patch);
