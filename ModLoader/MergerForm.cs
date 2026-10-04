@@ -152,6 +152,8 @@ namespace ModLoader
 
         private void ListItemCheck(object sender, ItemCheckEventArgs e)
         {
+            if (Refreshing) return;
+
             var listBox = sender as CheckedListBox;
 
             var item = listBox.Items[e.Index];
