@@ -20,10 +20,10 @@ namespace ModLoader.Core.Persistence.Stored
 
         internal async Task WriteToStreamAsync(Stream stream, bool compressed)
         {
-            SnabInstance instance = new(includeExtTypes: true);
+            SnabInstance instance = new();
 
             using (var writer = instance.CreateWriter(stream, compressed ? 
-                SnabFlags.Extended | SnabFlags.Compressed : SnabFlags.Extended, 
+                SnabFlags.Compressed : SnabFlags.None, 
                 leaveOpen: true))
             {
                 writer.Serialize(this);
@@ -32,7 +32,7 @@ namespace ModLoader.Core.Persistence.Stored
 
         internal static async Task<Graph> LoadFromStreamAsync(Stream stream)
         {
-            SnabInstance instance = new(includeExtTypes: true);
+            SnabInstance instance = new();
 
             using (var memStream = new MemoryStream())
             {

@@ -116,7 +116,7 @@ namespace ModLoader.Core
 
                 try
                 {
-                    SnabInstance instance = new(includeExtTypes: true);
+                    SnabInstance instance = new();
 
                     using (var stream = GetDataStream())
                     using (var memStream = new MemoryStream())
