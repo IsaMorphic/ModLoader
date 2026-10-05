@@ -61,10 +61,10 @@ namespace ModLoader.Core.Utilities
                 }
             }
 
-            SnabInstance instance = new(includeExtTypes: true);
+            SnabInstance instance = new();
 
             using (var outputFileStream = File.Create(outputFilePath))
-            using (var writer = instance.CreateWriter(outputFileStream, SnabFlags.Extended))
+            using (var writer = instance.CreateWriter(outputFileStream, SnabFlags.None))
             {
                 Patch.Data patch = new() { Chunks = chunks.ToArray() };
                 writer.Serialize(patch);
