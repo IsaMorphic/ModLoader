@@ -11,6 +11,8 @@
 
         public Guid Id { get; }
 
+        public bool IsArchive => true;
+
         public IResolvable<IPackBase> Fallback => null;
 
         public IDictionary<string, Module> Members { get; }

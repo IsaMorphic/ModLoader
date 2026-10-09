@@ -158,10 +158,10 @@ namespace ModLoader.Core
         {
             var dirs = Directory.GetDirectories(ModPath);
 
-            foreach (var dir in dirs)
+            foreach (var dir in dirs.Select(x => x.ToLowerInvariant()))
             {
-                string name = Path.GetFileName(dir);
-                if (name == "_base_") continue;
+                string name = Path.GetFileNameWithoutExtension(dir);
+                if (name == "_base_" || Path.GetExtension(dir) == ".pack") continue;
 
                 var meta = new Pack.Meta
                 {
@@ -195,8 +195,14 @@ namespace ModLoader.Core
             foreach (var file in Directory.EnumerateFiles(ModPath, "*.zip"))
             {
                 var packName = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
-                if (packName == "_base_") continue;
+                var pack = new Pack(this, packName);
+                Merger.Mergers.Add(pack);
+            }
 
+            foreach (var dir in Directory.EnumerateDirectories(ModPath, "*.pack"))
+            {
+                var packName = Path.GetFileNameWithoutExtension(dir).ToLowerInvariant();
+                if (packName == "_base_") continue;
                 var pack = new Pack(this, packName);
                 Merger.Mergers.Add(pack);
             }
