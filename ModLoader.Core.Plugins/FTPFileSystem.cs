@@ -1,8 +1,8 @@
 ﻿using FluentFTP;
+using FluentFTP.Helpers;
 
 namespace ModLoader.Core.Plugins
 {
-    using FluentFTP.Helpers;
     using Interfaces;
 
     public class FTPFileSystem : IFileSystem
@@ -97,6 +97,11 @@ namespace ModLoader.Core.Plugins
 
                 File.Delete(Path.Combine(TempDir, file.Path));
             });
+        }
+
+        public Task LinkFileAsync(string sourceFilePath, string destFilePath)
+        {
+            throw new NotImplementedException("Linking files is not supported in FTPFileSystem.");
         }
 
         public async Task RemoveFileAsync(string path)

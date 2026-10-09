@@ -17,7 +17,7 @@
             {
                 var resolved = Parent.Fallback as IPackBase;
                 if (resolved == null) return null;
-                else return resolved.Members.ContainsKey(Name) ? 
+                else return resolved.Members.ContainsKey(Name) ?
                         resolved.Members[Name] : new GhostModule(resolved, Name);
             }
         }
@@ -60,6 +60,28 @@
 
             if (Root.Graph.Table[Name] == Id) return;
 
+            if (!Parent.IsArchive)
+            {
+                try
+                {
+                    await Root.BasePack.CopyModuleAsync(Name);
+
+                    string sourceFilePath = Path.Combine(Root.ModPath, Parent.Name, Name);
+                    string targetFilePath = Path.Combine(Root.GamePath, Name);
+                    await Root.Files.LinkFileAsync(sourceFilePath, targetFilePath);
+
+                    if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id)
+                    {
+                        await Root.BasePack.RemoveModuleAsync(Name);
+                    }
+
+                    Root.Graph.Table[Name] = Id;
+
+                    return;
+                }
+                catch (NotImplementedException) { }
+            }
+
             var file = await Root.Files.StageFileAsync(Name);
             try
             {
@@ -72,7 +94,7 @@
 
                 await Root.Files.CommitFileAsync(file);
 
-                if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id) 
+                if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id)
                 {
                     await Root.BasePack.RemoveModuleAsync(Name);
                 }

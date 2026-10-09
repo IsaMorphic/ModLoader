@@ -20,6 +20,7 @@
         Task UnstageFileAsync(StagedFile file);
 
         Task CommitFileAsync(StagedFile file);
+        Task LinkFileAsync(string sourceFilePath, string destFilePath);
         Task RemoveFileAsync(string path);
 
         Task UnmountAsync();

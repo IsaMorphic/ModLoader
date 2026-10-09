@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace ModLoader.Core.Plugins.Interfaces
+﻿namespace ModLoader.Core.Plugins.Interfaces
 {
     public interface IPlugin<T>
     {

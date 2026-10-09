@@ -156,6 +156,8 @@ namespace ModLoader.Core
 
         public async Task RebuildTestPacksAsync()
         {
+            return;
+
             var dirs = Directory.GetDirectories(ModPath);
 
             foreach (var dir in dirs)
@@ -197,6 +199,14 @@ namespace ModLoader.Core
                 var packName = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
                 if (packName == "_base_") continue;
 
+                var pack = new Pack(this, packName);
+                Merger.Mergers.Add(pack);
+            }
+
+            foreach (var dir in Directory.EnumerateDirectories(ModPath))
+            {
+                var packName = Path.GetFileName(dir).ToLowerInvariant();
+                if (packName == "_base_") continue;
                 var pack = new Pack(this, packName);
                 Merger.Mergers.Add(pack);
             }

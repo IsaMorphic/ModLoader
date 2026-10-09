@@ -7,6 +7,8 @@ namespace ModLoader.Core
 
     public partial class Pack : IPackBase, IResolvable<Pack>, IGroup<Prioritized<Module, string>>
     {
+        private ZipArchive _archive;
+
         public Game Parent { get; }
 
         public string Name { get; }
@@ -21,8 +23,6 @@ namespace ModLoader.Core
         IEnumerable<Prioritized<Module, string>> IGroup<Prioritized<Module, string>>.Members => Members.Values.Select(m => new PrioritizedModule(m));
 
         public Graph Graph { get; private set; }
-
-        public ZipArchive Archive { get; private set; }
 
         public IResolvable<IPackBase> Fallback { get; private set; }
         IResolvable<Pack> IResolvable<Pack>.Fallback => Fallback as IResolvable<Pack>;
@@ -46,6 +46,8 @@ namespace ModLoader.Core
 
         public bool Initialized { get; private set; }
 
+        public bool IsArchive { get; private set; }
+
         public Pack(Game parent, string name)
         {
             Name = name;
@@ -61,23 +63,21 @@ namespace ModLoader.Core
             if (Initialized) return;
 
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
-            Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
+            if (File.Exists(path))
+            {
+                _archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
+                IsArchive = true;
+            }
 
-            if (Archive.GetEntry("_meta.snab") is ZipArchiveEntry snabEntry)
+            if (GetStream("_meta.snab") is Stream metaStream)
             {
-                using (var stream = snabEntry.Open())
-                {
-                    MetaData = await Meta.LoadFromStreamAsync(stream);
-                }
+                MetaData = await Meta.LoadFromStreamAsync(metaStream);
             }
-            else if (Archive.GetEntry("_meta.json") is ZipArchiveEntry jsonEntry)
+            else if (GetStream("_meta.json") is Stream jsonStream)
             {
-                using (var stream = jsonEntry.Open())
-                {
-                    MetaData = await Meta.LoadFromStreamAsync(stream, useJson: true);
-                }
+                MetaData = await Meta.LoadFromStreamAsync(jsonStream, useJson: true);
             }
-            else 
+            else
             {
                 MetaData = new Meta
                 {
@@ -99,38 +99,30 @@ namespace ModLoader.Core
                 await ReadMetaDataAsync();
             }
 
-            if (Archive.GetEntry("_pack.snab") is ZipArchiveEntry snabEntry)
+            if (GetStream("_pack.snab") is Stream snabStream)
             {
-                using (var stream = snabEntry.Open())
-                {
-                    Graph = await Graph.LoadFromStreamAsync(stream);
-                }
+                Graph = await Graph.LoadFromStreamAsync(snabStream);
             }
-            else if (Archive.GetEntry("_pack.json") is ZipArchiveEntry jsonEntry)
+            else if (GetStream("_pack.json") is Stream jsonStream)
             {
-                using (var stream = jsonEntry.Open())
-                {
-                    Graph = await Graph.LoadFromStreamAsync(stream, useJson: true);
-                }
+                Graph = await Graph.LoadFromStreamAsync(jsonStream, useJson: true);
             }
 
-            var noteEntry = Archive.GetEntry("_pack.txt");
-            if (noteEntry != null)
+            var noteStream = GetStream("_pack.txt");
+            if (noteStream != null)
             {
-                using (var stream = noteEntry.Open())
-                using (var reader = new StreamReader(stream))
+                using (var reader = new StreamReader(noteStream))
                 {
                     MetaData.Notes = await reader.ReadToEndAsync();
                 }
             }
 
-            var fallbackEntry = Archive.GetEntry("_fallback.txt");
-            if (fallbackEntry != null)
+            var fallbackStream = GetStream("_fallback.txt");
+            if (fallbackStream != null)
             {
                 string fallback;
 
-                using (var stream = fallbackEntry.Open())
-                using (var reader = new StreamReader(stream))
+                using (var reader = new StreamReader(fallbackStream))
                     fallback = (await reader.ReadLineAsync()).ToLowerInvariant();
 
                 Fallback = Parent.Packs.SingleOrDefault(p => p.Name == fallback) as IPackBase ?? Parent.BasePack;
@@ -147,41 +139,49 @@ namespace ModLoader.Core
 
             HashSet<string> burnDirs = new HashSet<string>();
 
-            var entries = Archive.Entries.Where(entry => !entry.FullName.ToLowerInvariant().StartsWith("_pack") && !entry.FullName.ToLowerInvariant().StartsWith("_meta") && !entry.FullName.ToLowerInvariant().StartsWith("_fallback") && !entry.FullName.ToLowerInvariant().EndsWith("/"));
-            foreach (var entry in entries)
+            IEnumerable<string> entries;
+            if (_archive == null)
             {
-                string name = entry.FullName.ToLowerInvariant();
-                Guid id = Graph.Table[name];
+                entries = Directory.EnumerateFiles(Path.Combine(Parent.ModPath, Name), "*", SearchOption.AllDirectories)
+                    .Select(f => Path.GetRelativePath(Path.Combine(Parent.ModPath, Name), f).Replace("\\", "/").ToLowerInvariant());
+            }
+            else
+            {
+                entries = _archive.Entries.Select(entry => entry.FullName.ToLowerInvariant());
+            }
+            foreach (var entry in entries.Where(entry => !entry.StartsWith("_pack") && !entry.StartsWith("_meta") && !entry.StartsWith("_fallback") && !entry.EndsWith("/")))
+            {
+                Guid id = Graph.Table[entry];
 
-                if (name.EndsWith(".diff"))
+                if (entry.EndsWith(".diff"))
                 {
-                    var key = name.Replace(".diff", "");
+                    var key = entry.Replace(".diff", "");
                     var diff = new Diff(this, key, id);
                     await diff.InitializeAsync();
                     Members.Add(key, diff);
                 }
-                else if (name.EndsWith(".patch"))
+                else if (entry.EndsWith(".patch"))
                 {
-                    var key = name.Replace(".patch", "");
+                    var key = entry.Replace(".patch", "");
                     var patch = new Patch(this, key, id);
                     await patch.InitializeAsync();
                     Members.Add(key, patch);
                 }
-                else if (Path.GetFileName(name) == ".burn")
+                else if (Path.GetFileName(entry) == ".burn")
                 {
-                    var dir = Path.GetDirectoryName(name);
+                    var dir = Path.GetDirectoryName(entry);
                     burnDirs.Add(dir);
                 }
-                else if (name.EndsWith(".burn"))
+                else if (entry.EndsWith(".burn"))
                 {
-                    var key = name.Replace(".burn", "");
+                    var key = entry.Replace(".burn", "");
                     var burn = new Burn(this, key, id);
                     Members.Add(key, burn);
                 }
                 else
                 {
-                    var module = new Module(this, name, id);
-                    Members.Add(name, module);
+                    var module = new Module(this, entry, id);
+                    Members.Add(entry, module);
                 }
             }
 
@@ -201,14 +201,18 @@ namespace ModLoader.Core
 
         public void Unload()
         {
-            Archive?.Dispose();
-            Archive = null;
+            _archive?.Dispose();
+            _archive = null;
         }
 
         public void Reload()
         {
             var path = Path.Combine(Parent.ModPath, $"{Name}.zip");
-            Archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
+            if (File.Exists(path))
+            {
+                _archive?.Dispose();
+                _archive = new ZipArchive(File.OpenRead(path), ZipArchiveMode.Read);
+            }
         }
 
         Pack IPotential<Pack>.ResolveSelf() => this;
@@ -225,7 +229,21 @@ namespace ModLoader.Core
 
         public Stream GetStream(string name)
         {
-            return Archive.GetEntry(name)?.Open() ?? throw new FileNotFoundException($"The file '{name}' was not found in the pack '{this}'.");
+            if (_archive == null)
+            {
+                try
+                {
+                    return File.OpenRead(Path.Combine(Parent.ModPath, Name, name));
+                }
+                catch (FileNotFoundException)
+                {
+                    return null;
+                }
+            }
+            else 
+            {
+                return _archive.GetEntry(name)?.Open();
+            }
         }
 
         public override string ToString()

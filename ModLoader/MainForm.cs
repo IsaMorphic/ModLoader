@@ -109,7 +109,7 @@ namespace ModLoader
             {
                 PackImage.Image?.Dispose();
 
-                using (var stream = pack.Archive.GetEntry("_pack.png").Open())
+                using (var stream = pack.GetStream("_pack.png"))
                     PackImage.Image = Image.FromStream(stream);
 
                 NameEdit.Text = pack.MetaData.Name ?? "Unnamed";

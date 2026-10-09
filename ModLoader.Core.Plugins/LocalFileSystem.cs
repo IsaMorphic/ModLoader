@@ -51,8 +51,29 @@
 
             return Task.Run(() =>
             {
-                File.Copy(tempFile, localFile, true);
+                if (File.Exists(localFile))
+                {
+                    File.Delete(localFile);
+                }
+
+                File.Copy(tempFile, localFile);
                 File.Delete(tempFile);
+            });
+        }
+
+        public Task LinkFileAsync(string sourceFilePath, string destFilePath)
+        {
+            return Task.Run(() =>
+            {
+                if (File.Exists(destFilePath))
+                {
+                    File.Delete(destFilePath);
+                }
+
+                if (File.Exists(sourceFilePath))
+                {
+                    File.CreateSymbolicLink(destFilePath, sourceFilePath);
+                }
             });
         }
 
@@ -76,7 +97,7 @@
 
         public string Description => "-----BEGIN PGP SIGNED MESSAGE-----\r\nHash: SHA256\r\n\r\n.NET System.IO wrapper for ModLoader's filesystem interface\r\n-----BEGIN PGP SIGNATURE-----\r\n\r\niQGzBAEBCAAdFiEEo0MI7XC8G4gcRT8qFfao5RQOljsFAmN1N0IACgkQFfao5RQO\r\nljvAXAv+LpScxuaw5jOV5NLipQoxL/nROJ4eBuLdTyInL11qnlgexFcII8essEny\r\noDzfrHcDdizC9QTjErHCxfhkJ2CGU11nfBzh5CS75XsWGWHfnHVZhBnVGHweCWgB\r\nRDc0ezGZQq3JxLqKFyWbRuYevipyZTF9YYsN2ESgh5rejWq53s5gLgUsNb11XtCp\r\nhbNJh223I4kNAK6b96BKsvD1S1QsdQVWcjaP5f54eHqkznjLgHekq3Jd1oQuSaBx\r\nKYzXLtbljoR+CpwThlt4T8fMBc8CJxdRu2INv0K8OJ1AFz4MoTDlTQ5Ek6XM/FG4\r\nnK9We8Es5BRWKou6/CJKipImJ3P75BFSYlR5WllO06WgMvRDvfeoVHU/cjiAyR8N\r\nOz4e8qH0GtgsRxCvjJbr6HMCNlL6G/zAYk/aEkWCqhtPgqUjTawBg3TLM+YVhSvg\r\na8C60YHrtWT8fPNDWUIJc22vvDQjuuTjxmxXTuXFOxDbeMps4F/PrXyLxWuJqpSS\r\ngk1iuYPX\r\n=OywE\r\n-----END PGP SIGNATURE-----\r\n";
 
-        public string[] ConfigItems => new[] { "LocalDir", "TempDir" }; 
+        public string[] ConfigItems => new[] { "LocalDir", "TempDir" };
 
         public IFileSystem CreateInstance(IReadOnlyDictionary<string, string> configOptions)
         {

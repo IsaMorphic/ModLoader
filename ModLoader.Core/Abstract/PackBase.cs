@@ -8,6 +8,8 @@
 
         Game Parent { get; }
 
+        bool IsArchive { get; }
+
         new IDictionary<string, Module> Members { get; }
 
         Stream GetStream(string name);
