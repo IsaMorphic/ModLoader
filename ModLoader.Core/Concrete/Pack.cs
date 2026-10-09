@@ -142,8 +142,8 @@ namespace ModLoader.Core
             IEnumerable<string> entries;
             if (_archive == null)
             {
-                entries = Directory.EnumerateFiles(Path.Combine(Parent.ModPath, Name), "*", SearchOption.AllDirectories)
-                    .Select(f => Path.GetRelativePath(Path.Combine(Parent.ModPath, Name), f).Replace("\\", "/").ToLowerInvariant());
+                entries = Directory.EnumerateFiles(Path.Combine(Parent.ModPath, Name + ".pack"), "*", SearchOption.AllDirectories)
+                    .Select(f => Path.GetRelativePath(Path.Combine(Parent.ModPath, Name + ".pack"), f).Replace("\\", "/").ToLowerInvariant());
             }
             else
             {
@@ -233,7 +233,8 @@ namespace ModLoader.Core
             {
                 try
                 {
-                    return File.OpenRead(Path.Combine(Parent.ModPath, Name, name));
+                    string filePath = Path.Combine(Parent.ModPath, Name + ".pack", name);
+                    return File.OpenRead(filePath);
                 }
                 catch (FileNotFoundException)
                 {

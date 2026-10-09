@@ -66,7 +66,7 @@
                 {
                     await Root.BasePack.CopyModuleAsync(Name);
 
-                    string sourceFilePath = Path.Combine(Root.ModPath, Parent.Name, Name);
+                    string sourceFilePath = Path.Combine(Root.ModPath, Parent.Name + ".pack", Name);
                     string targetFilePath = Path.Combine(Root.GamePath, Name);
                     await Root.Files.LinkFileAsync(sourceFilePath, targetFilePath);
 
