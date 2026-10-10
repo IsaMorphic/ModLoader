@@ -143,13 +143,14 @@ namespace ModLoader.Core
             if (_archive == null)
             {
                 entries = Directory.EnumerateFiles(Path.Combine(Parent.ModPath, Name + ".pack"), "*", SearchOption.AllDirectories)
-                    .Select(f => Path.GetRelativePath(Path.Combine(Parent.ModPath, Name + ".pack"), f).Replace("\\", "/").ToLowerInvariant());
+                    .Select(f => Path.GetRelativePath(Path.Combine(Parent.ModPath, Name + ".pack"), f).ToLowerInvariant());
             }
             else
             {
                 entries = _archive.Entries.Select(entry => entry.FullName.ToLowerInvariant());
             }
-            foreach (var entry in entries.Where(entry => !entry.StartsWith("_pack") && !entry.StartsWith("_meta") && !entry.StartsWith("_fallback") && !entry.EndsWith("/")))
+
+            foreach (var entry in entries.Where(entry => !entry.StartsWith("_pack") && !entry.StartsWith("_meta") && !entry.StartsWith("_fallback") && !entry.EndsWith("\\")))
             {
                 Guid id = Graph.Table[entry];
 
