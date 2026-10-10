@@ -65,6 +65,8 @@
         {
             return Task.Run(() =>
             {
+                Directory.CreateDirectory(Path.GetDirectoryName(destFilePath));
+
                 if (File.Exists(destFilePath))
                 {
                     File.Delete(destFilePath);
