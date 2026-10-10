@@ -192,19 +192,27 @@ namespace ModLoader.Core
 
             await LoadGraphAsync();
 
+            HashSet<string> packNames = new HashSet<string> { "_base_" };
             foreach (var file in Directory.EnumerateFiles(ModPath, "*.zip"))
             {
                 var packName = Path.GetFileNameWithoutExtension(file).ToLowerInvariant();
+                if (packNames.Contains(packName)) continue;
+
                 var pack = new Pack(this, packName);
                 Merger.Mergers.Add(pack);
+
+                packNames.Add(packName);
             }
 
             foreach (var dir in Directory.EnumerateDirectories(ModPath, "*.pack"))
             {
                 var packName = Path.GetFileNameWithoutExtension(dir).ToLowerInvariant();
-                if (packName == "_base_") continue;
+                if (packNames.Contains(packName)) continue;
+
                 var pack = new Pack(this, packName);
                 Merger.Mergers.Add(pack);
+
+                packNames.Add(packName);
             }
 
             foreach (var pack in Packs)
