@@ -5,7 +5,7 @@ namespace ModLoader.Core.Persistence.Types
 {
     public class SnabHashId : ISnabType<HashId>
     {
-        public const byte TypeId = 0x81;
+        public const byte TypeId = 0xC0;
 
         public HashSet<byte> TypeIds => [TypeId];
 

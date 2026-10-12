@@ -26,7 +26,7 @@ namespace ModLoader.Core.Persistence.Stored
             instance.RegisterType<SnabHashId>();
 
             using (var writer = instance.CreateWriter(stream, compressed ? 
-                SnabFlags.Compressed : SnabFlags.None, 
+                SnabFlags.Compressed | SnabFlags.User : SnabFlags.User, 
                 leaveOpen: true))
             {
                 writer.Serialize(this);
