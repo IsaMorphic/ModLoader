@@ -158,10 +158,10 @@ namespace ModLoader.Core
         {
             var dirs = Directory.GetDirectories(ModPath);
 
-            foreach (var dir in dirs.Select(x => x.ToLowerInvariant()))
+            foreach (var dir in dirs)
             {
-                string name = Path.GetFileNameWithoutExtension(dir);
-                if (name == "_base_" || Path.GetExtension(dir) == ".pack") continue;
+                string name = Path.GetFileName(dir).Replace(".pack", "");
+                if (name == "_base_" || dir.EndsWith(".pack")) continue;
 
                 var meta = new Pack.Meta
                 {
@@ -184,6 +184,10 @@ namespace ModLoader.Core
             await UnloadAsync();
 
             await LoadConfigEarlyAsync();
+
+            ReloadPlugins();
+
+            await Files.MountAsync();
 
             BasePack = new BasePack(this);
             await BasePack.InitializeAsync();
@@ -226,10 +230,6 @@ namespace ModLoader.Core
             }
 
             await LoadConfigAsync();
-
-            ReloadPlugins();
-
-            await Files.MountAsync();
         }
 
         private void ReloadPlugins()
