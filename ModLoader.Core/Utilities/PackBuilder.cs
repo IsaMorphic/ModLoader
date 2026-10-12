@@ -62,12 +62,22 @@ namespace ModLoader.Core.Utilities
                     var entry = archive.CreateEntry(name);
 
                     HashId id;
-                    using (var entryStream = entry.Open())
-                    using (var sha256Stream = new SHA256Stream(entryStream))
-                    using (var fileStream = File.OpenRead(file))
+                    switch (Path.GetExtension(file))
                     {
-                        await fileStream.CopyToAsync(sha256Stream);
-                        id = sha256Stream.GetHash();
+                        case ".diff":
+                        case ".patch":
+                        case ".burn":
+                            id = HashId.NewHashId();
+                            break;
+                        default:
+                            using (var entryStream = entry.Open())
+                            using (var sha256Stream = new SHA256Stream(entryStream))
+                            using (var fileStream = File.OpenRead(file))
+                            {
+                                await fileStream.CopyToAsync(sha256Stream);
+                                id = sha256Stream.GetHash();
+                            }
+                            break;
                     }
 
                     if (name != "_fallback.txt")
