@@ -157,7 +157,7 @@
             XunkLoader.Register(new DiffLoader());
         }
 
-        public Diff(Pack parent, string name, Guid id) : base(parent, name, id)
+        public Diff(Pack parent, string name, HashId id) : base(parent, name, id)
         {
         }
 

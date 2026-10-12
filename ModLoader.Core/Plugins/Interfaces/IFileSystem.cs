@@ -1,4 +1,6 @@
-﻿namespace ModLoader.Core.Plugins.Interfaces
+﻿using ModLoader.Core.Utilities.Hashing;
+
+namespace ModLoader.Core.Plugins.Interfaces
 {
     public class StagedFile
     {
@@ -16,7 +18,16 @@
     {
         Task MountAsync();
 
-        Task<HashId> PullFileAsync(string path, Stream stream);
+        Task PullFileAsync(string path, Stream stream);
+
+        public async Task<HashId> HashFileAsync(string path)
+        {
+            using (var sha256Stream = new SHA256Stream(Stream.Null))
+            {
+                await PullFileAsync(path, sha256Stream);
+                return sha256Stream.GetHash();
+            }
+        }
 
         Task<StagedFile> StageFileAsync(string path);
         Task UnstageFileAsync(StagedFile file);

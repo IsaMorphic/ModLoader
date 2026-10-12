@@ -4,7 +4,7 @@ namespace ModLoader.Core.Persistence.Mutable
 {
     public class Graph
     {
-        public Dictionary<string, Guid> Table { get; }
+        public Dictionary<string, HashId> Table { get; }
 
         public Graph() 
         {
@@ -26,7 +26,7 @@ namespace ModLoader.Core.Persistence.Mutable
             var graph = new Stored.Graph();
 
             List<Stored.Graph.Entry> table = new();
-            foreach ((string name, Guid id) in Table)
+            foreach ((string name, HashId id) in Table)
             {
                 table.Add(new Stored.Graph.Entry
                 {

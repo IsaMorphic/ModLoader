@@ -13,11 +13,11 @@
 
         public override int GetPriorityOver(Prioritized<Module, string> other)
         {
-            Guid otherId = other.Inner.ResolveSelf().Id;
+            HashId otherId = other.Inner.ResolveSelf().Id;
             int thisPriority = Inner.ResolveFull()
                 .FindIndex(m => m.ResolveSelf()?.Id == otherId);
 
-            Guid thisId = Inner.ResolveSelf().Id;
+            HashId thisId = Inner.ResolveSelf().Id;
             int otherPriority = other.Inner.ResolveFull()
                 .FindIndex(m => m.ResolveSelf()?.Id == thisId);
 

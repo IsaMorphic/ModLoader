@@ -1,4 +1,5 @@
 ﻿using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 
 namespace ModLoader.Core
 {
@@ -41,6 +42,11 @@ namespace ModLoader.Core
         public override int GetHashCode()
         {
             return HashCode.Combine(_a, _b, _c, _d);
+        }
+
+        public static HashId NewHashId()
+        { 
+            return new HashId(RandomNumberGenerator.GetBytes(32));
         }
     }
 }

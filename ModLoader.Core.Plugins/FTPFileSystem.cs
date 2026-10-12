@@ -56,7 +56,7 @@ namespace ModLoader.Core.Plugins
             });
         }
 
-        public async Task<HashId> PullFileAsync(string path, Stream stream)
+        public async Task PullFileAsync(string path, Stream stream)
         {
             string localFilePath = LocalDir.CombineLocalPath(path);
 
@@ -69,11 +69,7 @@ namespace ModLoader.Core.Plugins
 
             if (check.exists)
             {
-                using (var sha256Stream = new SHA256Stream(stream))
-                {
-                    Client.DownloadStream(sha256Stream, check.realName);
-                    return sha256Stream.GetHash();
-                }
+                Client.DownloadStream(stream, check.realName);
             }
             else
             {

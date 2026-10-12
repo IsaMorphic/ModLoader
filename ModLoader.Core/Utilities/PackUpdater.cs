@@ -1,4 +1,5 @@
 ﻿using System.IO.Compression;
+using System.Security.Cryptography;
 
 namespace ModLoader.Core.Utilities
 {
@@ -150,13 +151,19 @@ namespace ModLoader.Core.Utilities
 
                     case UpdateType.Add:
                         Archive.CreateEntryFromFile(update.FilePath, module.Name);
-                        Graph.Table.Add(module.Name, Guid.NewGuid());
+                        using (var stream = File.OpenRead(update.FilePath))
+                        {
+                            Graph.Table.Add(module.Name, new(await SHA256.HashDataAsync(stream)));
+                        }
                         break;
 
                     case UpdateType.Replace:
                         Archive.GetEntry(module.Name).Delete();
                         Archive.CreateEntryFromFile(update.FilePath, module.Name);
-                        Graph.Table[module.Name] = Guid.NewGuid();
+                        using (var stream = File.OpenRead(update.FilePath))
+                        {
+                            Graph.Table[module.Name] = new(await SHA256.HashDataAsync(stream));
+                        }
                         break;
                 }
             }

@@ -2,6 +2,7 @@
 
 namespace ModLoader.Core.Utilities
 {
+    using Hashing;
     using Persistence.Mutable;
 
     public class PackBuilder
@@ -60,14 +61,17 @@ namespace ModLoader.Core.Utilities
                     var name = file.Replace(InputDir, "").Trim('\\').ToLowerInvariant();
                     var entry = archive.CreateEntry(name);
 
-                    using (var fileStream = File.OpenRead(file))
+                    HashId id;
                     using (var entryStream = entry.Open())
+                    using (var sha256Stream = new SHA256Stream(entryStream))
+                    using (var fileStream = File.OpenRead(file))
                     {
-                        await fileStream.CopyToAsync(entryStream);
+                        await fileStream.CopyToAsync(sha256Stream);
+                        id = sha256Stream.GetHash();
                     }
 
                     if (name != "_fallback.txt")
-                        graph.Table.Add(name, Guid.NewGuid());
+                        graph.Table.Add(name, id);
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())

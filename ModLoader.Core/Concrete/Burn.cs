@@ -2,7 +2,7 @@
 {
     public class Burn : Module
     {
-        public Burn(Pack parent, string name, Guid id) : base(parent, name, id)
+        public Burn(Pack parent, string name, HashId id) : base(parent, name, id)
         {
         }
 
