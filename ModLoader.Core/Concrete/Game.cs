@@ -121,7 +121,7 @@ namespace ModLoader.Core
                 new Persistence.Mutable.Config.Handler()
                 {
                     Name = typeof(IFileSystem).FullName,
-                    Type = typeof(LocalFileSystem).FullName
+                    Type = "ModLoader.Core.Plugins.LocalFileSystem"
                 });
 
             await SaveConfigAsync();

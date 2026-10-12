@@ -1,6 +1,7 @@
 ﻿namespace ModLoader.Core.Plugins
 {
     using Interfaces;
+    using Utilities.Hashing;
 
     public class LocalFileSystem : IFileSystem
     {
@@ -17,6 +18,16 @@
         {
             Directory.CreateDirectory(TempDir);
             return Task.CompletedTask;
+        }
+
+        public async Task<HashId> PullFileAsync(string path, Stream stream)
+        {
+            using (var fileStream = File.OpenRead(Path.Combine(LocalDir, path)))
+            using (var sha256Stream = new SHA256Stream(stream))
+            {
+                await fileStream.CopyToAsync(stream);
+                return sha256Stream.GetHash();
+            }
         }
 
         public Task<StagedFile> StageFileAsync(string path)
