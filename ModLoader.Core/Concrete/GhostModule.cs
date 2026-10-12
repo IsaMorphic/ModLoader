@@ -5,7 +5,7 @@
 
     public class GhostModule : Module
     {
-        public GhostModule(IPackBase parent, string name) : base(parent, name, Guid.Empty)
+        public GhostModule(IPackBase parent, string name) : base(parent, name, default)
         {
         }
 

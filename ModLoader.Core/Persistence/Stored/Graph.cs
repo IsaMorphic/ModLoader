@@ -2,6 +2,8 @@
 
 namespace ModLoader.Core.Persistence.Stored
 {
+    using Persistence.Types;
+
     [SnabStruct]
     public partial class Graph
     {
@@ -12,7 +14,7 @@ namespace ModLoader.Core.Persistence.Stored
             public string Name { get; set; }
 
             [SnabField]
-            public Guid Id { get; set; }
+            public HashId Id { get; set; }
         }
 
         [SnabField("Table", SnabType.Array)]
@@ -21,6 +23,7 @@ namespace ModLoader.Core.Persistence.Stored
         internal async Task WriteToStreamAsync(Stream stream, bool compressed)
         {
             SnabInstance instance = new();
+            instance.RegisterType<SnabHashId>();
 
             using (var writer = instance.CreateWriter(stream, compressed ? 
                 SnabFlags.Compressed : SnabFlags.None, 
@@ -33,6 +36,7 @@ namespace ModLoader.Core.Persistence.Stored
         internal static async Task<Graph> LoadFromStreamAsync(Stream stream)
         {
             SnabInstance instance = new();
+            instance.RegisterType<SnabHashId>();
 
             using (var memStream = new MemoryStream())
             {

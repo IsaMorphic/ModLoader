@@ -4,7 +4,7 @@
 
     public class Module : ILoadable<Module>, IMergeable<Module, string>
     {
-        public Guid Id { get; }
+        public HashId Id { get; }
 
         public string Name { get; }
 
@@ -28,7 +28,7 @@
 
         public string MergeKey => Name;
 
-        public Module(IPackBase parent, string name, Guid id)
+        public Module(IPackBase parent, string name, HashId id)
         {
             Id = id;
             Name = name;
@@ -55,10 +55,14 @@
         {
             if (!Root.Graph.Table.ContainsKey(Name))
             {
-                Root.Graph.Table.Add(Name, Guid.Empty);
+                Root.Graph.Table.Add(Name, default);
             }
 
-            if (Root.Graph.Table[Name] == Id) return;
+            if (Root.Graph.Table[Name] == Id)
+            {
+                HashId currId = await Root.Files.HashFileAsync(Name);
+                if (currId == Id) return;
+            }
 
             if (!Parent.IsArchive)
             {
@@ -70,7 +74,7 @@
                     string targetFilePath = Path.Combine(Root.GamePath, Name);
                     await Root.Files.LinkFileAsync(sourceFilePath, targetFilePath);
 
-                    if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id)
+                    if (Root.BasePack.Graph.Table.TryGetValue(Name, out HashId id) && id == Id)
                     {
                         await Root.BasePack.RemoveModuleAsync(Name);
                     }
@@ -94,7 +98,7 @@
 
                 await Root.Files.CommitFileAsync(file);
 
-                if (Root.BasePack.Graph.Table.TryGetValue(Name, out Guid id) && id == Id)
+                if (Root.BasePack.Graph.Table.TryGetValue(Name, out HashId id) && id == Id)
                 {
                     await Root.BasePack.RemoveModuleAsync(Name);
                 }

@@ -152,7 +152,7 @@ namespace ModLoader.Core
 
             foreach (var entry in entries.Where(entry => !entry.StartsWith("_pack") && !entry.StartsWith("_meta") && !entry.StartsWith("_fallback") && !entry.EndsWith("\\")))
             {
-                Guid id = Graph.Table[entry];
+                HashId id = Graph.Table[entry];
 
                 if (entry.EndsWith(".diff"))
                 {
@@ -193,7 +193,7 @@ namespace ModLoader.Core
 
                 foreach (var name in namesToBurn)
                 {
-                    Members.Add(name, new Burn(this, name, Guid.NewGuid()));
+                    Members.Add(name, new Burn(this, name, HashId.NewHashId()));
                 }
             }
 

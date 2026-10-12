@@ -1,4 +1,7 @@
-﻿namespace ModLoader.Core
+﻿
+using System.Security.Cryptography;
+
+namespace ModLoader.Core
 {
     using Abstract;
     using Persistence.Mutable;
@@ -69,7 +72,11 @@
                 Graph = new Graph();
                 foreach (string filePath in Directory.EnumerateFiles(Parent.GamePath, "*.*", SearchOption.AllDirectories))
                 {
-                    Graph.Table.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), Guid.NewGuid());
+                    using (var stream = File.OpenRead(filePath))
+                    {
+                        HashId id = new HashId(await SHA256.HashDataAsync(stream));
+                        Graph.Table.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), id);
+                    }
                 }
 
                 using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
@@ -91,7 +98,7 @@
             foreach (var entry in entries)
             {
                 string name = entry.ToLowerInvariant();
-                if (Graph.Table.TryGetValue(name, out Guid id))
+                if (Graph.Table.TryGetValue(name, out HashId id))
                 {
                     var module = new Module(this, name, id);
                     Members.Add(name, module);
@@ -118,10 +125,15 @@
                 !File.Exists(packFilePath))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
-                using (var stream = File.Create(packFilePath))
+                try
                 {
+                    using var stream = File.Create(packFilePath);
                     await Parent.Files.PullFileAsync(name, stream);
                     return true;
+                }
+                catch (ArgumentException)
+                {
+                    return false;
                 }
             }
             else

@@ -104,7 +104,7 @@ namespace ModLoader.Core
             XunkLoader.Register(new PatchLoader());
         }
 
-        public Patch(Pack parent, string name, Guid id) : base(parent, name, id)
+        public Patch(Pack parent, string name, HashId id) : base(parent, name, id)
         {
         }
 

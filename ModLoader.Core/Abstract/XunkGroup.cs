@@ -46,7 +46,7 @@
 
         IEnumerable<IPotential<T>> IGroup<IPotential<T>>.Members => Xunks;
 
-        public XunkGroup(IPackBase parent, string name, Guid id) : base(parent, name, id)
+        public XunkGroup(IPackBase parent, string name, HashId id) : base(parent, name, id)
         {
             Xunks = new HashSet<IPotential<T>>();
             Base = this.ResolveFull().FirstOrDefault(r => r.GetType() == typeof(Module)) as Module;
@@ -56,7 +56,7 @@
                 Errors.Add(new InvalidOperationException($"Attempted to initialize a xunk group with no viable base.\nOffending module: {this}"));
         }
 
-        public XunkGroup(IPackBase parent, string name, Module @base, HashSet<IPotential<T>> xunks) : base(parent, name, Guid.NewGuid())
+        public XunkGroup(IPackBase parent, string name, Module @base, HashSet<IPotential<T>> xunks) : base(parent, name, HashId.NewHashId())
         {
             Xunks = xunks;
             Base = @base;
