@@ -64,7 +64,7 @@
 
                 File.Delete(Path.Combine(Parent.ModPath, Name, "_pack.json"));
             }
-            else 
+            else
             {
                 Graph = new Graph();
                 foreach (string filePath in Directory.EnumerateFiles(Parent.GamePath, "*.*", SearchOption.AllDirectories))
@@ -111,25 +111,23 @@
             }
         }
 
-        public Task<bool> CopyModuleAsync(string name)
+        public async Task<bool> CopyModuleAsync(string name)
         {
-            return Task.Run(() =>
+            string packFilePath = Path.Combine(Parent.ModPath, Name, name);
+            if (Graph.Table.ContainsKey(name) &&
+                !File.Exists(packFilePath))
             {
-                string gameFilePath = Path.Combine(Parent.GamePath, name);
-                string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (Graph.Table.ContainsKey(name) &&
-                    !File.Exists(packFilePath) &&
-                    File.Exists(gameFilePath))
+                Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
+                using (var stream = File.Create(packFilePath))
                 {
-                    Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
-                    File.Copy(gameFilePath, packFilePath, true);
+                    await Parent.Files.PullFileAsync(name, stream);
                     return true;
                 }
-                else
-                {
-                    return false;
-                }
-            });
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public Task<bool> RemoveModuleAsync(string name)

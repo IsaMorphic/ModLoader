@@ -16,6 +16,8 @@
     {
         Task MountAsync();
 
+        Task<HashId> PullFileAsync(string path, Stream stream);
+
         Task<StagedFile> StageFileAsync(string path);
         Task UnstageFileAsync(StagedFile file);
 

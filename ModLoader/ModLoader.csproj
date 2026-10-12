@@ -23,6 +23,7 @@
     <EmbeddedResource Include="Logo\Translucent.png" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ModLoader.Core.Plugins\ModLoader.Core.Plugins.csproj" />
     <ProjectReference Include="..\ModLoader.Core\ModLoader.Core.csproj" />
   </ItemGroup>
   <ItemGroup>

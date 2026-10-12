@@ -4,6 +4,7 @@ using FluentFTP.Helpers;
 namespace ModLoader.Core.Plugins
 {
     using Interfaces;
+    using Utilities.Hashing;
 
     public class FTPFileSystem : IFileSystem
     {
@@ -53,6 +54,31 @@ namespace ModLoader.Core.Plugins
                 Client = new FtpClient(HostName, UserName, Password);
                 Client.AutoConnect();
             });
+        }
+
+        public async Task<HashId> PullFileAsync(string path, Stream stream)
+        {
+            string localFilePath = LocalDir.CombineLocalPath(path);
+
+            string localFileDir = localFilePath.GetFtpDirectoryName();
+            string localFileName = localFilePath.GetFtpFileName();
+
+            Client.SetWorkingDirectory(localFileDir);
+
+            var check = await CheckFileAsync(localFileName);
+
+            if (check.exists)
+            {
+                using (var sha256Stream = new SHA256Stream(stream))
+                {
+                    Client.DownloadStream(sha256Stream, check.realName);
+                    return sha256Stream.GetHash();
+                }
+            }
+            else
+            {
+                throw new ArgumentException($"File '{path}' not found on FTP server.");
+            }
         }
 
         public Task<StagedFile> StageFileAsync(string path)
