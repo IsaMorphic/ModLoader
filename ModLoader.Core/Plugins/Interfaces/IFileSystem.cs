@@ -1,7 +1,7 @@
-﻿using ModLoader.Core.Utilities.Hashing;
-
-namespace ModLoader.Core.Plugins.Interfaces
+﻿namespace ModLoader.Core.Plugins.Interfaces
 {
+    using Utilities.Hashing;
+
     public class StagedFile
     {
         public string Path { get; }

@@ -25,7 +25,7 @@ namespace ModLoader.Core.Persistence.Types
         {
             if (obj is HashId hash && typeId == TypeId) 
             {
-                Span<byte> hashBytes = MemoryMarshal.AsBytes(new Span<HashId>(ref hash));
+                ReadOnlySpan<byte> hashBytes = MemoryMarshal.AsBytes(new ReadOnlySpan<HashId>(ref hash));
                 instance.BaseStream.Write(hashBytes);
             }
             else if (typeId != TypeId)
