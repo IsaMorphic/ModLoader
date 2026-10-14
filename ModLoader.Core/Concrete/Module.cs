@@ -71,7 +71,7 @@
                     await Root.BasePack.CopyModuleAsync(Name);
 
                     string sourceFilePath = Path.Combine(Root.ModPath, Parent.Name + ".pack", Name);
-                    string targetFilePath = Path.Combine(Root.GamePath, Name);
+                    string targetFilePath = Path.Combine(Root.Config.GamePath, Name);
                     await Root.Files.LinkFileAsync(sourceFilePath, targetFilePath);
 
                     if (Root.BasePack.Graph.Table.TryGetValue(Name, out HashId id) && id == Id)

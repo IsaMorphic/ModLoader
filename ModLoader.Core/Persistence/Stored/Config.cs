@@ -77,6 +77,9 @@ namespace ModLoader.Core.Persistence.Stored
         [SnabField]
         public string GamePath { get; set; }
 
+        [SnabField]
+        public bool UseFullBackup { get; set; }
+
         [SnabField("Packs", SnabType.Array)]
         public Pack[] Packs { get; set; }
 

@@ -30,10 +30,10 @@
             });
         }
 
-        public async Task AddGameAsync(string name, string gamePath)
+        public async Task AddGameAsync(string name, string gamePath, bool useFullBackup)
         {
             var game = new Game(this, name);
-            await game.InitializeAsync(gamePath);
+            await game.InitializeAsync(gamePath, useFullBackup);
             Games.Add(game);
         }
 

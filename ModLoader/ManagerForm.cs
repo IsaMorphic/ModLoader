@@ -48,7 +48,7 @@ namespace ModLoader
                 Hide();
                 var waiter = new WaitingForm();
                 waiter.Show();
-                await GameManager.AddGameAsync(dialog.GameName, dialog.GamePath);
+                await GameManager.AddGameAsync(dialog.GameName, dialog.GamePath, dialog.UseFullBackup);
                 GameList.Items.Clear();
                 GameList.Items.AddRange(GameManager.Games.ToArray());
                 waiter.Close();

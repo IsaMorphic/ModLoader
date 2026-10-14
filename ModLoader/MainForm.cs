@@ -364,7 +364,7 @@ namespace ModLoader
             ProcessStartInfo startInfo = new ProcessStartInfo
             {
                 FileName = "explorer.exe",
-                Arguments = Game.GamePath,
+                Arguments = Game.Config.GamePath,
                 UseShellExecute = true
             };
 

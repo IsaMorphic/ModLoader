@@ -72,12 +72,31 @@ namespace ModLoader.Core
             else
             {
                 Graph = new Graph();
-                foreach (string filePath in Directory.EnumerateFiles(Parent.GamePath, "*.*", SearchOption.AllDirectories))
+                foreach (string filePath in Directory.EnumerateFiles(Parent.Config.GamePath, "*.*", SearchOption.AllDirectories))
                 {
+                    string name = Path.GetRelativePath(Parent.Config.GamePath, filePath);
                     using (var stream = File.OpenRead(filePath))
                     {
-                        HashId id = new HashId(await SHA256.HashDataAsync(stream));
-                        Graph.Table.Add(Path.GetRelativePath(Parent.GamePath, filePath).ToLowerInvariant(), id);
+                        HashId id;
+                        if (Parent.Config.UseFullBackup)
+                        {
+                            string copyFilePath = Path.Combine(Parent.ModPath, Name, name);
+                            string dirPath = Path.GetDirectoryName(copyFilePath);
+                            Directory.CreateDirectory(dirPath);
+
+                            using (var copyStream = File.Create(copyFilePath))
+                            using (var sha256Stream = new SHA256Stream(copyStream))
+                            {
+                                await stream.CopyToAsync(sha256Stream);
+                                id = sha256Stream.GetHash();
+                            }
+                        }
+                        else 
+                        {
+                            id = new(await SHA256.HashDataAsync(stream));
+                        }
+
+                        Graph.Table.Add(name.ToLowerInvariant(), id);
                     }
                 }
 
@@ -94,8 +113,8 @@ namespace ModLoader.Core
                     !entry.StartsWith("_pack") &&
                     !entry.StartsWith("_meta") &&
                     !entry.StartsWith("_fallback"));
-            var gameFiles = Directory.EnumerateFiles(Parent.GamePath, "*.*", SearchOption.AllDirectories)
-                .Select(entry => Path.GetRelativePath(Parent.GamePath, entry.ToLowerInvariant()));
+            var gameFiles = Directory.EnumerateFiles(Parent.Config.GamePath, "*.*", SearchOption.AllDirectories)
+                .Select(entry => Path.GetRelativePath(Parent.Config.GamePath, entry.ToLowerInvariant()));
             HashSet<string> entries = [.. packFiles, .. gameFiles];
             foreach (var entry in entries)
             {
@@ -123,7 +142,8 @@ namespace ModLoader.Core
         public async Task<bool> CopyModuleAsync(string name)
         {
             string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-            if (Graph.Table.TryGetValue(name, out HashId cachedId) &&
+            if (!Parent.Config.UseFullBackup && 
+                Graph.Table.TryGetValue(name, out HashId cachedId) &&
                 !File.Exists(packFilePath))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
@@ -158,7 +178,7 @@ namespace ModLoader.Core
             return Task.Run(() =>
             {
                 string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (File.Exists(packFilePath))
+                if (File.Exists(packFilePath) && !Parent.Config.UseFullBackup)
                 {
                     File.Delete(packFilePath);
                     return true;
