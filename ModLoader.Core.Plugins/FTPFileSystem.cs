@@ -4,7 +4,6 @@ using FluentFTP.Helpers;
 namespace ModLoader.Core.Plugins
 {
     using Interfaces;
-    using Utilities.Hashing;
 
     public class FTPFileSystem : IFileSystem
     {
