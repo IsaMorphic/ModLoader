@@ -80,7 +80,7 @@ namespace ModLoader.Core
                         HashId id;
                         if (Parent.Config.UseFullBackup)
                         {
-                            string copyFilePath = Path.Combine(Parent.ModPath, name);
+                            string copyFilePath = Path.Combine(Parent.ModPath, Name, name);
                             string dirPath = Path.GetDirectoryName(copyFilePath);
                             Directory.CreateDirectory(dirPath);
 
