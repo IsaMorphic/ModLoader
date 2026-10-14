@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 namespace ModLoader.Core
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct HashId : IEquatable<HashId>
+    public readonly struct HashId : IEquatable<HashId>
     {
         private readonly ulong _a, _b, _c, _d;
 

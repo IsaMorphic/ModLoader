@@ -4,7 +4,9 @@ using System.Security.Cryptography;
 namespace ModLoader.Core
 {
     using Abstract;
+    using Exceptions;
     using Persistence.Mutable;
+    using Utilities.Hashing;
 
     public class BasePack : IPackBase
     {
@@ -121,25 +123,34 @@ namespace ModLoader.Core
         public async Task<bool> CopyModuleAsync(string name)
         {
             string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-            if (Graph.Table.ContainsKey(name) &&
+            if (Graph.Table.TryGetValue(name, out HashId cachedId) &&
                 !File.Exists(packFilePath))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(packFilePath));
                 try
                 {
-                    using var stream = File.Create(packFilePath);
-                    await Parent.Files.PullFileAsync(name, stream);
-                    return true;
+                    HashId actualId;
+                    using (var stream = File.Create(packFilePath))
+                    using (var sha256Stream = new SHA256Stream(stream))
+                    {
+                        await Parent.Files.PullFileAsync(name, sha256Stream);
+                        actualId = sha256Stream.GetHash();
+                    }
+
+                    if (actualId == cachedId)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        File.Delete(packFilePath);
+                        throw new HashMismatchException($"Hash mismatch for base module '{name}'. Restore the original file before loading your mods!");
+                    }
                 }
-                catch (ArgumentException)
-                {
-                    return false;
-                }
+                catch (ArgumentException) { }
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public Task<bool> RemoveModuleAsync(string name)
