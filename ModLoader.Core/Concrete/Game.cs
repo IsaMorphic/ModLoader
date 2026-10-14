@@ -6,7 +6,6 @@ namespace ModLoader.Core
     using Concrete;
     using Exceptions;
     using Filters;
-    using Plugins;
     using Plugins.Interfaces;
     using Utilities;
 
@@ -20,7 +19,6 @@ namespace ModLoader.Core
         public string ModPath { get; }
         public string PluginPath { get; }
         public string TempPath { get; }
-        public string GamePath { get; private set; }
 
         public string GraphPath { get; }
         public string ConfigPath { get; }
@@ -110,13 +108,11 @@ namespace ModLoader.Core
                     );
         }
 
-        public async Task InitializeAsync(string gamePath)
+        public async Task InitializeAsync(string gamePath, bool useFullBackup)
         {
             Directory.CreateDirectory(BasePath);
 
-            GamePath = gamePath;
-
-            Config = new() { GamePath = gamePath };
+            Config = new() { GamePath = gamePath, UseFullBackup = useFullBackup };
             Config.TryAddHandler(
                 new Persistence.Mutable.Config.Handler()
                 {
@@ -254,7 +250,7 @@ namespace ModLoader.Core
                     pluginConfig = new() { Name = fsHandler.Type };
                 }
 
-                pluginConfig.Items.TryAdd("LocalDir", GamePath);
+                pluginConfig.Items.TryAdd("LocalDir", Config.GamePath);
                 pluginConfig.Items.TryAdd("TempDir", TempPath);
 
                 Files = plugin.CreateInstance(pluginConfig.Items);
@@ -280,8 +276,6 @@ namespace ModLoader.Core
 
                 File.Delete(Path.ChangeExtension(ConfigPath, ".json"));
             }
-
-            GamePath = Config.GamePath;
         }
 
         public async Task LoadConfigAsync()
@@ -412,7 +406,7 @@ namespace ModLoader.Core
             var startInfo = new ProcessStartInfo(ScriptPath);
 
             startInfo.WorkingDirectory = BasePath;
-            startInfo.Environment["GAME_PATH"] = GamePath;
+            startInfo.Environment["GAME_PATH"] = Config.GamePath;
             startInfo.UseShellExecute = false;
 
             var proc = Process.Start(startInfo);
@@ -423,10 +417,10 @@ namespace ModLoader.Core
 
         public Task RunGameAsync()
         {
-            var exePath = Directory.EnumerateFiles(GamePath, "*.exe").Single();
+            var exePath = Directory.EnumerateFiles(Config.GamePath, "*.exe").Single();
 
             var startInfo = new ProcessStartInfo(exePath)
-            { WorkingDirectory = GamePath };
+            { WorkingDirectory = Config.GamePath };
 
             var proc = Process.Start(startInfo);
             return Task.Run(proc.WaitForExit);

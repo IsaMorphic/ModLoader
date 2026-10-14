@@ -34,6 +34,8 @@
             AddButton = new System.Windows.Forms.Button();
             Step33Label = new System.Windows.Forms.Label();
             NameEntry = new System.Windows.Forms.TextBox();
+            label1 = new System.Windows.Forms.Label();
+            fullBackupCheckBox = new System.Windows.Forms.CheckBox();
             SuspendLayout();
             // 
             // Step1Label
@@ -60,7 +62,7 @@
             // AddButton
             // 
             AddButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 11F);
-            AddButton.Location = new System.Drawing.Point(11, 277);
+            AddButton.Location = new System.Drawing.Point(9, 359);
             AddButton.Name = "AddButton";
             AddButton.Size = new System.Drawing.Size(538, 69);
             AddButton.TabIndex = 7;
@@ -86,11 +88,32 @@
             NameEntry.Size = new System.Drawing.Size(537, 38);
             NameEntry.TabIndex = 9;
             // 
+            // label1
+            // 
+            label1.Font = new System.Drawing.Font("Lucida Console", 11F);
+            label1.Location = new System.Drawing.Point(9, 251);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(538, 45);
+            label1.TabIndex = 10;
+            label1.Text = "Step 3: Choose backup type";
+            label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // fullBackupCheckBox
+            // 
+            fullBackupCheckBox.Location = new System.Drawing.Point(9, 299);
+            fullBackupCheckBox.Name = "fullBackupCheckBox";
+            fullBackupCheckBox.Size = new System.Drawing.Size(539, 54);
+            fullBackupCheckBox.TabIndex = 11;
+            fullBackupCheckBox.Text = "Use Full Backup";
+            fullBackupCheckBox.UseVisualStyleBackColor = true;
+            // 
             // GameForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(13F, 32F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            ClientSize = new System.Drawing.Size(559, 376);
+            ClientSize = new System.Drawing.Size(559, 440);
+            Controls.Add(fullBackupCheckBox);
+            Controls.Add(label1);
             Controls.Add(NameEntry);
             Controls.Add(Step33Label);
             Controls.Add(AddButton);
@@ -116,6 +139,8 @@
         private System.Windows.Forms.Button AddButton;
         private System.Windows.Forms.Label Step33Label;
         private System.Windows.Forms.TextBox NameEntry;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.CheckBox fullBackupCheckBox;
     }
 }
 

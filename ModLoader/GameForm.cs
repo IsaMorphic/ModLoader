@@ -9,6 +9,7 @@ namespace ModLoader
     {
         public string GamePath { get; private set; }
         public string GameName { get; private set; }
+        public bool UseFullBackup { get; private set; }
 
         public GameForm()
         {
@@ -19,7 +20,7 @@ namespace ModLoader
         {
             FolderDialog.ShowDialog();
 
-            if(!Directory.Exists(FolderDialog.SelectedPath))
+            if (!Directory.Exists(FolderDialog.SelectedPath))
             {
                 MessageBox.Show("The folder you have selected does not exist.  Please select a valid folder.", "Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
@@ -34,6 +35,7 @@ namespace ModLoader
                 GameName = !string.IsNullOrEmpty(NameEntry.Text) &&
                         !NameEntry.Text.Any(c => Path.GetInvalidFileNameChars().Contains(c)) ?
                          NameEntry.Text : throw new Exception("The user has failed to enter a valid game name. Game names must be a valid file-name on the host system and cannot be empty.");
+                UseFullBackup = fullBackupCheckBox.Checked;
                 Close();
             }
             catch (Exception ex)

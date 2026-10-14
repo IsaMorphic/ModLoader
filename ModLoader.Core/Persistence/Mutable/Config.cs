@@ -185,6 +185,8 @@ namespace ModLoader.Core.Persistence.Mutable
 
         public string GamePath { get; set; }
 
+        public bool UseFullBackup { get; set; }
+
         public Dictionary<string, Pack> Packs { get; }
 
         public Dictionary<string, object> Handlers { get; }
@@ -198,6 +200,8 @@ namespace ModLoader.Core.Persistence.Mutable
             Plugins = new();
 
             GamePath = config.GamePath;
+
+            UseFullBackup = config.UseFullBackup;
 
             foreach (var pack in config.Packs)
             {
@@ -227,6 +231,7 @@ namespace ModLoader.Core.Persistence.Mutable
             var config = new Stored.Config()
             {
                 GamePath = GamePath,
+                UseFullBackup = UseFullBackup,
             };
 
             List<Stored.Config.Pack> packs = new();
