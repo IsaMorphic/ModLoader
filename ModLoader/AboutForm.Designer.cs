@@ -85,7 +85,7 @@
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(1168, 69);
             label1.TabIndex = 1;
-            label1.Text = "ModLoader v1.22.0.0";
+            label1.Text = "ModLoader v1.22.1.0";
             label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label9
