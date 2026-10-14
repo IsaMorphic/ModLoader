@@ -7,6 +7,15 @@ namespace ModLoader.Core.Utilities
 
     public class PackBuilder
     {
+        private static readonly HashSet<string> _reservedNames =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "_pack.png",
+                "_meta.snab",
+                "_pack.snab",
+                "_fallback.txt"
+            };
+
         private string InputDir { get; }
         private string OutputDir { get; }
 
@@ -58,7 +67,9 @@ namespace ModLoader.Core.Utilities
             {
                 foreach (var file in Directory.EnumerateFiles(InputDir, "*.*", SearchOption.AllDirectories))
                 {
-                    var name = file.Replace(InputDir, "").Trim('\\').ToLowerInvariant();
+                    var name = Path.GetRelativePath(InputDir, file).Trim('\\').ToLowerInvariant();
+                    if (_reservedNames.Contains(name)) continue;
+
                     var entry = archive.CreateEntry(name);
 
                     HashId id;
@@ -80,8 +91,7 @@ namespace ModLoader.Core.Utilities
                             break;
                     }
 
-                    if (name != "_fallback.txt")
-                        graph.Table.Add(name, id);
+                    graph.Table.Add(name, id);
                 }
 
                 using (var entryStream = archive.CreateEntry("_pack.png").Open())
