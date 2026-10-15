@@ -178,7 +178,7 @@ namespace ModLoader.Core
             return Task.Run(() =>
             {
                 string packFilePath = Path.Combine(Parent.ModPath, Name, name);
-                if (File.Exists(packFilePath) && !Parent.Config.UseFullBackup)
+                if (!Parent.Config.UseFullBackup && File.Exists(packFilePath))
                 {
                     File.Delete(packFilePath);
                     return true;
