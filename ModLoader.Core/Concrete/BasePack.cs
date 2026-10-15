@@ -102,7 +102,7 @@ namespace ModLoader.Core
 
                 using (var stream = File.OpenWrite(Path.Combine(Parent.ModPath, Name, "_pack.snab")))
                 {
-                    await Graph.WriteToStreamAsync(stream);
+                    await Graph.WriteToStreamAsync(stream, compressed: true);
                 }
             }
 
