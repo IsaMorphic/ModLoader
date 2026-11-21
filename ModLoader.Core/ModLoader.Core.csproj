@@ -5,14 +5,14 @@
 		<Product>ModLoader</Product>
 		<Company>Chosen Few Software</Company>
 		<Authors>IsaMorphic</Authors>
-		<Version>1.22.10</Version>
+		<Version>1.22.11</Version>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ChosenFewSoftware.SnabNet" Version="1.1.27" />
-		<PackageReference Include="ChosenFewSoftware.SnabNet.SourceGenerators" Version="1.1.27" />
+		<PackageReference Include="ChosenFewSoftware.SnabNet" Version="1.1.28" />
+		<PackageReference Include="ChosenFewSoftware.SnabNet.SourceGenerators" Version="1.1.28" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
 	</ItemGroup>
 	
